@@ -79,13 +79,13 @@
 
         <!-- 星期標題列 -->
         <div class="grid grid-cols-7 gap-1 px-4 pt-4 pb-2 text-center text-sm font-semibold text-slate-500">
-            <div class="text-rose-400">日</div>
             <div>一</div>
             <div>二</div>
             <div>三</div>
             <div>四</div>
             <div>五</div>
             <div class="text-sky-400">六</div>
+            <div class="text-rose-400">日</div>
         </div>
 
         <!-- 日期網格 -->
@@ -162,12 +162,13 @@
                 yearSelect.value = year;
                 monthSelect.value = month;
 
-                const firstDayOfMonth = new Date(year, month, 1).getDay(); // 本月第一天是星期幾 (0-6)
+                const firstDayOfMonth = new Date(year, month, 1).getDay(); // 本月第一天是星期幾 (0-6, 0=日)
+                const adjustedFirstDay = (firstDayOfMonth + 6) % 7; // 將星期一調整為 0，星期日調整為 6
                 const daysInMonth = new Date(year, month + 1, 0).getDate(); // 本月總天數
                 const daysInPrevMonth = new Date(year, month, 0).getDate(); // 上個月總天數
 
                 // 1. 填補上個月的尾部日期
-                for (let i = firstDayOfMonth; i > 0; i--) {
+                for (let i = adjustedFirstDay; i > 0; i--) {
                     const dayNum = daysInPrevMonth - i + 1;
                     const dayDiv = document.createElement('div');
                     dayDiv.className = 'py-2 flex justify-center items-center';
@@ -224,7 +225,7 @@
                 }
 
                 // 3. 填補下個月的首部日期 (維持 6 行 7 列的網格，共 42 格)
-                const totalCellsRendered = firstDayOfMonth + daysInMonth;
+                const totalCellsRendered = adjustedFirstDay + daysInMonth;
                 const remainingCells = 42 - totalCellsRendered;
                 
                 for (let i = 1; i <= remainingCells; i++) {
