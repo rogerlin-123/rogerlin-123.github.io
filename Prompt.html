@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>提示詞 7 段式寫法產生器</title>
+    <title>AI 提示詞 7 段式寫法產生器</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
@@ -36,7 +36,7 @@
         <!-- 頂部標題區 -->
         <div class="text-center mb-8">
             <h1 class="text-4xl md:text-5xl font-black text-gray-800 mb-3 tracking-wide">
-                GPT <span class="text-amber-800">提示詞</span> 7 段式寫法
+                AI <span class="text-amber-800">提示詞</span> 7 段式寫法
             </h1>
             <div class="flex items-center justify-center gap-4">
                 <div class="h-[2px] w-12 bg-amber-600/50"></div>
@@ -58,7 +58,7 @@
                             <div class="text-xs text-gray-400 mt-0.5">AI要扮演什麼角色？</div>
                         </div>
                     </div>
-                    <textarea class="w-full md:w-2/3 bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm md:text-base focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all resize-none" rows="2" data-label="角色 (Role)">專業的中英翻譯官</textarea>
+                    <textarea class="w-full md:w-2/3 bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm md:text-base focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all resize-none" rows="2" data-label="角色 (Role)">資深的資訊安全網路工程師</textarea>
                 </div>
 
                 <!-- Item 2 -->
@@ -70,7 +70,7 @@
                             <div class="text-xs text-gray-400 mt-0.5">語氣、風格、協作方式</div>
                         </div>
                     </div>
-                    <textarea class="w-full md:w-2/3 bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm md:text-base focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all resize-none" rows="2" data-label="人設 (Personality)">語氣正式、精確，翻譯自然流暢，不要使用過於口語化或地區性的俚語。</textarea>
+                    <textarea class="w-full md:w-2/3 bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm md:text-base focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all resize-none" rows="2" data-label="人設 (Personality)">專業、嚴謹、客觀，具備高度的資安危機意識，擅長分析網路架構與風險評估。</textarea>
                 </div>
 
                 <!-- Item 3 -->
@@ -82,7 +82,7 @@
                             <div class="text-xs text-gray-400 mt-0.5">你最後想得到什麼成果？</div>
                         </div>
                     </div>
-                    <textarea class="w-full md:w-2/3 bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm md:text-base focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all resize-none" rows="3" data-label="目標 (Goal)">將我隨後提供的一篇「人工智慧科技新聞」的英文報導，完整翻譯成繁體中文，並整理出 3 個核心重點。</textarea>
+                    <textarea class="w-full md:w-2/3 bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm md:text-base focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all resize-none" rows="3" data-label="目標 (Goal)">分析我隨後提供的一段防火牆日誌 (Firewall Log) 或網路架構說明，找出潛在的資安漏洞，並提供具體的修補與防禦策略。</textarea>
                 </div>
 
                 <!-- Item 4 -->
@@ -94,7 +94,7 @@
                             <div class="text-xs text-gray-400 mt-0.5">怎樣才算完成得好？</div>
                         </div>
                     </div>
-                    <textarea class="w-full md:w-2/3 bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm md:text-base focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all resize-none" rows="2" data-label="成功標準 (Success)">專業術語翻譯正確，文句符合中文閱讀習慣，且能精準抓出文章的重點摘要。</textarea>
+                    <textarea class="w-full md:w-2/3 bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm md:text-base focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all resize-none" rows="3" data-label="成功標準 (Success)">能精準識別可能的攻擊手法（如 Port Scan, DDoS, SQLi 等），並遵循零信任 (Zero Trust) 原則給出建議，建議需具備實務可操作性。</textarea>
                 </div>
 
                 <!-- Item 5 -->
@@ -106,7 +106,7 @@
                             <div class="text-xs text-gray-400 mt-0.5">不能做什麼？有哪些邊界？</div>
                         </div>
                     </div>
-                    <textarea class="w-full md:w-2/3 bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm md:text-base focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all resize-none" rows="3" data-label="約束 (Constraints)">不要隨意刪減原文內容。遇到不確定的專有名詞時，請保留英文，並在後方用括號附註你的理解。</textarea>
+                    <textarea class="w-full md:w-2/3 bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm md:text-base focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all resize-none" rows="3" data-label="約束 (Constraints)">不要提供具備攻擊性或破壞性的測試腳本。假設企業預算有限，請優先考慮使用現有設備功能或開源工具來強化防護。</textarea>
                 </div>
 
                 <!-- Item 6 -->
@@ -118,7 +118,7 @@
                             <div class="text-xs text-gray-400 mt-0.5">格式、長度、語氣、呈現方式</div>
                         </div>
                     </div>
-                    <textarea class="w-full md:w-2/3 bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm md:text-base focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all resize-none" rows="3" data-label="輸出 (Output)">使用 Markdown 格式輸出。先列出「核心重點摘要」（條列式），接著再提供「完整翻譯內容」，段落要分明。</textarea>
+                    <textarea class="w-full md:w-2/3 bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm md:text-base focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all resize-none" rows="3" data-label="輸出 (Output)">使用 Markdown 格式輸出。包含三大區塊：1. 威脅分析摘要；2. 漏洞詳細說明（請標示風險等級：高/中/低）；3. 防禦建議（分為「立即處置」與「長期規劃」）。</textarea>
                 </div>
 
                 <!-- Item 7 -->
@@ -130,7 +130,7 @@
                             <div class="text-xs text-gray-400 mt-0.5">何時要暫停、追問？</div>
                         </div>
                     </div>
-                    <textarea class="w-full md:w-2/3 bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm md:text-base focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all resize-none" rows="2" data-label="停止規則 (Stop rules)">如果你準備好了，請回答「我已準備好，請提供英文報導」，不要急著產生其他內容。</textarea>
+                    <textarea class="w-full md:w-2/3 bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm md:text-base focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all resize-none" rows="2" data-label="停止規則 (Stop rules)">如果你完全理解了，請回答「我已準備好，請提供您的防火牆日誌或網路架構資訊」，請勿直接產生任何分析內容。</textarea>
                 </div>
 
             </form>
