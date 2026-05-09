@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>提示詞 7 段式寫法產生器</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #F8F5EE; /* 溫暖的米黃色背景 */
+        }
+        /* 自定義滾動條 */
+        textarea::-webkit-scrollbar {
+            width: 8px;
+        }
+        textarea::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+            border-radius: 4px;
+        }
+        textarea::-webkit-scrollbar-thumb {
+            background: #ccc; 
+            border-radius: 4px;
+        }
+        textarea::-webkit-scrollbar-thumb:hover {
+            background: #aaa; 
+        }
+    </style>
+</head>
+<body class="text-gray-800 p-4 md:p-8 min-h-screen flex flex-col items-center">
+
+    <!-- 主要容器 -->
+    <div class="max-w-4xl w-full">
+        
+        <!-- 頂部標題區 -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl md:text-5xl font-black text-gray-800 mb-3 tracking-wide">
+                GPT <span class="text-amber-800">提示詞</span> 7 段式寫法
+            </h1>
+            <div class="flex items-center justify-center gap-4">
+                <div class="h-[2px] w-12 bg-amber-600/50"></div>
+                <p class="text-amber-800 font-bold text-lg md:text-xl">重點不是把指令寫很長，而是把目標、邊界與輸出說清楚</p>
+                <div class="h-[2px] w-12 bg-amber-600/50"></div>
+            </div>
+        </div>
+
+        <!-- 表單區塊 -->
+        <div class="bg-white rounded-2xl shadow-lg border border-amber-100 p-6 md:p-8 mb-8">
+            <form id="prompt-form" class="space-y-6">
+                
+                <!-- Item 1 -->
+                <div class="flex flex-col md:flex-row md:items-start gap-4 border-b border-gray-100 pb-6">
+                    <div class="md:w-1/3 flex items-center gap-3 shrink-0 mt-2">
+                        <div class="w-8 h-8 rounded bg-red-700 text-white font-bold flex items-center justify-center shrink-0">1</div>
+                        <div>
+                            <div class="font-bold text-lg">角色 <span class="text-gray-500 font-normal text-sm">(Role)</span></div>
+                            <div class="text-xs text-gray-400 mt-0.5">AI要扮演什麼角色？</div>
+                        </div>
+                    </div>
+                    <textarea class="w-full md:w-2/3 bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm md:text-base focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all resize-none" rows="2" data-label="角色 (Role)">專業的中英翻譯官</textarea>
+                </div>
+
+                <!-- Item 2 -->
+                <div class="flex flex-col md:flex-row md:items-start gap-4 border-b border-gray-100 pb-6">
+                    <div class="md:w-1/3 flex items-center gap-3 shrink-0 mt-2">
+                        <div class="w-8 h-8 rounded bg-red-700 text-white font-bold flex items-center justify-center shrink-0">2</div>
+                        <div>
+                            <div class="font-bold text-lg">人設 <span class="text-gray-500 font-normal text-sm">(Personality)</span></div>
+                            <div class="text-xs text-gray-400 mt-0.5">語氣、風格、協作方式</div>
+                        </div>
+                    </div>
+                    <textarea class="w-full md:w-2/3 bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm md:text-base focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all resize-none" rows="2" data-label="人設 (Personality)">語氣正式、精確，翻譯自然流暢，不要使用過於口語化或地區性的俚語。</textarea>
+                </div>
+
+                <!-- Item 3 -->
+                <div class="flex flex-col md:flex-row md:items-start gap-4 border-b border-gray-100 pb-6">
+                    <div class="md:w-1/3 flex items-center gap-3 shrink-0 mt-2">
+                        <div class="w-8 h-8 rounded bg-red-700 text-white font-bold flex items-center justify-center shrink-0">3</div>
+                        <div>
+                            <div class="font-bold text-lg">目標 <span class="text-gray-500 font-normal text-sm">(Goal)</span></div>
+                            <div class="text-xs text-gray-400 mt-0.5">你最後想得到什麼成果？</div>
+                        </div>
+                    </div>
+                    <textarea class="w-full md:w-2/3 bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm md:text-base focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all resize-none" rows="3" data-label="目標 (Goal)">將我隨後提供的一篇「人工智慧科技新聞」的英文報導，完整翻譯成繁體中文，並整理出 3 個核心重點。</textarea>
+                </div>
+
+                <!-- Item 4 -->
+                <div class="flex flex-col md:flex-row md:items-start gap-4 border-b border-gray-100 pb-6">
+                    <div class="md:w-1/3 flex items-center gap-3 shrink-0 mt-2">
+                        <div class="w-8 h-8 rounded bg-red-700 text-white font-bold flex items-center justify-center shrink-0">4</div>
+                        <div>
+                            <div class="font-bold text-lg">成功標準 <span class="text-gray-500 font-normal text-sm">(Success)</span></div>
+                            <div class="text-xs text-gray-400 mt-0.5">怎樣才算完成得好？</div>
+                        </div>
+                    </div>
+                    <textarea class="w-full md:w-2/3 bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm md:text-base focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all resize-none" rows="2" data-label="成功標準 (Success)">專業術語翻譯正確，文句符合中文閱讀習慣，且能精準抓出文章的重點摘要。</textarea>
+                </div>
+
+                <!-- Item 5 -->
+                <div class="flex flex-col md:flex-row md:items-start gap-4 border-b border-gray-100 pb-6">
+                    <div class="md:w-1/3 flex items-center gap-3 shrink-0 mt-2">
+                        <div class="w-8 h-8 rounded bg-red-700 text-white font-bold flex items-center justify-center shrink-0">5</div>
+                        <div>
+                            <div class="font-bold text-lg">約束 <span class="text-gray-500 font-normal text-sm">(Constraints)</span></div>
+                            <div class="text-xs text-gray-400 mt-0.5">不能做什麼？有哪些邊界？</div>
+                        </div>
+                    </div>
+                    <textarea class="w-full md:w-2/3 bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm md:text-base focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all resize-none" rows="3" data-label="約束 (Constraints)">不要隨意刪減原文內容。遇到不確定的專有名詞時，請保留英文，並在後方用括號附註你的理解。</textarea>
+                </div>
+
+                <!-- Item 6 -->
+                <div class="flex flex-col md:flex-row md:items-start gap-4 border-b border-gray-100 pb-6">
+                    <div class="md:w-1/3 flex items-center gap-3 shrink-0 mt-2">
+                        <div class="w-8 h-8 rounded bg-red-700 text-white font-bold flex items-center justify-center shrink-0">6</div>
+                        <div>
+                            <div class="font-bold text-lg">輸出 <span class="text-gray-500 font-normal text-sm">(Output)</span></div>
+                            <div class="text-xs text-gray-400 mt-0.5">格式、長度、語氣、呈現方式</div>
+                        </div>
+                    </div>
+                    <textarea class="w-full md:w-2/3 bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm md:text-base focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all resize-none" rows="3" data-label="輸出 (Output)">使用 Markdown 格式輸出。先列出「核心重點摘要」（條列式），接著再提供「完整翻譯內容」，段落要分明。</textarea>
+                </div>
+
+                <!-- Item 7 -->
+                <div class="flex flex-col md:flex-row md:items-start gap-4">
+                    <div class="md:w-1/3 flex items-center gap-3 shrink-0 mt-2">
+                        <div class="w-8 h-8 rounded bg-red-700 text-white font-bold flex items-center justify-center shrink-0">7</div>
+                        <div>
+                            <div class="font-bold text-lg">停止規則 <span class="text-gray-500 font-normal text-sm">(Stop rules)</span></div>
+                            <div class="text-xs text-gray-400 mt-0.5">何時要暫停、追問？</div>
+                        </div>
+                    </div>
+                    <textarea class="w-full md:w-2/3 bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm md:text-base focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all resize-none" rows="2" data-label="停止規則 (Stop rules)">如果你準備好了，請回答「我已準備好，請提供英文報導」，不要急著產生其他內容。</textarea>
+                </div>
+
+            </form>
+        </div>
+
+        <!-- 輸出結果區塊 -->
+        <div class="bg-gray-800 rounded-2xl shadow-xl overflow-hidden relative">
+            <!-- 裝飾頂部 -->
+            <div class="bg-gray-900 px-6 py-3 flex justify-between items-center">
+                <span class="text-gray-300 font-medium text-sm flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    最終提示詞輸出結果
+                </span>
+                <button onclick="copyToClipboard()" class="bg-amber-600 hover:bg-amber-500 text-white px-4 py-1.5 rounded text-sm font-bold transition-colors flex items-center gap-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                    複製純文字
+                </button>
+            </div>
+            
+            <!-- 唯讀輸出框 -->
+            <div class="p-6">
+                <textarea id="final-output" readonly class="w-full h-64 bg-transparent text-gray-200 focus:outline-none resize-none text-base leading-relaxed" spellcheck="false"></textarea>
+            </div>
+            
+            <!-- 複製成功提示 (預設隱藏) -->
+            <div id="toast" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black/80 text-white px-6 py-3 rounded-lg font-bold opacity-0 pointer-events-none transition-opacity duration-300">
+                ✅ 已複製到剪貼簿！
+            </div>
+        </div>
+
+        <div class="text-center text-gray-400 text-sm mt-8 pb-8">
+            將右側內容修改為您的需求，下方結果將自動即時更新。
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const inputs = document.querySelectorAll('#prompt-form textarea');
+            const finalOutput = document.getElementById('final-output');
+
+            // 自動更新輸出內容的邏輯
+            function updateOutput() {
+                let generatedText = "請根據以下指示完成任務：\n\n";
+                
+                inputs.forEach(input => {
+                    const label = input.getAttribute('data-label');
+                    const value = input.value.trim();
+                    if (value) {
+                        generatedText += `【${label}】\n${value}\n\n`;
+                    }
+                });
+
+                finalOutput.value = generatedText;
+            }
+
+            // 監聽所有輸入框的即時變更
+            inputs.forEach(input => {
+                input.addEventListener('input', updateOutput);
+            });
+
+            // 初始化：第一次載入時產生預設文字
+            updateOutput();
+        });
+
+        // 複製到剪貼簿功能
+        function copyToClipboard() {
+            const copyText = document.getElementById("final-output");
+            
+            // 選擇文字
+            copyText.select();
+            copyText.setSelectionRange(0, 99999); // 給行動裝置的相容性
+
+            try {
+                // 使用 document.execCommand 確保在 iframe 中也能運作
+                document.execCommand("copy");
+                
+                // 顯示成功 Toast
+                const toast = document.getElementById("toast");
+                toast.classList.remove("opacity-0");
+                toast.classList.add("opacity-100");
+                
+                // 取消選取狀態
+                window.getSelection().removeAllRanges();
+                
+                // 2秒後隱藏 Toast
+                setTimeout(() => {
+                    toast.classList.remove("opacity-100");
+                    toast.classList.add("opacity-0");
+                }, 2000);
+                
+            } catch (err) {
+                alert("複製失敗，請手動選取複製");
+            }
+        }
+    </script>
+</body>
+</html>
