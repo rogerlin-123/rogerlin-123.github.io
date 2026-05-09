@@ -33,9 +33,9 @@
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden border border-slate-200">
         
         <!-- 頂部控制列 -->
-        <div class="bg-indigo-600 text-white p-5">
+        <div class="bg-sky-100 text-sky-900 p-5">
             <div class="flex justify-between items-center mb-4">
-                <button id="prev-month" class="p-2 hover:bg-indigo-700 rounded-full transition-colors focus:outline-none" aria-label="上個月">
+                <button id="prev-month" class="p-2 hover:bg-sky-200 rounded-full transition-colors focus:outline-none" aria-label="上個月">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                     </svg>
@@ -43,10 +43,10 @@
                 
                 <!-- 年月選擇器 -->
                 <div class="flex space-x-2">
-                    <select id="year-select" class="bg-indigo-500 text-white font-bold text-lg rounded-lg px-3 py-1 pr-8 border border-indigo-400 focus:outline-none focus:ring-2 focus:ring-white cursor-pointer transition-colors hover:bg-indigo-400">
+                    <select id="year-select" class="bg-white text-sky-800 font-bold text-lg rounded-lg px-3 py-1 pr-8 border border-sky-300 focus:outline-none focus:ring-2 focus:ring-sky-400 cursor-pointer transition-colors hover:bg-sky-50">
                         <!-- JavaScript 將自動填充年份 -->
                     </select>
-                    <select id="month-select" class="bg-indigo-500 text-white font-bold text-lg rounded-lg px-3 py-1 pr-8 border border-indigo-400 focus:outline-none focus:ring-2 focus:ring-white cursor-pointer transition-colors hover:bg-indigo-400">
+                    <select id="month-select" class="bg-white text-sky-800 font-bold text-lg rounded-lg px-3 py-1 pr-8 border border-sky-300 focus:outline-none focus:ring-2 focus:ring-sky-400 cursor-pointer transition-colors hover:bg-sky-50">
                         <option value="0">1月</option>
                         <option value="1">2月</option>
                         <option value="2">3月</option>
@@ -62,7 +62,7 @@
                     </select>
                 </div>
 
-                <button id="next-month" class="p-2 hover:bg-indigo-700 rounded-full transition-colors focus:outline-none" aria-label="下個月">
+                <button id="next-month" class="p-2 hover:bg-sky-200 rounded-full transition-colors focus:outline-none" aria-label="下個月">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                     </svg>
@@ -71,7 +71,7 @@
             
             <!-- 回到今天按鈕 -->
             <div class="text-center">
-                <button id="btn-today" class="text-indigo-100 text-sm hover:text-white hover:underline transition-all">
+                <button id="btn-today" class="text-sky-600 text-sm hover:text-sky-800 hover:underline transition-all font-medium">
                     回到今天
                 </button>
             </div>
@@ -79,13 +79,13 @@
 
         <!-- 星期標題列 -->
         <div class="grid grid-cols-7 gap-1 px-4 pt-4 pb-2 text-center text-sm font-semibold text-slate-500">
-            <div class="text-red-500">日</div>
+            <div class="text-rose-400">日</div>
             <div>一</div>
             <div>二</div>
             <div>三</div>
             <div>四</div>
             <div>五</div>
-            <div class="text-indigo-500">六</div>
+            <div class="text-sky-400">六</div>
         </div>
 
         <!-- 日期網格 -->
@@ -185,16 +185,16 @@
                     let spanClasses = 'w-8 h-8 flex items-center justify-center rounded-full cursor-pointer transition-all duration-200 ';
                     
                     if (isToday) {
-                        spanClasses += 'bg-indigo-600 text-white font-bold shadow-md ring-2 ring-indigo-200 ring-offset-1 hover:bg-indigo-700';
+                        spanClasses += 'bg-sky-400 text-white font-bold shadow-md ring-2 ring-sky-200 ring-offset-1 hover:bg-sky-500';
                     } else {
-                        spanClasses += 'text-slate-700 hover:bg-indigo-100 hover:text-indigo-700';
+                        spanClasses += 'text-slate-700 hover:bg-sky-100 hover:text-sky-700';
                     }
 
                     // 處理週末顏色 (紅色/紫色點綴)
                     const currentDayOfWeek = new Date(year, month, i).getDay();
                     if (!isToday) {
-                        if (currentDayOfWeek === 0) spanClasses += ' text-red-500'; // 星期日
-                        if (currentDayOfWeek === 6) spanClasses += ' text-indigo-500'; // 星期六
+                        if (currentDayOfWeek === 0) spanClasses += ' text-rose-500'; // 星期日
+                        if (currentDayOfWeek === 6) spanClasses += ' text-sky-500'; // 星期六
                     }
 
                     dayDiv.innerHTML = `<span class="${spanClasses}">${i}</span>`;
@@ -203,8 +203,8 @@
                     dayDiv.addEventListener('click', () => {
                         // 移除其他日期的選中狀態 (除了今天的特殊樣式)
                         document.querySelectorAll('#calendar-grid span').forEach(span => {
-                            if (!span.classList.contains('bg-indigo-600')) {
-                                span.classList.remove('bg-indigo-100', 'ring-2', 'ring-indigo-300');
+                            if (!span.classList.contains('bg-sky-400')) {
+                                span.classList.remove('bg-sky-100', 'ring-2', 'ring-sky-300');
                             }
                         });
                         
@@ -214,7 +214,7 @@
                         } else {
                             activeMode = 'selected';
                             activeDate = { year, month, day: i };
-                            span.classList.add('bg-indigo-100', 'ring-2', 'ring-indigo-300');
+                            span.classList.add('bg-sky-100', 'ring-2', 'ring-sky-300');
                         }
                         
                         updateBottomText(); // 點擊時立即更新文字
