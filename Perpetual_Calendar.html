@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>萬年曆 Perpetual Calendar</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* 隱藏原生 select 的箭頭，用自定義樣式讓它更好看 */
+        select {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 0.5rem center;
+            background-size: 1em;
+        }
+        
+        /* 簡單的淡入動畫 */
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-slate-100 min-h-screen flex items-center justify-center p-4 font-sans">
+
+    <!-- 萬年曆主要容器 -->
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden border border-slate-200">
+        
+        <!-- 頂部控制列 -->
+        <div class="bg-indigo-600 text-white p-5">
+            <div class="flex justify-between items-center mb-4">
+                <button id="prev-month" class="p-2 hover:bg-indigo-700 rounded-full transition-colors focus:outline-none" aria-label="上個月">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                </button>
+                
+                <!-- 年月選擇器 -->
+                <div class="flex space-x-2">
+                    <select id="year-select" class="bg-indigo-500 text-white font-bold text-lg rounded-lg px-3 py-1 pr-8 border border-indigo-400 focus:outline-none focus:ring-2 focus:ring-white cursor-pointer transition-colors hover:bg-indigo-400">
+                        <!-- JavaScript 將自動填充年份 -->
+                    </select>
+                    <select id="month-select" class="bg-indigo-500 text-white font-bold text-lg rounded-lg px-3 py-1 pr-8 border border-indigo-400 focus:outline-none focus:ring-2 focus:ring-white cursor-pointer transition-colors hover:bg-indigo-400">
+                        <option value="0">1月</option>
+                        <option value="1">2月</option>
+                        <option value="2">3月</option>
+                        <option value="3">4月</option>
+                        <option value="4">5月</option>
+                        <option value="5">6月</option>
+                        <option value="6">7月</option>
+                        <option value="7">8月</option>
+                        <option value="8">9月</option>
+                        <option value="9">10月</option>
+                        <option value="10">11月</option>
+                        <option value="11">12月</option>
+                    </select>
+                </div>
+
+                <button id="next-month" class="p-2 hover:bg-indigo-700 rounded-full transition-colors focus:outline-none" aria-label="下個月">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- 回到今天按鈕 -->
+            <div class="text-center">
+                <button id="btn-today" class="text-indigo-100 text-sm hover:text-white hover:underline transition-all">
+                    回到今天
+                </button>
+            </div>
+        </div>
+
+        <!-- 星期標題列 -->
+        <div class="grid grid-cols-7 gap-1 px-4 pt-4 pb-2 text-center text-sm font-semibold text-slate-500">
+            <div class="text-red-500">日</div>
+            <div>一</div>
+            <div>二</div>
+            <div>三</div>
+            <div>四</div>
+            <div>五</div>
+            <div class="text-indigo-500">六</div>
+        </div>
+
+        <!-- 日期網格 -->
+        <div id="calendar-grid" class="grid grid-cols-7 gap-1 px-4 pb-6 text-center text-sm font-medium fade-in">
+            <!-- JavaScript 將動態生成日期 -->
+        </div>
+        
+        <!-- 底部裝飾或提示區 -->
+        <div class="bg-slate-50 p-3 text-center text-xs text-slate-400 border-t border-slate-100">
+            <span id="selected-date-display">請選擇日期</span>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const yearSelect = document.getElementById('year-select');
+            const monthSelect = document.getElementById('month-select');
+            const prevBtn = document.getElementById('prev-month');
+            const nextBtn = document.getElementById('next-month');
+            const todayBtn = document.getElementById('btn-today');
+            const calendarGrid = document.getElementById('calendar-grid');
+            const selectedDateDisplay = document.getElementById('selected-date-display');
+
+            // 初始化狀態
+            const today = new Date();
+            let currentYear = today.getFullYear();
+            let currentMonth = today.getMonth(); // 0-11
+
+            // 填充年份選單 (1900 - 2100)
+            function populateYears() {
+                const startYear = 1900;
+                const endYear = 2100;
+                for (let i = startYear; i <= endYear; i++) {
+                    const option = document.createElement('option');
+                    option.value = i;
+                    option.textContent = i + '年';
+                    yearSelect.appendChild(option);
+                }
+            }
+
+            // 格式化日期顯示 (例如: 2026年5月9日)
+            function formatDateString(year, month, day) {
+                return `${year}年${month + 1}月${day}日`;
+            }
+
+            // 渲染日曆
+            function renderCalendar(year, month) {
+                calendarGrid.innerHTML = ''; // 清空現有網格
+                
+                // 重新觸發淡入動畫
+                calendarGrid.classList.remove('fade-in');
+                void calendarGrid.offsetWidth; // 觸發 reflow
+                calendarGrid.classList.add('fade-in');
+
+                // 更新選擇器的值
+                yearSelect.value = year;
+                monthSelect.value = month;
+
+                const firstDayOfMonth = new Date(year, month, 1).getDay(); // 本月第一天是星期幾 (0-6)
+                const daysInMonth = new Date(year, month + 1, 0).getDate(); // 本月總天數
+                const daysInPrevMonth = new Date(year, month, 0).getDate(); // 上個月總天數
+
+                // 1. 填補上個月的尾部日期
+                for (let i = firstDayOfMonth; i > 0; i--) {
+                    const dayNum = daysInPrevMonth - i + 1;
+                    const dayDiv = document.createElement('div');
+                    dayDiv.className = 'py-2 flex justify-center items-center';
+                    dayDiv.innerHTML = `<span class="w-8 h-8 flex items-center justify-center text-slate-300">${dayNum}</span>`;
+                    calendarGrid.appendChild(dayDiv);
+                }
+
+                // 2. 填入本月日期
+                for (let i = 1; i <= daysInMonth; i++) {
+                    const dayDiv = document.createElement('div');
+                    dayDiv.className = 'py-2 flex justify-center items-center';
+                    
+                    const isToday = (year === today.getFullYear() && month === today.getMonth() && i === today.getDate());
+                    
+                    let spanClasses = 'w-8 h-8 flex items-center justify-center rounded-full cursor-pointer transition-all duration-200 ';
+                    
+                    if (isToday) {
+                        spanClasses += 'bg-indigo-600 text-white font-bold shadow-md ring-2 ring-indigo-200 ring-offset-1 hover:bg-indigo-700';
+                        selectedDateDisplay.textContent = `今天是：${formatDateString(year, month, i)}`;
+                    } else {
+                        spanClasses += 'text-slate-700 hover:bg-indigo-100 hover:text-indigo-700';
+                    }
+
+                    // 處理週末顏色 (紅色/紫色點綴)
+                    const currentDayOfWeek = new Date(year, month, i).getDay();
+                    if (!isToday) {
+                        if (currentDayOfWeek === 0) spanClasses += ' text-red-500'; // 星期日
+                        if (currentDayOfWeek === 6) spanClasses += ' text-indigo-500'; // 星期六
+                    }
+
+                    dayDiv.innerHTML = `<span class="${spanClasses}">${i}</span>`;
+                    
+                    // 點擊日期事件
+                    dayDiv.addEventListener('click', () => {
+                        // 移除其他日期的選中狀態 (除了今天的特殊樣式)
+                        document.querySelectorAll('#calendar-grid span').forEach(span => {
+                            if (!span.classList.contains('bg-indigo-600')) {
+                                span.classList.remove('bg-indigo-100', 'ring-2', 'ring-indigo-300');
+                            }
+                        });
+                        
+                        const span = dayDiv.querySelector('span');
+                        if (!isToday) {
+                            span.classList.add('bg-indigo-100', 'ring-2', 'ring-indigo-300');
+                        }
+                        
+                        selectedDateDisplay.textContent = `已選擇：${formatDateString(year, month, i)}`;
+                    });
+
+                    calendarGrid.appendChild(dayDiv);
+                }
+
+                // 3. 填補下個月的首部日期 (維持 6 行 7 列的網格，共 42 格)
+                const totalCellsRendered = firstDayOfMonth + daysInMonth;
+                const remainingCells = 42 - totalCellsRendered;
+                
+                for (let i = 1; i <= remainingCells; i++) {
+                    const dayDiv = document.createElement('div');
+                    dayDiv.className = 'py-2 flex justify-center items-center';
+                    dayDiv.innerHTML = `<span class="w-8 h-8 flex items-center justify-center text-slate-300">${i}</span>`;
+                    calendarGrid.appendChild(dayDiv);
+                }
+            }
+
+            // 事件監聽器：上個月
+            prevBtn.addEventListener('click', () => {
+                currentMonth--;
+                if (currentMonth < 0) {
+                    currentMonth = 11;
+                    currentYear--;
+                }
+                renderCalendar(currentYear, currentMonth);
+            });
+
+            // 事件監聽器：下個月
+            nextBtn.addEventListener('click', () => {
+                currentMonth++;
+                if (currentMonth > 11) {
+                    currentMonth = 0;
+                    currentYear++;
+                }
+                renderCalendar(currentYear, currentMonth);
+            });
+
+            // 事件監聽器：年份變更
+            yearSelect.addEventListener('change', (e) => {
+                currentYear = parseInt(e.target.value);
+                renderCalendar(currentYear, currentMonth);
+            });
+
+            // 事件監聽器：月份變更
+            monthSelect.addEventListener('change', (e) => {
+                currentMonth = parseInt(e.target.value);
+                renderCalendar(currentYear, currentMonth);
+            });
+
+            // 事件監聽器：回到今天
+            todayBtn.addEventListener('click', () => {
+                currentYear = today.getFullYear();
+                currentMonth = today.getMonth();
+                renderCalendar(currentYear, currentMonth);
+            });
+
+            // 啟動程式
+            populateYears();
+            renderCalendar(currentYear, currentMonth);
+        });
+    </script>
+</body>
+</html>
