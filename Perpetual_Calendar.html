@@ -114,6 +114,24 @@
             let currentYear = today.getFullYear();
             let currentMonth = today.getMonth(); // 0-11
 
+            // 追蹤目前的顯示模式與選擇的日期
+            let activeMode = 'today'; 
+            let activeDate = { year: currentYear, month: currentMonth, day: today.getDate() };
+
+            // 定期更新底部文字與即時時間
+            function updateBottomText() {
+                if (activeMode === 'today') {
+                    const now = new Date();
+                    const timeStr = now.toLocaleTimeString('zh-TW', { hour12: false });
+                    selectedDateDisplay.textContent = `今天是：${formatDateString(now.getFullYear(), now.getMonth(), now.getDate())} ${timeStr}`;
+                } else {
+                    selectedDateDisplay.textContent = `已選擇：${formatDateString(activeDate.year, activeDate.month, activeDate.day)}`;
+                }
+            }
+
+            // 設定每秒鐘執行一次更新
+            setInterval(updateBottomText, 1000);
+
             // 填充年份選單 (1900 - 2100)
             function populateYears() {
                 const startYear = 1900;
@@ -168,7 +186,6 @@
                     
                     if (isToday) {
                         spanClasses += 'bg-indigo-600 text-white font-bold shadow-md ring-2 ring-indigo-200 ring-offset-1 hover:bg-indigo-700';
-                        selectedDateDisplay.textContent = `今天是：${formatDateString(year, month, i)}`;
                     } else {
                         spanClasses += 'text-slate-700 hover:bg-indigo-100 hover:text-indigo-700';
                     }
@@ -192,11 +209,15 @@
                         });
                         
                         const span = dayDiv.querySelector('span');
-                        if (!isToday) {
+                        if (isToday) {
+                            activeMode = 'today';
+                        } else {
+                            activeMode = 'selected';
+                            activeDate = { year, month, day: i };
                             span.classList.add('bg-indigo-100', 'ring-2', 'ring-indigo-300');
                         }
                         
-                        selectedDateDisplay.textContent = `已選擇：${formatDateString(year, month, i)}`;
+                        updateBottomText(); // 點擊時立即更新文字
                     });
 
                     calendarGrid.appendChild(dayDiv);
@@ -250,12 +271,15 @@
             todayBtn.addEventListener('click', () => {
                 currentYear = today.getFullYear();
                 currentMonth = today.getMonth();
+                activeMode = 'today';
+                updateBottomText();
                 renderCalendar(currentYear, currentMonth);
             });
 
             // 啟動程式
             populateYears();
             renderCalendar(currentYear, currentMonth);
+            updateBottomText(); // 啟動時立刻顯示一次
         });
     </script>
 </body>
