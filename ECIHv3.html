@@ -30,9 +30,10 @@
             justify-content: center;
         }
 
+        /* 保留給登入/讀取畫面的舊版單行容器 */
         .container {
             width: 100%;
-            max-width: 980px;
+            max-width: 600px;
             background: white;
             padding: 30px;
             border-radius: 12px;
@@ -40,52 +41,56 @@
             transition: all 0.3s;
         }
 
-        header {
-            border-bottom: 2px solid var(--border);
-            margin-bottom: 20px;
-            padding-bottom: 15px;
+        /* --- 新版：左右雙欄佈局 (App Layout) --- */
+        .app-layout {
+            width: 100%;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: nowrap;
+            gap: 25px;
+            align-items: flex-start;
+        }
+
+        /* 左側儀表板 (Sidebar) */
+        .sidebar {
+            width: 250px;
+            background: white;
+            padding: 25px 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+            display: flex;
+            flex-direction: column;
             gap: 15px;
-        }
-
-        header > div:first-child {
-            flex: 1;
-            min-width: 0;
-        }
-
-        h2 { margin: 0; color: var(--primary); font-size: 1.6em; }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: nowrap;
             flex-shrink: 0;
+            position: sticky; /* 當右側滾動時，左側欄保持固定在上方 */
+            top: 20px;
         }
 
-        .btn-action {
-            color: white;
+        .sidebar h2 { font-size: 1.4em; text-align: center; margin: 0; color: var(--primary); line-height: 1.3; }
+        .sidebar .sync-status-container { text-align: center; margin-bottom: 5px; }
+        
+        .sidebar-buttons { display: flex; flex-direction: column; gap: 10px; }
+        
+        .sidebar .btn-action {
+            width: 100%;
             border: none;
-            padding: 8px 12px;
+            padding: 10px;
             border-radius: 6px;
             cursor: pointer;
             font-weight: bold;
-            font-size: 0.85em;
+            font-size: 0.95em;
+            text-align: center;
             transition: 0.2s;
+            color: white;
         }
         .btn-clear { background: var(--danger); }
         .btn-clear:hover { background: #c0392b; }
         .btn-review { background: var(--info); }
         .btn-review:hover { background: #732d91; }
 
-        .stats-board { display: flex; gap: 10px; flex-wrap: nowrap; }
+        .sidebar .stats-board { display: flex; flex-direction: column; gap: 10px; margin-top: 5px; }
 
         .stat-box {
             background: var(--light);
-            padding: 8px 12px;
+            padding: 10px 12px;
             border-radius: 8px;
             border: 1px solid var(--border);
             text-align: center;
@@ -99,6 +104,31 @@
             color: var(--primary);
             margin-top: 3px;
         }
+
+        .sidebar .user-info {
+            margin-top: auto;
+            padding-top: 15px;
+            border-top: 1px solid var(--border);
+            font-size: 0.85em;
+            font-weight: bold;
+            color: #7f8c8d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        /* 右側主內容區 (Main Content) */
+        .main-content {
+            flex: 1;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+            min-width: 0; /* 防止子元素撐破 flex 容器 */
+        }
+        /* --- 新版佈局結束 --- */
 
         /* Loading Screen */
         #loading-screen { text-align: center; padding: 60px 20px; }
@@ -126,7 +156,7 @@
         }
         .fallback-upload:hover { background: #1a252f; }
 
-        /* Quiz Screen */
+        /* Quiz Navigator */
         .navigator {
             display: flex;
             align-items: center;
@@ -179,25 +209,19 @@
         .flag-btn:hover { transform: scale(1.2); }
         .flag-btn.active { opacity: 1; filter: none; animation: pop 0.3s ease; }
 
-        .btn-export-small {
-            background: #27ae60; color: white; border: none; padding: 4px 10px;
+        .btn-export-small, .btn-nav-small, .btn-clear-small {
+            color: white; border: none; padding: 4px 10px;
             border-radius: 20px; cursor: pointer; font-size: 0.8em; font-weight: bold;
             transition: 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 0;
         }
+        
+        .btn-export-small { background: #27ae60; }
         .btn-export-small:hover { background: #219150; transform: translateY(-1px); }
 
-        .btn-nav-small {
-            background: var(--info); color: white; border: none; padding: 4px 10px;
-            border-radius: 20px; cursor: pointer; font-size: 0.8em; font-weight: bold;
-            transition: 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 0;
-        }
+        .btn-nav-small { background: var(--info); }
         .btn-nav-small:hover { background: #732d91; transform: translateY(-1px); }
 
-        .btn-clear-small {
-            background: var(--danger); color: white; border: none; padding: 4px 10px;
-            border-radius: 20px; cursor: pointer; font-size: 0.8em; font-weight: bold;
-            transition: 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 0;
-        }
+        .btn-clear-small { background: var(--danger); }
         .btn-clear-small:hover { background: #c0392b; transform: translateY(-1px); }
 
         .btn-logout-small {
@@ -218,16 +242,20 @@
             border-radius: 6px; color: #444; font-size: 0.95em; line-height: 1.6;
         }
 
+        /* 縮小字體：題目文字由 1.2em 調整為 1.0em */
         .question-text {
-            font-size: 1.2em; font-weight: 600; margin-bottom: 25px;
+            font-size: 1.0em; 
+            font-weight: 600; margin-bottom: 25px;
             line-height: 1.6; color: var(--primary);
         }
 
         .options-list { list-style: none; padding: 0; margin: 0; }
+        
+        /* 縮小字體：選項文字由 1.05em 調整為 0.9em */
         .option-item {
             background: #fdfdfd; border: 2px solid var(--border); padding: 16px;
             margin-bottom: 12px; border-radius: 8px; cursor: pointer;
-            transition: all 0.2s; font-size: 1.05em; line-height: 1.4;
+            transition: all 0.2s; font-size: 0.9em; line-height: 1.4;
             display: flex; align-items: flex-start; gap: 10px;
         }
         .option-item:hover:not(.disabled) {
@@ -322,22 +350,40 @@
             text-align: center;
         }
 
+        /* 手機 RWD 設定：當螢幕夠小時，左側欄自動往上疊加 */
         @media (max-width: 850px) {
-            header {
+            .app-layout {
                 flex-direction: column;
-                align-items: flex-start;
-                gap: 15px;
+                align-items: stretch;
             }
-            .header-actions {
+            .sidebar {
                 width: 100%;
+                position: static; /* 手機版不固定浮動 */
+                padding: 20px;
+                order: -1; /* 確保顯示在最上方 */
+            }
+            .sidebar-buttons {
+                flex-direction: row;
+            }
+            .sidebar .btn-action {
+                flex: 1;
+            }
+            .sidebar .stats-board {
+                flex-direction: row;
                 flex-wrap: wrap;
                 justify-content: space-between;
             }
+            .sidebar .stat-box {
+                flex: 1;
+                min-width: 30%;
+            }
+            .sidebar h2 { font-size: 1.6em; }
         }
     </style>
 </head>
 <body>
 
+<!-- 初始畫面 -->
 <div class="container" id="loading-screen">
     <div class="loader-spinner" id="spinner"></div>
     <h2 style="color: var(--primary);" id="loading-title">⚙️ 題庫資料擷取中...</h2>
@@ -347,6 +393,7 @@
     <div id="error-msg" style="color: var(--danger); margin-top: 20px; font-weight: bold;"></div>
 </div>
 
+<!-- 登入視窗 -->
 <div class="modal-overlay" id="login-modal" style="display: none; z-index: 3000;">
     <div class="modal-content" style="max-width: 400px; text-align: center; padding: 30px;">
         <h3 style="color: var(--primary); margin-top: 0; font-size: 1.5em;">👋 歡迎來到模擬題庫</h3>
@@ -359,47 +406,58 @@
     </div>
 </div>
 
-<div class="container" id="quiz-screen" style="display: none;">
-    <header>
-        <div>
+<!-- 測驗畫面 (新版雙欄儀表板佈局) -->
+<div id="quiz-screen" style="display: none; width: 100%; max-width: 1150px;">
+    <div class="app-layout">
+        <!-- 左側邊欄 -->
+        <aside class="sidebar">
             <h2>ECIH v3 模擬考練習</h2>
-            <p style="margin: 5px 0 0 0; color: #7f8c8d; font-size: 0.9em; font-weight: bold; display: flex; align-items: center; flex-wrap: wrap; gap: 8px;">
-                👤 目前登入: <span id="display-userid" style="color: var(--primary);">---</span> 
-                <button class="btn-logout-small" onclick="logout()" title="登出並更換 ID">登出</button>
-                <span style="color: #ccc;">|</span>
-                <span id="sync-status" style="color: #7f8c8d;">☁️ 等待同步...</span>
-            </p>
-        </div>
-        <div class="header-actions">
-            <button class="btn-action btn-review" onclick="openReview()">📊 檢視紀錄</button>
-            <button class="btn-action btn-clear" onclick="clearProgress()">🗑️ 清空進度</button>
+            <div class="sync-status-container">
+                <span id="sync-status" style="color: #7f8c8d; font-weight: bold; font-size: 0.9em;">☁️ 等待同步...</span>
+            </div>
+            
+            <div class="sidebar-buttons">
+                <button class="btn-action btn-review" onclick="openReview()">📊 檢視紀錄</button>
+                <button class="btn-action btn-clear" onclick="clearProgress()">🗑️ 清空進度</button>
+            </div>
+            
             <div class="stats-board">
                 <div class="stat-box">作答進度<span id="progress-text">0 / 0</span></div>
                 <div class="stat-box">答對題數<span id="score-text" style="color: var(--success);">0</span></div>
                 <div class="stat-box">正確率<span id="accuracy-text" style="color: var(--warning);">0%</span></div>
             </div>
-        </div>
-    </header>
 
-    <div class="navigator">
-        <label for="jump-input">前往題號：</label>
-        <input type="number" id="jump-input" min="1" value="1" onkeydown="if(event.key === 'Enter') jumpQuestion()">
-        <span style="font-weight: bold; color: #555;">/ 共 <span id="total-q"></span> 題</span>
-        <button onclick="jumpQuestion()">立即跳轉</button>
-    </div>
+            <div class="user-info">
+                👤 目前登入: <span id="display-userid" style="color: var(--primary);">---</span> 
+                <button class="btn-logout-small" onclick="logout()" title="登出並更換 ID">登出</button>
+            </div>
+        </aside>
 
-    <div id="quiz-container">
-        </div>
+        <!-- 右側主內容區 -->
+        <main class="main-content">
+            <div class="navigator">
+                <label for="jump-input">前往題號：</label>
+                <input type="number" id="jump-input" min="1" value="1" onkeydown="if(event.key === 'Enter') jumpQuestion()">
+                <span style="font-weight: bold; color: #555;">/ 共 <span id="total-q"></span> 題</span>
+                <button onclick="jumpQuestion()">立即跳轉</button>
+            </div>
 
-    <div class="controls">
-        <button class="btn-prev" id="prev-btn" onclick="prevQuestion()">◄ 上一題</button>
-        <button class="btn-next" id="next-btn" onclick="nextQuestion()">下一題 ►</button>
-    </div>
-    <div class="keyboard-hints">
-        💡 快捷鍵：按 <span class="key-btn">←</span> <span class="key-btn">→</span> 切換，按 <span class="key-btn">1</span> <span class="key-btn">2</span> <span class="key-btn">3</span> <span class="key-btn">4</span> 快速作答
+            <div id="quiz-container">
+                <!-- 題目將由 JavaScript 動態生成 -->
+            </div>
+
+            <div class="controls">
+                <button class="btn-prev" id="prev-btn" onclick="prevQuestion()">◄ 上一題</button>
+                <button class="btn-next" id="next-btn" onclick="nextQuestion()">下一題 ►</button>
+            </div>
+            <div class="keyboard-hints">
+                💡 快捷鍵：按 <span class="key-btn">←</span> <span class="key-btn">→</span> 切換，按 <span class="key-btn">1</span> <span class="key-btn">2</span> <span class="key-btn">3</span> <span class="key-btn">4</span> 快速作答
+            </div>
+        </main>
     </div>
 </div>
 
+<!-- 檢視紀錄 Modal -->
 <div class="modal-overlay" id="review-modal" onclick="if(event.target===this) closeReview()">
     <div class="modal-content">
         <div class="modal-header">
@@ -407,7 +465,8 @@
             <button class="btn-close" onclick="closeReview()">&times;</button>
         </div>
         <div class="review-grid" id="review-grid">
-            </div>
+            <!-- 格子將由 JavaScript 動態生成 -->
+        </div>
     </div>
 </div>
 
@@ -420,6 +479,29 @@
     let userState = [];
     let currentUserId = "";
     let saveTimeout = null; 
+
+    // --- 差異化更新的佇列 (Queue) ---
+    let syncQueue = { clearAll: false, updateIdx: false, updates: {} };
+
+    function loadQueueFromLS() {
+        const q = localStorage.getItem('ecih_v3_sync_queue');
+        if (q) {
+            try { syncQueue = JSON.parse(q); } catch(e){}
+        }
+    }
+
+    function saveQueueToLS() {
+        localStorage.setItem('ecih_v3_sync_queue', JSON.stringify(syncQueue));
+        localStorage.setItem('ecih_v3_unsynced', 'true');
+    }
+
+    // 儲存本機最新狀態，作為離線時的保護快取
+    function saveLocalState() {
+        localStorage.setItem('ecih_v3_local_state', JSON.stringify({
+            currentIdx: currentIdx,
+            state: userState
+        }));
+    }
 
     // --- 1. 自動載入 DOCX ---
     window.onload = function() {
@@ -706,7 +788,7 @@
             document.getElementById('sync-status').style.color = "var(--danger)";
         } finally {
             document.getElementById('loading-screen').style.display = 'none';
-            document.getElementById('quiz-screen').style.display = 'block';
+            document.getElementById('quiz-screen').style.display = 'block'; // 使用 block 是因為外層是一個普通 div
             initQuiz();
         }
     }
@@ -825,7 +907,7 @@
         }
     }
 
-    // 綁定三個生命週期事件，完美覆蓋 PC, iOS Safari, Firefox 等各種死亡/隱藏瞬間
+    // 綁定三個生命週期事件，完美覆蓋 PC, iOS Safari 等各種死亡/隱藏瞬間
     window.addEventListener('beforeunload', forceSyncData);
     window.addEventListener('pagehide', forceSyncData);
     window.addEventListener('visibilitychange', () => {
