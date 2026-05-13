@@ -1,0 +1,51 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-list-stars"></i> 帳密列表</h2>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">+ 新增項目</button>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>項目</th>
+                    <th>帳號</th>
+                    <th>代碼</th>
+                    <th>密碼</th>
+                    <th>更新日期</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.username }}</td>
+                    <td><code>{{ item.user_code }}</code></td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="copyToClipboard('{{ item.password }}')">
+                            <i class="bi bi-clipboard"></i> 複製
+                        </button>
+                    </td>
+                    <td><small>{{ item.updated_at }}</small></td>
+                    <td>
+                        <button class="btn btn-sm btn-info text-white"><i class="bi bi-clock-history"></i></button>
+                        <button class="btn btn-sm btn-warning"><i class="bi bi-pencil-square"></i></button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        alert("密碼已複製到剪貼簿！");
+    });
+}
+</script>
+{% endblock %}
