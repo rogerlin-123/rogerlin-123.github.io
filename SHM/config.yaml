@@ -1,0 +1,72 @@
+# ==========================================================================
+# System Health Monitor — 設定檔
+# ==========================================================================
+# 絕大多數設定可直接在 Web UI 操作(管理中心),這個檔案只在批次改 / 起始部署時用。
+# 儲存後程式會自動熱重載,通常 3 秒內生效,不需重啟 exe。
+# ==========================================================================
+
+# ------------------------------- Telegram 告警 ---------------------------
+# 沒有要用 Telegram 告警就整段保持註解(#),監控照跑,只是不發告警。
+# 要啟用:取消以下 4 行的註解,把 bot_token / chat_id 填真值,enabled 改成 true
+#
+# telegram:
+#   - name: "主通道"
+#     bot_token: "123456789:REPLACE_WITH_YOUR_BOT_TOKEN"
+#     chat_id: "REPLACE_WITH_YOUR_CHAT_ID"
+#     enabled: false
+#
+# 取得方法:
+#   bot_token: 在 Telegram 找 @BotFather,傳 /newbot 建新 bot 即可拿到 token
+#   chat_id  : 先主動傳訊息給 bot,再打開下面網址找 result[0].message.chat.id
+#              https://api.telegram.org/bot<TOKEN>/getUpdates
+
+# ------------------------------- 系統參數 --------------------------------
+settings:
+  check_interval_seconds: 30      # 全域檢查間隔(秒),每個 check 也可自行覆寫
+  tcp_timeout_seconds: 5          # 單次連線/查詢的 timeout
+  failure_threshold: 3            # 連續失敗 N 次才判定 DOWN 並發告警
+  recovery_threshold: 1           # 連續成功 N 次才判定恢復
+  reminder_interval_minutes: 60   # DOWN 期間提醒頻率(0 = 不提醒)
+  web_host: 0.0.0.0               # 0.0.0.0 = 區網可存取;127.0.0.1 = 僅本機
+  web_port: 5192                  # Web UI port
+
+  # 事件紀錄
+  events:
+    log_every_fail: true          # 每次檢查失敗都寫入事件檔
+    log_every_success: false      # 每次成功都寫入(會讓事件檔大幅增長)
+
+  # 延遲顏色門檻(ms):[綠色上限, 黃色上限, 紅色下限]。UI 會依此上色
+  latency_thresholds:
+    tcp:  [50, 200, 500]
+    icmp: [50, 200, 500]
+    http: [500, 1500, 3500]
+    dns:  [50, 150, 500]
+
+# ------------------------------ RADIUS 外部認證 ---------------------------
+# 沒有要用公司 RADIUS 登入就整段保持註解,只用本地 admin / viewer 帳號即可。
+#
+# radius:
+#   enabled: true
+#   server: 192.168.1.100
+#   port: 1812
+#   secret: "shared_secret"
+#   timeout: 5
+#   default_role: readonly          # RADIUS 首次登入自動建立的角色
+#   display_name: "技術部無線網路認證"  # 登入頁下拉顯示的名稱
+
+# ------------------------------ 監控目標清單 ------------------------------
+# 每個 target 可以含多個 check(tcp / icmp / http / dns 四種)。
+# 下面示範 Google,讓程式一啟動就有東西看。請改成你自己要監控的服務。
+# 改設定檔後會自動熱重載 —— 也可以直接從 Web UI 新增 / 刪除 target。
+targets:
+  - name: Google
+    checks:
+      - type: tcp
+        host: www.google.com
+        port: 443
+      - type: icmp
+        host: www.google.com
+      - type: http
+        url: https://www.google.com
+      - type: dns
+        hostname: www.google.com

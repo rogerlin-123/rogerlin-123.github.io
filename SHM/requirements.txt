@@ -1,0 +1,14 @@
+requests>=2.31
+PyYAML>=6.0
+Flask>=3.0
+dnspython>=2.6       # DNS 解析檢查
+ldap3>=2.9           # AD 認證測試工具用
+
+# truststore 已移除(2026-05):該套件的 inject_into_ssl() 是 AV 強訊號,
+# 跟 RAT/MITM 工具的 SSL 攔截行為簽名重疊。HTTP check 改成預設不驗證 SSL,
+# per-check 可改 verify_ssl: true 啟用驗證(走 certifi 預設)。
+
+# 內部 RADIUS 套件(公司內部 wheel,不在 PyPI):
+# 由 run.command / build-macos.sh 自動尋找並安裝;手動安裝:
+#   pip install "<path>/hauman_radius-1.0.0-py3-none-any.whl"
+# 沒裝的話,RADIUS 認證登入會無法使用,其他功能正常。
