@@ -1,0 +1,1343 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECIH v3 模擬題庫 (雲端同步版)</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --success: #2ecc71;
+            --danger: #e74c3c;
+            --warning: #f1c40f;
+            --info: #8e44ad;
+            --light: #f4f7f6;
+            --border: #e0e6ed;
+            --text-dark: #333;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light);
+            color: var(--text-dark);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* 保留給登入/讀取畫面的舊版單行容器 */
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+        }
+
+        /* --- 新版：左右雙欄佈局 (App Layout) --- */
+        .app-layout {
+            width: 100%;
+            display: flex;
+            gap: 25px;
+            align-items: flex-start;
+        }
+
+        /* 左側儀表板 (Sidebar) */
+        .sidebar {
+            width: 250px;
+            background: white;
+            padding: 25px 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            flex-shrink: 0;
+            position: sticky; /* 當右側滾動時，左側欄保持固定在上方 */
+            top: 20px;
+        }
+
+        .sidebar h2 { font-size: 1.4em; text-align: center; margin: 0; color: var(--primary); line-height: 1.3; }
+        .sidebar .sync-status-container { text-align: center; margin-bottom: 5px; }
+        
+        .sidebar-buttons { display: flex; flex-direction: column; gap: 10px; }
+        
+        .sidebar .btn-action {
+            width: 100%;
+            border: none;
+            padding: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.95em;
+            text-align: center;
+            transition: 0.2s;
+            color: white;
+        }
+        .btn-clear { background: var(--danger); }
+        .btn-clear:hover { background: #c0392b; }
+        .btn-review { background: var(--info); }
+        .btn-review:hover { background: #732d91; }
+
+        .sidebar .stats-board { display: flex; flex-direction: column; gap: 10px; margin-top: 5px; }
+
+        .stat-box {
+            background: var(--light);
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            text-align: center;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .stat-box span {
+            display: block;
+            font-size: 1.3em;
+            color: var(--primary);
+            margin-top: 3px;
+        }
+
+        .sidebar .user-info {
+            margin-top: auto;
+            padding-top: 15px;
+            border-top: 1px solid var(--border);
+            font-size: 0.85em;
+            font-weight: bold;
+            color: #7f8c8d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        /* 右側主內容區 (Main Content) */
+        .main-content {
+            flex: 1;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+            min-width: 0; /* 防止子元素撐破 flex 容器 */
+        }
+        /* --- 新版佈局結束 --- */
+
+        /* Loading Screen */
+        #loading-screen { text-align: center; padding: 60px 20px; }
+        
+        .loader-spinner {
+            border: 6px solid #f3f3f3;
+            border-top: 6px solid var(--secondary);
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Fallback Upload Button */
+        .fallback-upload {
+            display: inline-block; padding: 10px 20px; background: var(--primary);
+            color: white; border-radius: 6px; cursor: pointer; font-weight: bold;
+            margin-top: 15px; transition: 0.2s; border: none;
+        }
+        .fallback-upload:hover { background: #1a252f; }
+
+        /* Quiz Navigator */
+        .navigator {
+            display: flex;
+            align-items: center;
+            background: #ebf5fb;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            gap: 10px;
+            border: 1px solid #bce0fd;
+            flex-wrap: wrap;
+        }
+
+        .navigator label { font-weight: bold; color: var(--primary); }
+        .navigator input {
+            width: 80px; padding: 8px; border: 1px solid #ccc;
+            border-radius: 6px; font-size: 1em; text-align: center;
+        }
+        .navigator button {
+            padding: 8px 20px; background: var(--secondary); color: white;
+            border: none; border-radius: 6px; cursor: pointer; font-weight: bold;
+        }
+        .navigator button:hover { background: #2980b9; }
+
+        .question-card { animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateX(10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .alert-tag {
+            font-size: 0.85em; background: #fff3cd; padding: 5px 10px;
+            border-radius: 20px; margin-bottom: 15px; display: inline-block;
+            color: #856404; font-weight: 600; margin-top: 10px;
+        }
+
+        /* Question Action Buttons */
+        .btn-translate {
+            background: var(--warning); color: #fff; border: none; padding: 4px 10px;
+            border-radius: 20px; cursor: pointer; font-size: 0.8em; font-weight: bold;
+            transition: 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 0;
+        }
+        .btn-translate:hover:not(:disabled) { background: #d68910; transform: translateY(-1px); }
+        .btn-translate:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        .flag-btn {
+            background: none; border: none; cursor: pointer; font-size: 1.2em;
+            transition: 0.2s; padding: 0; margin: 0;
+            opacity: 0.3; filter: grayscale(100%);
+        }
+        .flag-btn:hover { transform: scale(1.2); }
+        .flag-btn.active { opacity: 1; filter: none; animation: pop 0.3s ease; }
+
+        .btn-export-small, .btn-nav-small, .btn-clear-small {
+            color: white; border: none; padding: 4px 10px;
+            border-radius: 20px; cursor: pointer; font-size: 0.8em; font-weight: bold;
+            transition: 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 0;
+        }
+        
+        .btn-export-small { background: #27ae60; }
+        .btn-export-small:hover { background: #219150; transform: translateY(-1px); }
+
+        .btn-nav-small { background: var(--info); }
+        .btn-nav-small:hover { background: #732d91; transform: translateY(-1px); }
+
+        .btn-clear-small { background: var(--danger); }
+        .btn-clear-small:hover { background: #c0392b; transform: translateY(-1px); }
+
+        .btn-logout-small {
+            background: #95a5a6; color: white; border: none; padding: 3px 8px;
+            border-radius: 12px; cursor: pointer; font-size: 0.75em; font-weight: bold;
+            transition: 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .btn-logout-small:hover { background: #7f8c8d; transform: translateY(-1px); }
+
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+
+        .translation-box {
+            margin-top: 15px; padding: 15px; background: #fef9e7; border-left: 5px solid var(--warning);
+            border-radius: 6px; color: #444; font-size: 0.95em; line-height: 1.6;
+        }
+
+        /* 縮小字體：題目文字由 1.2em 調整為 1.0em */
+        .question-text {
+            font-size: 1.0em; 
+            font-weight: 600; margin-bottom: 25px;
+            line-height: 1.6; color: var(--primary);
+        }
+
+        .options-list { list-style: none; padding: 0; margin: 0; }
+        
+        /* 縮小字體：選項文字由 1.05em 調整為 0.9em */
+        .option-item {
+            background: #fdfdfd; border: 2px solid var(--border); padding: 16px;
+            margin-bottom: 12px; border-radius: 8px; cursor: pointer;
+            transition: all 0.2s; font-size: 0.9em; line-height: 1.4;
+            display: flex; align-items: flex-start; gap: 10px;
+        }
+        .option-item:hover:not(.disabled) {
+            border-color: var(--secondary); background: #f0f8ff; transform: translateX(5px);
+        }
+        .option-item.disabled { cursor: default; }
+        .option-item.correct {
+            border-color: var(--success) !important; background: #eafaf1 !important; font-weight: bold;
+        }
+        .option-item.wrong {
+            border-color: var(--danger) !important; background: #fdedec !important;
+        }
+        .option-badge {
+            background: #e0e6ed; color: #555; padding: 2px 8px; 
+            border-radius: 4px; font-size: 0.9em; font-weight: bold;
+        }
+        .option-item.correct .option-badge { background: var(--success); color: white; }
+        .option-item.wrong .option-badge { background: var(--danger); color: white; }
+
+        .feedback {
+            margin-top: 20px; padding: 15px; border-radius: 8px;
+            font-size: 1.1em; font-weight: bold; display: none;
+        }
+
+        .controls {
+            margin-top: 35px; display: flex; justify-content: space-between;
+            border-top: 2px solid var(--border); padding-top: 20px;
+        }
+        .controls button {
+            padding: 12px 25px; border: none; border-radius: 6px; cursor: pointer;
+            font-weight: bold; font-size: 1.05em; transition: 0.2s;
+        }
+        .btn-prev { background: #95a5a6; color: white; }
+        .btn-prev:hover:not(:disabled) { background: #7f8c8d; }
+        .btn-next { background: var(--primary); color: white; }
+        .btn-next:hover:not(:disabled) { background: #1a252f; }
+        button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        .keyboard-hints {
+            text-align: center; margin-top: 15px; font-size: 0.85em; color: #7f8c8d;
+        }
+        .key-btn {
+            background: #ecf0f1; border: 1px solid #bdc3c7; border-radius: 4px;
+            padding: 2px 6px; font-family: monospace; font-weight: bold; color: #2c3e50;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6); z-index: 2000;
+            display: none; justify-content: center; align-items: center;
+            backdrop-filter: blur(3px);
+        }
+        .modal-content {
+            background: white; padding: 25px; border-radius: 12px;
+            width: 90%; max-width: 800px; max-height: 85vh;
+            display: flex; flex-direction: column;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        .modal-header {
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 2px solid var(--border); padding-bottom: 15px; margin-bottom: 20px;
+        }
+        .modal-header h3 { margin: 0; color: var(--primary); font-size: 1.4em; }
+        .btn-close {
+            background: none; border: none; font-size: 1.5em; cursor: pointer; color: #999;
+            padding: 0; line-height: 1; transition: 0.2s;
+        }
+        .btn-close:hover { color: var(--danger); transform: scale(1.1); }
+        .review-grid {
+            display: grid; 
+            grid-template-columns: repeat(10, 1fr);
+            gap: 10px;
+            overflow-y: auto; 
+            padding-right: 10px;
+        }
+        .review-item {
+            padding: 10px 5px; text-align: center; border-radius: 6px; cursor: pointer; 
+            font-weight: bold; border: 1px solid #ccc; background: #f9f9f9; color: #999;
+            transition: 0.2s; display: flex; flex-direction: column; justify-content: center;
+            position: relative;
+        }
+        .review-item:hover { filter: brightness(0.95); transform: translateY(-2px); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .review-item.correct { background: var(--success); color: white; border-color: var(--success); }
+        .review-item.wrong { background: var(--danger); color: white; border-color: var(--danger); }
+        .review-item.current { box-shadow: 0 0 0 3px var(--secondary); border-color: var(--secondary); }
+        
+        .flag-indicator {
+            position: absolute; top: -6px; right: -6px; font-size: 1em;
+            background: white; border-radius: 50%; width: 18px; height: 18px;
+            line-height: 18px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        /* 手機 RWD 設定：當螢幕夠小時，左側欄自動往上疊加 */
+        @media (max-width: 850px) {
+            .app-layout {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .sidebar {
+                width: 100%;
+                position: static; /* 手機版不固定浮動 */
+                padding: 20px;
+                order: -1; /* 確保顯示在最上方 */
+            }
+            .sidebar-buttons {
+                flex-direction: row;
+            }
+            .sidebar .btn-action {
+                flex: 1;
+            }
+            .sidebar .stats-board {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: space-between;
+            }
+            .sidebar .stat-box {
+                flex: 1;
+                min-width: 30%;
+            }
+            .sidebar h2 { font-size: 1.6em; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- 初始畫面 -->
+<div class="container" id="loading-screen">
+    <div class="loader-spinner" id="spinner"></div>
+    <h2 style="color: var(--primary);" id="loading-title">⚙️ 題庫資料擷取中...</h2>
+    <p style="color: #7f8c8d; margin-top: 15px; font-size: 1.1em;" id="loading-subtitle">
+        正在讀取並解析同目錄下的 <b>ECIHv3.docx</b><br>請稍候片刻...
+    </p>
+    <div id="error-msg" style="color: var(--danger); margin-top: 20px; font-weight: bold;"></div>
+</div>
+
+<!-- 登入視窗 -->
+<div class="modal-overlay" id="login-modal" style="display: none; z-index: 3000;">
+    <div class="modal-content" style="max-width: 400px; text-align: center; padding: 30px;">
+        <h3 style="color: var(--primary); margin-top: 0; font-size: 1.5em;">👋 歡迎來到模擬題庫</h3>
+        <p style="color: #7f8c8d; margin-bottom: 25px; line-height: 1.6;">
+            請輸入您的 <strong>專屬 ID</strong> (如學號或自訂名稱)<br>
+            系統將透過雲端同步您的作答進度！
+        </p>
+        <input type="text" id="userid-input" placeholder="請輸入 ID..." style="width: 100%; padding: 12px; border: 2px solid var(--border); border-radius: 8px; font-size: 1.1em; margin-bottom: 20px; text-align: center;" onkeydown="if(event.key === 'Enter') startWithUserId()">
+        <button onclick="startWithUserId()" style="width: 100%; padding: 14px; background: var(--secondary); color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 1.1em; cursor: pointer; transition: 0.2s;" onmouseover="this.style.background='#2980b9'" onmouseout="this.style.background='var(--secondary)'">進入測驗 🚀</button>
+    </div>
+</div>
+
+<!-- 測驗畫面 (新版雙欄儀表板佈局) -->
+<div id="quiz-screen" style="display: none; width: 100%; max-width: 1150px;">
+    <div class="app-layout">
+        <!-- 左側邊欄 -->
+        <aside class="sidebar">
+            <h2>ECIH v3 模擬考練習</h2>
+            <div class="sync-status-container">
+                <span id="sync-status" style="color: #7f8c8d; font-weight: bold; font-size: 0.9em;">☁️ 等待同步...</span>
+            </div>
+            
+            <div class="sidebar-buttons">
+                <button class="btn-action btn-review" onclick="openReview()">📊 檢視紀錄</button>
+                <button class="btn-action btn-clear" onclick="clearProgress()">🗑️ 清空進度</button>
+            </div>
+            
+            <div class="stats-board">
+                <div class="stat-box">作答進度<span id="progress-text">0 / 0</span></div>
+                <div class="stat-box">標記題數<span id="flagged-text" style="color: var(--danger);">0</span></div>
+                <div class="stat-box">答對題數<span id="score-text" style="color: var(--success);">0</span></div>
+                <div class="stat-box">正確率<span id="accuracy-text" style="color: var(--warning);">0%</span></div>
+            </div>
+
+            <div class="user-info">
+                👤 目前登入: <span id="display-userid" style="color: var(--primary);">---</span> 
+                <button class="btn-logout-small" onclick="logout()" title="登出並更換 ID">登出</button>
+            </div>
+        </aside>
+
+        <!-- 右側主內容區 -->
+        <main class="main-content">
+            <div class="navigator">
+                <label for="jump-input">前往題號：</label>
+                <input type="number" id="jump-input" min="1" value="1" onkeydown="if(event.key === 'Enter') jumpQuestion()">
+                <span style="font-weight: bold; color: #555;">/ 共 <span id="total-q"></span> 題</span>
+                <button onclick="jumpQuestion()">立即跳轉</button>
+            </div>
+
+            <div id="quiz-container">
+                <!-- 題目將由 JavaScript 動態生成 -->
+            </div>
+
+            <div class="controls">
+                <button class="btn-prev" id="prev-btn" onclick="prevQuestion()">◄ 上一題</button>
+                <button class="btn-next" id="next-btn" onclick="nextQuestion()">下一題 ►</button>
+            </div>
+            <div class="keyboard-hints">
+                💡 快捷鍵：按 <span class="key-btn">←</span> <span class="key-btn">→</span> 切換，按 <span class="key-btn">1</span> <span class="key-btn">2</span> <span class="key-btn">3</span> <span class="key-btn">4</span> 快速作答
+            </div>
+        </main>
+    </div>
+</div>
+
+<!-- 檢視紀錄 Modal -->
+<div class="modal-overlay" id="review-modal" onclick="if(event.target===this) closeReview()">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>📊 作答紀錄總覽</h3>
+            <button class="btn-close" onclick="closeReview()">&times;</button>
+        </div>
+        <div class="review-grid" id="review-grid">
+            <!-- 格子將由 JavaScript 動態生成 -->
+        </div>
+    </div>
+</div>
+
+<script>
+    // ✅ Google Apps Script API 網址
+    const API_URL = "https://script.google.com/macros/s/AKfycby4bPmq9mBiclIJccfSft4uqvNGGOfOq8QkNUDb_p8W4VMSNoR0n8TBNpD46z33hBt9/exec";
+    
+    let rawData = [];
+    let currentIdx = 0; 
+    let userState = [];
+    let currentUserId = "";
+    let saveTimeout = null; 
+
+    // --- 差異化更新的佇列 (Queue) ---
+    let syncQueue = { clearAll: false, updateIdx: false, updates: {} };
+
+    function loadQueueFromLS() {
+        const q = localStorage.getItem('ecih_v3_sync_queue');
+        if (q) {
+            try { syncQueue = JSON.parse(q); } catch(e){}
+        }
+    }
+
+    function saveQueueToLS() {
+        localStorage.setItem('ecih_v3_sync_queue', JSON.stringify(syncQueue));
+        localStorage.setItem('ecih_v3_unsynced', 'true');
+    }
+
+    // 儲存本機最新狀態，作為離線時的保護快取
+    function saveLocalState() {
+        localStorage.setItem('ecih_v3_local_state', JSON.stringify({
+            currentIdx: currentIdx,
+            state: userState
+        }));
+    }
+
+    // --- 1. 自動載入 DOCX ---
+    window.onload = function() {
+        const targetFilename = './ECIHv3.docx';
+        try {
+            fetch(targetFilename)
+                .then(response => {
+                    if (!response.ok) throw new Error(`HTTP 錯誤狀態: ${response.status}`);
+                    return response.arrayBuffer();
+                })
+                .then(arrayBuffer => JSZip.loadAsync(arrayBuffer))
+                .then(zip => zip.file("word/document.xml").async("string"))
+                .then(xmlString => parseWordXML(xmlString))
+                .catch(error => {
+                    console.error("載入或解析檔案時發生錯誤:", error);
+                    showFallbackUpload(targetFilename, error.message);
+                });
+        } catch (error) {
+            console.error("Fetch API 執行失敗:", error);
+            showFallbackUpload(targetFilename, error.message);
+        }
+    };
+
+    function showFallbackUpload(filename, errMsg) {
+        document.getElementById('spinner').style.display = 'none';
+        document.getElementById('loading-title').innerText = "⚠️ 題庫載入失敗";
+        document.getElementById('loading-subtitle').style.display = 'none';
+        document.getElementById('error-msg').innerHTML = 
+            `無法在伺服器找到 <b>${filename}</b>。<br>
+             <span style="font-size: 0.85em; color: #555;">(錯誤詳情: ${errMsg})</span><br><br>
+             您可以手動選取檔案繼續：<br>
+             <label for="fallback-file" class="fallback-upload">📁 手動選擇 .docx 檔案</label>
+             <input type="file" id="fallback-file" accept=".docx" style="display:none;" onchange="handleFallbackFile(this)">`;
+    }
+
+    function handleFallbackFile(input) {
+        if (input.files.length === 0) return;
+        const file = input.files[0];
+        document.getElementById('error-msg').innerHTML = "<span style='color:#3498db'>讀取中，請稍候...</span>";
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            JSZip.loadAsync(e.target.result)
+                .then(zip => zip.file("word/document.xml").async("string"))
+                .then(xmlString => parseWordXML(xmlString))
+                .catch(err => alert("手動解析失敗: " + err));
+        };
+        reader.readAsArrayBuffer(file);
+    }
+
+    function escapeHtml(str) {
+        return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    function mapWordColor(val) {
+        if (val.startsWith("#")) return val;
+        const map = {
+            "yellow": "yellow", "green": "green", "cyan": "cyan", "magenta": "magenta", 
+            "blue": "blue", "red": "red", "darkBlue": "darkblue", "darkCyan": "darkcyan", 
+            "darkGreen": "darkgreen", "darkMagenta": "darkmagenta", "darkRed": "darkred", 
+            "darkYellow": "#cccc00", "darkGray": "darkgray", "lightGray": "lightgray", "black": "black"
+        };
+        return map[val] || val;
+    }
+
+    function parseWordXML(xmlString) {
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(xmlString, "text/xml");
+        const paragraphs = xmlDoc.getElementsByTagName("w:p");
+        let parsedLines = [];
+        
+        for (let i = 0; i < paragraphs.length; i++) {
+            let p = paragraphs[i];
+            let textPieces = [];
+            let pHighlighted = false;
+            let pBgColor = "";
+            
+            let pPrList = p.getElementsByTagName("w:pPr");
+            if (pPrList.length > 0) {
+                let shdList = pPrList[0].getElementsByTagName("w:shd");
+                if (shdList.length > 0) {
+                    let fill = shdList[0].getAttribute("w:fill");
+                    if (fill && fill !== "auto" && fill !== "none" && fill !== "FFFFFF" && fill !== "000000") {
+                        pHighlighted = true; pBgColor = "#" + fill;
+                    }
+                }
+            }
+            
+            let runs = p.getElementsByTagName("w:r");
+            for (let j = 0; j < runs.length; j++) {
+                let r = runs[j];
+                let rHighlighted = false;
+                let rFontColor = "";
+                let rBgColor = "";
+                
+                let rPrList = r.getElementsByTagName("w:rPr");
+                if (rPrList.length > 0) {
+                    let colorNode = rPrList[0].getElementsByTagName("w:color");
+                    if (colorNode.length > 0) {
+                        let val = colorNode[0].getAttribute("w:val");
+                        if (val && val !== "auto") rFontColor = "#" + val;
+                    }
+                    let highlightList = rPrList[0].getElementsByTagName("w:highlight");
+                    if (highlightList.length > 0) {
+                        let val = highlightList[0].getAttribute("w:val");
+                        if (val && val !== "none") { rHighlighted = true; rBgColor = val; }
+                    }
+                    let shdList = rPrList[0].getElementsByTagName("w:shd");
+                    if (shdList.length > 0) {
+                        let fill = shdList[0].getAttribute("w:fill");
+                        if (fill && fill !== "auto" && fill !== "none" && fill !== "FFFFFF" && fill !== "000000") {
+                            rHighlighted = true; rBgColor = "#" + fill;
+                        }
+                    }
+                }
+                
+                for (let child of r.childNodes) {
+                    if (child.localName === "t") {
+                        textPieces.push({ 
+                            text: child.textContent, 
+                            isHighlighted: pHighlighted || rHighlighted,
+                            color: rFontColor, bgColor: rBgColor || pBgColor
+                        });
+                    } else if (child.localName === "br") {
+                        textPieces.push({ text: "\n", isHighlighted: false });
+                    }
+                }
+            }
+            
+            let currentLinePlain = "";
+            let currentLineHtml = "";
+            let currentLineHighlight = false;
+
+            for (let tp of textPieces) {
+                if (tp.text === "\n") {
+                    if (currentLinePlain.trim().length > 0) {
+                        parsedLines.push({ plainText: currentLinePlain.trim(), htmlText: currentLineHtml.trim(), isHighlighted: currentLineHighlight });
+                    }
+                    currentLinePlain = ""; currentLineHtml = ""; currentLineHighlight = false;
+                } else {
+                    currentLinePlain += tp.text;
+                    let styleStr = "";
+                    if (tp.color) styleStr += `color: ${tp.color}; `;
+                    if (tp.bgColor) {
+                        let cssBg = mapWordColor(tp.bgColor);
+                        styleStr += `background-color: ${cssBg}; `;
+                    }
+                    if (styleStr) currentLineHtml += `<span style="${styleStr}">${escapeHtml(tp.text)}</span>`;
+                    else currentLineHtml += escapeHtml(tp.text);
+                    if (tp.isHighlighted && tp.text.trim().length > 0) currentLineHighlight = true;
+                }
+            }
+            if (currentLinePlain.trim().length > 0) {
+                parsedLines.push({ plainText: currentLinePlain.trim(), htmlText: currentLineHtml.trim(), isHighlighted: currentLineHighlight });
+            }
+        }
+        processParsedLines(parsedLines);
+    }
+
+    function processParsedLines(parsedLines) {
+        let questions = [];
+        let currentQ = null;
+
+        parsedLines.forEach(lineObj => {
+            let text = lineObj.plainText;
+            let htmlText = lineObj.htmlText;
+            let isHighlighted = lineObj.isHighlighted;
+
+            if (text.match(/Exam.*Part/i) || text.includes("Question 100") || text.includes("Question 205")) {
+                return;
+            }
+
+            if (text.match(/^QUESTION \d+/i) || text.match(/^\d+\.?\s*$/)) {
+                if (currentQ && currentQ.q) questions.push(currentQ);
+                currentQ = { 
+                    q: "", plainQ: "", options: [], ans: 0, hasHighlight: false, 
+                    translatedData: null, translationVisible: false 
+                };
+                return;
+            }
+
+            if (!currentQ) return;
+
+            let optMatch = text.match(/^([A-F])[\.\)]\s*(.+)/i);
+            if (optMatch) {
+                currentQ.options.push(optMatch[2].trim());
+                if (isHighlighted) { currentQ.ans = currentQ.options.length - 1; currentQ.hasHighlight = true; }
+            } else {
+                if (currentQ.options.length === 0) {
+                    currentQ.q += (currentQ.q ? "<br>" : "") + htmlText;
+                    currentQ.plainQ += (currentQ.plainQ ? "\n" : "") + text;
+                } else {
+                    currentQ.options[currentQ.options.length - 1] += " " + text;
+                    if (isHighlighted) { currentQ.ans = currentQ.options.length - 1; currentQ.hasHighlight = true; }
+                }
+            }
+        });
+
+        if (currentQ && currentQ.q) questions.push(currentQ);
+
+        if (questions.length < 1) {
+            alert("⚠️ 解析異常：未能在檔案中找到有效的題目標記結構。");
+            return;
+        }
+
+        rawData = questions;
+        userState = new Array(rawData.length).fill(null);
+        
+        document.getElementById('loading-screen').style.display = 'none';
+
+        const savedUserId = localStorage.getItem('ecih_v3_userid');
+        if (savedUserId) {
+            document.getElementById('userid-input').value = savedUserId;
+            startWithUserId(); 
+        } else {
+            document.getElementById('login-modal').style.display = 'flex'; 
+        }
+    }
+
+    // --- 2. 登入與雲端讀取邏輯 ---
+    function startWithUserId() {
+        const uid = document.getElementById('userid-input').value.trim();
+        if(!uid) {
+            alert("⚠️ 請輸入您的 ID 才能開始測驗！");
+            return;
+        }
+        currentUserId = uid;
+        localStorage.setItem('ecih_v3_userid', currentUserId);
+
+        document.getElementById('display-userid').textContent = currentUserId;
+        document.getElementById('login-modal').style.display = 'none';
+
+        document.getElementById('loading-screen').style.display = 'block';
+        document.getElementById('spinner').style.display = 'block';
+        document.getElementById('loading-title').innerText = "☁️ 正在連線雲端資料庫...";
+        document.getElementById('loading-subtitle').innerHTML = "正在同步您的作答紀錄，請稍候...<br><span style='font-size: 0.85em; color: #999;'>(初次連線可能需要 1~2 秒)</span>";
+
+        loadProgressFromCloud();
+    }
+
+    async function loadProgressFromCloud() {
+        // [離線重試機制] 若有未同步的離線資料，優先載入並嘗試上傳
+        const isUnsynced = localStorage.getItem('ecih_v3_unsynced') === 'true';
+        if (isUnsynced) {
+            const backupPayload = localStorage.getItem('ecih_v3_offline_backup');
+            if (backupPayload) {
+                try {
+                    const parsed = JSON.parse(backupPayload);
+                    const data = JSON.parse(parsed.progressData);
+                    if (data.state && data.state.length === rawData.length) {
+                        userState = data.state;
+                        currentIdx = data.currentIdx || 0;
+                        document.getElementById('sync-status').innerText = "☁️ 已載入離線暫存，準備同步...";
+                        
+                        document.getElementById('loading-screen').style.display = 'none';
+                        document.getElementById('quiz-screen').style.display = 'block';
+                        initQuiz();
+                        
+                        // 嘗試推上雲端 (立刻同步)
+                        triggerCloudSync();
+                        return;
+                    }
+                } catch(e) { console.error("解析離線備份失敗", e); }
+            }
+        }
+
+        try {
+            const response = await fetch(`${API_URL}?userId=${encodeURIComponent(currentUserId)}`);
+            const result = await response.json();
+
+            if (result.status === "success" && result.data) {
+                const data = JSON.parse(result.data);
+                if (data.state && data.state.length === rawData.length) {
+                    userState = data.state;
+                    currentIdx = data.currentIdx || 0;
+                    document.getElementById('sync-status').innerText = "☁️ 已從雲端載入";
+                }
+            } else {
+                document.getElementById('sync-status').innerText = "☁️ 雲端已就緒 (新進度)";
+            }
+        } catch (error) {
+            console.error("雲端讀取失敗:", error);
+            alert("⚠️ 無法連線至雲端資料庫，本次將以「離線模式」開啟。");
+            document.getElementById('sync-status').innerText = "⚠️ 離線模式";
+            document.getElementById('sync-status').style.color = "var(--danger)";
+        } finally {
+            document.getElementById('loading-screen').style.display = 'none';
+            document.getElementById('quiz-screen').style.display = 'block'; // 使用 block 是因為外層是一個普通 div
+            initQuiz();
+        }
+    }
+
+    // --- 3. 雲端自動儲存 (Debounce & 離線重試佇列) ---
+    function saveProgress() {
+        if (!currentUserId) return; 
+
+        const statusEl = document.getElementById('sync-status');
+        statusEl.innerText = "⏳ 暫存中 (將於 60 秒後同步)...";
+        statusEl.style.color = "var(--warning)";
+
+        const simplifiedState = userState.map(s => s ? { 
+            answered: s.answered, 
+            selectedIdx: s.selectedIdx, 
+            isCorrect: s.isCorrect,
+            isFlagged: s.isFlagged || false
+        } : null);
+        
+        const dataToSave = {
+            currentIdx: currentIdx,
+            state: simplifiedState
+        };
+
+        const payload = {
+            userId: currentUserId,
+            progressData: JSON.stringify(dataToSave)
+        };
+
+        // 優先寫入瀏覽器 LocalStorage，建立「離線備份與佇列」
+        localStorage.setItem('ecih_v3_offline_backup', JSON.stringify(payload));
+        localStorage.setItem('ecih_v3_unsynced', 'true'); // 標記有未同步的資料
+
+        if (saveTimeout) clearTimeout(saveTimeout);
+
+        // 延遲 60 秒後執行雲端儲存
+        saveTimeout = setTimeout(() => {
+            triggerCloudSync();
+        }, 60000);
+    }
+
+    // 執行真正的雲端同步動作
+    function triggerCloudSync() {
+        const unsynced = localStorage.getItem('ecih_v3_unsynced');
+        if (unsynced !== 'true') return; // 如果沒有未同步資料，就不執行
+
+        const payloadStr = localStorage.getItem('ecih_v3_offline_backup');
+        if (!payloadStr) return;
+
+        const statusEl = document.getElementById('sync-status');
+        if (statusEl) {
+            statusEl.innerText = "☁️ 雲端同步中...";
+            statusEl.style.color = "var(--warning)";
+        }
+
+        fetch(API_URL, {
+            method: "POST",
+            body: payloadStr
+        })
+        .then(res => res.json())
+        .then(result => {
+            if(result.status === "success") {
+                localStorage.removeItem('ecih_v3_unsynced'); // 成功後清除未同步標記
+                if (statusEl) {
+                    statusEl.innerText = "☁️ 已自動儲存";
+                    statusEl.style.color = "#7f8c8d";
+                }
+            } else {
+                if (statusEl) {
+                    statusEl.innerText = "⚠️ 儲存失敗 (離線暫存中)";
+                    statusEl.style.color = "var(--danger)";
+                }
+            }
+        })
+        .catch(err => {
+            console.error("儲存失敗", err);
+            if (statusEl) {
+                statusEl.innerText = "⚠️ 網路斷線 (將於連線後重試)";
+                statusEl.style.color = "var(--danger)";
+            }
+        });
+    }
+
+    // --- 4. 關閉網頁與背景隱藏的強制儲存 (多重保險) ---
+    let isForceSyncing = false; // 記憶體鎖，防止多重事件重複觸發
+
+    function forceSyncData() {
+        if (isForceSyncing) return; // 若已經在送出中，則直接返回
+        
+        if (localStorage.getItem('ecih_v3_unsynced') === 'true') {
+            const payloadStr = localStorage.getItem('ecih_v3_offline_backup');
+            if (payloadStr) {
+                isForceSyncing = true; // 上鎖
+                
+                fetch(API_URL, {
+                    method: "POST",
+                    body: payloadStr,
+                    keepalive: true // 確保瀏覽器關閉時仍能在背景發送請求
+                })
+                .then(res => res.json())
+                .then(result => {
+                    if (result.status === "success") {
+                        localStorage.removeItem('ecih_v3_unsynced');
+                        const statusEl = document.getElementById('sync-status');
+                        if (statusEl) {
+                            statusEl.innerText = "☁️ 已自動儲存";
+                            statusEl.style.color = "#7f8c8d";
+                        }
+                    }
+                })
+                .catch(() => {})
+                .finally(() => {
+                    isForceSyncing = false; // 解除鎖定
+                });
+            }
+        }
+    }
+
+    // 綁定三個生命週期事件，完美覆蓋 PC, iOS Safari 等各種死亡/隱藏瞬間
+    window.addEventListener('beforeunload', forceSyncData);
+    window.addEventListener('pagehide', forceSyncData);
+    window.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'hidden') {
+            forceSyncData();
+        }
+    });
+
+    // 偵測到重新恢復網路連線時，自動觸發重試
+    window.addEventListener('online', () => {
+        if (localStorage.getItem('ecih_v3_unsynced') === 'true') {
+            const statusEl = document.getElementById('sync-status');
+            if (statusEl) {
+                statusEl.innerText = "🌐 網路恢復，準備同步...";
+            }
+            triggerCloudSync();
+        }
+    });
+
+    function clearProgress() {
+        if(confirm("確定要清空所有作答進度嗎？\n(已標記的重點題目 🚩 將會被保留)")) {
+            userState = userState.map(state => {
+                if (state) {
+                    return {
+                        answered: false,
+                        selectedIdx: null,
+                        isCorrect: false,
+                        isFlagged: state.isFlagged
+                    };
+                }
+                return null;
+            });
+            
+            currentIdx = 0;
+            renderQuestion(); 
+            
+            const toast = document.createElement('div');
+            toast.innerHTML = `🗑️ 進度已清空 (標記已保留)，並準備同步！`;
+            toast.style.cssText = `position: fixed; bottom: 20px; right: 20px; background: var(--primary); color: white; padding: 15px 20px; border-radius: 8px; font-weight: bold; z-index: 1000; animation: fadeIn 0.3s;`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+    }
+
+    function initQuiz() {
+        const total = rawData.length;
+        document.getElementById('total-q').textContent = total;
+        document.getElementById('jump-input').max = total;
+        // 加入參數 false，確保初始載入或 F5 重整時，不會立刻觸發 60 秒存檔覆蓋了 UI
+        renderQuestion(false); 
+    }
+
+    function toggleFlag() {
+        if (!userState[currentIdx]) {
+            userState[currentIdx] = { answered: false, selectedIdx: null, isCorrect: false, isFlagged: false };
+        }
+        userState[currentIdx].isFlagged = !userState[currentIdx].isFlagged;
+        renderQuestion(); 
+    }
+
+    function jumpToPrevFlag() {
+        for (let i = currentIdx - 1; i >= 0; i--) {
+            if (userState[i] && userState[i].isFlagged) {
+                currentIdx = i;
+                renderQuestion();
+                return;
+            }
+        }
+        alert("⚠️ 前面已經沒有被標記 (🚩) 的題目了！");
+    }
+
+    function jumpToNextFlag() {
+        for (let i = currentIdx + 1; i < rawData.length; i++) {
+            if (userState[i] && userState[i].isFlagged) {
+                currentIdx = i;
+                renderQuestion();
+                return;
+            }
+        }
+        alert("⚠️ 後面已經沒有被標記 (🚩) 的題目了！");
+    }
+
+    function exportFlagged() {
+        let flaggedNumbers = [];
+
+        for (let i = 0; i < rawData.length; i++) {
+            const state = userState[i];
+            if (state && state.isFlagged) {
+                flaggedNumbers.push(i + 1);
+            }
+        }
+
+        if (flaggedNumbers.length === 0) {
+            alert("⚠️ 目前沒有任何被標記 (🚩) 的題目！\n請先在題目旁點擊 🚩 進行標記後再匯出。");
+            return;
+        }
+
+        let exportText = flaggedNumbers.join(", ");
+
+        const blob = new Blob([exportText], { type: "text/plain;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        
+        const now = new Date();
+        const yyyy = now.getFullYear();
+        const mm = String(now.getMonth() + 1).padStart(2, '0');
+        const dd = String(now.getDate()).padStart(2, '0');
+        const hh = String(now.getHours()).padStart(2, '0');
+        const min = String(now.getMinutes()).padStart(2, '0');
+        const ss = String(now.getSeconds()).padStart(2, '0');
+        
+        a.download = `ECIHv3_標記重點題號_${yyyy}${mm}${dd}_${hh}${min}${ss}.txt`;
+        
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    function logout() {
+        if(confirm("確定要登出嗎？\n(這會清除瀏覽器記住的 ID，需要重新輸入)")) {
+            // 登出前強制推一次尚未同步的資料，避免換帳號導致進度遺失
+            if (localStorage.getItem('ecih_v3_unsynced') === 'true') {
+                triggerCloudSync();
+            }
+
+            localStorage.removeItem('ecih_v3_userid'); 
+            localStorage.removeItem('ecih_v3_offline_backup');
+            localStorage.removeItem('ecih_v3_unsynced');
+            
+            currentUserId = "";
+            userState = new Array(rawData.length).fill(null);
+            
+            document.getElementById('quiz-screen').style.display = 'none';
+            document.getElementById('login-modal').style.display = 'flex';
+            document.getElementById('userid-input').value = "";
+        }
+    }
+
+    function openReview() {
+        const grid = document.getElementById('review-grid');
+        let html = '';
+        
+        for (let i = 0; i < rawData.length; i++) {
+            const state = userState[i];
+            let statusClass = 'unanswered';
+            let icon = '⬜';
+            let flagIndicator = '';
+            
+            if (state) {
+                if (state.answered) {
+                    if (state.isCorrect) {
+                        statusClass = 'correct';
+                        icon = '✅';
+                    } else {
+                        statusClass = 'wrong';
+                        icon = '❌';
+                    }
+                }
+                if (state.isFlagged) {
+                    flagIndicator = `<div class="flag-indicator">🚩</div>`;
+                }
+            }
+            
+            if (i === currentIdx) {
+                statusClass += ' current';
+            }
+
+            html += `
+                <div class="review-item ${statusClass}" onclick="goToQuestion(${i})">
+                    ${flagIndicator}
+                    <div style="font-size:0.85em; margin-bottom: 5px;">Q${i+1}</div>
+                    <div style="font-size:1.1em;">${icon}</div>
+                </div>
+            `;
+        }
+        
+        grid.innerHTML = html;
+        document.getElementById('review-modal').style.display = 'flex';
+    }
+
+    function closeReview() {
+        document.getElementById('review-modal').style.display = 'none';
+    }
+
+    function goToQuestion(idx) {
+        currentIdx = idx;
+        renderQuestion();
+        closeReview();
+    }
+
+    async function translateQuestion() {
+        const currentQ = rawData[currentIdx];
+        const translateBtn = document.getElementById('translate-btn');
+        const translatedDiv = document.getElementById('translated-text');
+
+        if (currentQ.translatedData) {
+            currentQ.translationVisible = !currentQ.translationVisible;
+            if (currentQ.translationVisible) {
+                translatedDiv.style.display = 'block';
+                translateBtn.innerHTML = "🙈 隱藏翻譯";
+            } else {
+                translatedDiv.style.display = 'none';
+                translateBtn.innerHTML = "🇹🇼 顯示翻譯";
+            }
+            return;
+        }
+
+        try {
+            translateBtn.innerHTML = "⏳ 翻譯中...";
+            translateBtn.disabled = true;
+
+            let textToTranslate = currentQ.plainQ + "\n\n";
+            currentQ.options.forEach((opt, i) => { textToTranslate += `${String.fromCharCode(65 + i)}. ${opt}\n`; });
+
+            // 將 tl=zh-TW 改為 tl=zh-Hant，強制 Google 引擎輸出繁體中文
+            const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=zh-Hant&dt=t&q=${encodeURIComponent(textToTranslate)}`;
+            const response = await fetch(url);
+            const data = await response.json();
+            
+            let translatedText = "";
+            data[0].forEach(part => { translatedText += part[0]; });
+
+            currentQ.translatedData = translatedText.replace(/\n/g, '<br>');
+            currentQ.translationVisible = true;
+            
+            translatedDiv.innerHTML = `<b>📝 中文翻譯：</b><br><br>${currentQ.translatedData}`;
+            translatedDiv.style.display = 'block';
+            translateBtn.innerHTML = "🙈 隱藏翻譯";
+            
+        } catch (error) {
+            console.error("翻譯失敗:", error);
+            alert("翻譯請求失敗，請檢查網路連線或稍後再試！");
+            translateBtn.innerHTML = "🇹🇼 翻譯";
+        } finally {
+            translateBtn.disabled = false;
+        }
+    }
+
+    // 加入 shouldSave 參數，預設為 true (代表作答/切題時正常存檔)
+    function renderQuestion(shouldSave = true) {
+        const container = document.getElementById('quiz-container');
+        const currentQ = rawData[currentIdx];
+        const state = userState[currentIdx];
+
+        document.getElementById('jump-input').value = currentIdx + 1;
+        document.getElementById('prev-btn').disabled = (currentIdx === 0);
+        document.getElementById('next-btn').disabled = (currentIdx === rawData.length - 1);
+
+        container.style.animation = 'none';
+        container.offsetHeight; 
+        container.style.animation = 'fadeIn 0.3s ease-out';
+
+        let optionsHtml = '';
+        currentQ.options.forEach((opt, i) => {
+            let itemClass = 'option-item';
+            if (state && state.answered) {
+                itemClass += ' disabled';
+                if (i === currentQ.ans) itemClass += ' correct';
+                else if (i === state.selectedIdx && !state.isCorrect) itemClass += ' wrong';
+            }
+            optionsHtml += `<li class="${itemClass}" onclick="checkAnswer(${i})"><span class="option-badge">${String.fromCharCode(65 + i)}</span><span>${opt}</span></li>`;
+        });
+
+        let feedbackHtml = '';
+        if (state && state.answered) {
+            if (state.isCorrect) feedbackHtml = `<div class="feedback" style="display:block; background:#eafaf1; color:var(--success);">✅ 答對了！</div>`;
+            else feedbackHtml = `<div class="feedback" style="display:block; background:#fdedec; color:var(--danger);">❌ 答錯了。正確答案為: ${String.fromCharCode(65 + currentQ.ans)}</div>`;
+        }
+
+        let alertTag = currentQ.hasHighlight ? "" : `<div class="alert-tag">⚠️ 此題未偵測到選項螢光筆，預設答案為 A</div>`;
+        
+        let transBtnText = "🇹🇼 翻譯";
+        let transDisplayStyle = "none";
+        if (currentQ.translatedData) {
+            transBtnText = currentQ.translationVisible ? "🙈 隱藏翻譯" : "🇹🇼 顯示翻譯";
+            transDisplayStyle = currentQ.translationVisible ? "block" : "none";
+        }
+
+        let translationHtml = `<div id="translated-text" class="translation-box" style="display:${transDisplayStyle};"><b>📝 中文翻譯：</b><br><br>${currentQ.translatedData || ''}</div>`;
+
+        let isFlagged = state && state.isFlagged;
+        let flagClass = isFlagged ? "flag-btn active" : "flag-btn";
+
+        let html = `
+            <div class="question-card">
+                ${alertTag}
+                
+                <div class="question-text">
+                    <span style="color:var(--secondary); display:flex; align-items:center; flex-wrap:wrap; gap: 8px;">
+                        第 ${currentIdx + 1} 題：
+                        <button id="translate-btn" class="btn-translate" onclick="translateQuestion()" style="margin: 0;">${transBtnText}</button>
+                        <button class="btn-clear-small" onclick="clearCurrentQuestion()" title="清除本題的作答紀錄" style="margin: 0;">🗑️ 清除本題</button>
+                        <button class="${flagClass}" onclick="toggleFlag()" title="標記此題 (方便之後複習)" style="margin: 0;">🚩</button>
+                        <button class="btn-export-small" onclick="exportFlagged()" title="匯出所有已標記的題目" style="display: none; margin: 0;">📥 匯出標記</button>
+                        <button class="btn-nav-small" onclick="jumpToPrevFlag()" title="跳到上一個有標記 🚩 的題目" style="margin: 0;">◀ 尋找標記</button>
+                        <button class="btn-nav-small" onclick="jumpToNextFlag()" title="跳到下一個有標記 🚩 的題目" style="margin: 0;">尋找標記 ▶</button>
+                    </span><br>
+                    ${currentQ.q}
+                    ${translationHtml}
+                </div>
+                <ul class="options-list">
+                    ${optionsHtml}
+                </ul>
+                ${feedbackHtml}
+            </div>
+        `;
+        
+        container.innerHTML = html;
+        updateStats();
+        
+        // 唯有 shouldSave 為 true 時 (真正操作答題、標記等)，才觸發 60 秒倒數
+        if (shouldSave) {
+            saveProgress(); 
+        }
+    }
+
+    function checkAnswer(selectedIdx) {
+        if (userState[currentIdx] && userState[currentIdx].answered) return;
+
+        const currentQ = rawData[currentIdx];
+        const isCorrect = (selectedIdx === currentQ.ans);
+
+        let existingFlag = userState[currentIdx] ? userState[currentIdx].isFlagged : false;
+
+        userState[currentIdx] = { 
+            answered: true, 
+            selectedIdx: selectedIdx, 
+            isCorrect: isCorrect,
+            isFlagged: existingFlag
+        };
+        renderQuestion(); 
+    }
+
+    function clearCurrentQuestion() {
+        if (!userState[currentIdx] || !userState[currentIdx].answered) {
+            return;
+        }
+
+        let existingFlag = userState[currentIdx].isFlagged;
+
+        userState[currentIdx] = {
+            answered: false,
+            selectedIdx: null,
+            isCorrect: false,
+            isFlagged: existingFlag
+        };
+        renderQuestion(); 
+    }
+
+    function jumpQuestion() {
+        const inputVal = parseInt(document.getElementById('jump-input').value);
+        if (isNaN(inputVal) || inputVal < 1 || inputVal > rawData.length) {
+            alert(`⚠️ 請輸入 1 到 ${rawData.length} 之間的有效題號。`);
+            return;
+        }
+        currentIdx = inputVal - 1;
+        renderQuestion();
+    }
+
+    function prevQuestion() {
+        if (currentIdx > 0) { currentIdx--; renderQuestion(); }
+    }
+
+    function nextQuestion() {
+        if (currentIdx < rawData.length - 1) { 
+            currentIdx++; 
+            saveLocalState();
+            renderQuestion(true); 
+        }
+    }
+
+    function updateStats() {
+        let answeredCount = 0, correctCount = 0, flaggedCount = 0;
+        userState.forEach(state => {
+            if (state && state.answered) {
+                answeredCount++;
+                if (state.isCorrect) correctCount++;
+            }
+            if (state && state.isFlagged) {
+                flaggedCount++;
+            }
+        });
+        document.getElementById('progress-text').textContent = `${answeredCount} / ${rawData.length}`;
+        
+        const flaggedEl = document.getElementById('flagged-text');
+        if (flaggedEl) {
+            flaggedEl.textContent = flaggedCount;
+        }
+        
+        document.getElementById('score-text').textContent = correctCount;
+        
+        const accuracy = answeredCount === 0 ? 0 : Math.round((correctCount / answeredCount) * 100);
+        const accuracyEl = document.getElementById('accuracy-text');
+        if (accuracyEl) {
+            accuracyEl.textContent = `${accuracy}%`;
+            
+            if (answeredCount > 0) {
+                if (accuracy < 70) {
+                    accuracyEl.style.color = 'var(--danger)'; 
+                } else {
+                    accuracyEl.style.color = 'var(--success)'; 
+                }
+            } else {
+                accuracyEl.style.color = 'var(--warning)'; 
+            }
+        }
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (document.getElementById('review-modal').style.display === 'flex') {
+            if (e.key === 'Escape') closeReview();
+            return;
+        }
+        if (document.getElementById('login-modal').style.display === 'flex') {
+            return; 
+        }
+
+        if (document.getElementById('quiz-screen').style.display === 'block' && e.target.tagName !== 'INPUT') {
+            if (e.key === 'ArrowLeft') prevQuestion();
+            else if (e.key === 'ArrowRight') nextQuestion();
+            else if (['1', '2', '3', '4', '5', '6'].includes(e.key)) {
+                const optIndex = parseInt(e.key) - 1;
+                if (rawData[currentIdx] && rawData[currentIdx].options.length > optIndex) checkAnswer(optIndex);
+            }
+        }
+    });
+</script>
+
+</body>
+</html>
