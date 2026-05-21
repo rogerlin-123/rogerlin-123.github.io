@@ -799,7 +799,7 @@
         if (!currentUserId) return; 
 
         const statusEl = document.getElementById('sync-status');
-        statusEl.innerText = "⏳ 暫存中 (將於 60 秒後同步)...";
+        statusEl.innerText = "⏳ 暫存中 (將於 100 秒後同步)...";
         statusEl.style.color = "var(--warning)";
 
         const simplifiedState = userState.map(s => s ? { 
@@ -825,10 +825,10 @@
 
         if (saveTimeout) clearTimeout(saveTimeout);
 
-        // 延遲 60 秒後執行雲端儲存
+        // 延遲 100 秒後執行雲端儲存
         saveTimeout = setTimeout(() => {
             triggerCloudSync();
-        }, 60000);
+        }, 100000);
     }
 
     // 執行真正的雲端同步動作
@@ -957,7 +957,7 @@
         const total = rawData.length;
         document.getElementById('total-q').textContent = total;
         document.getElementById('jump-input').max = total;
-        // 加入參數 false，確保初始載入或 F5 重整時，不會立刻觸發 60 秒存檔覆蓋了 UI
+        // 加入參數 false，確保初始載入或 F5 重整時，不會立刻觸發 100 秒存檔覆蓋了 UI
         renderQuestion(false); 
     }
 
@@ -1221,7 +1221,7 @@
         container.innerHTML = html;
         updateStats();
         
-        // 唯有 shouldSave 為 true 時 (真正操作答題、標記等)，才觸發 60 秒倒數
+        // 唯有 shouldSave 為 true 時 (真正操作答題、標記等)，才觸發 100 秒倒數
         if (shouldSave) {
             saveProgress(); 
         }
