@@ -411,7 +411,7 @@
     <div class="app-layout">
         <!-- 左側邊欄 -->
         <aside class="sidebar">
-            <h2>ECIHv3 模擬考題</h2>
+            <h2>ECIHv3 模擬</h2>
             <div class="sync-status-container">
                 <span id="sync-status" style="color: #7f8c8d; font-weight: bold; font-size: 0.9em;">☁️ 等待同步...</span>
             </div>
@@ -423,6 +423,7 @@
             
             <div class="stats-board">
                 <div class="stat-box">作答進度<span id="progress-text">0 / 0</span></div>
+                <div class="stat-box">標記題數<span id="flagged-text" style="color: var(--danger);">0</span></div>
                 <div class="stat-box">答對題數<span id="score-text" style="color: var(--success);">0</span></div>
                 <div class="stat-box">正確率<span id="accuracy-text" style="color: var(--warning);">0%</span></div>
             </div>
@@ -1274,18 +1275,31 @@
     }
 
     function nextQuestion() {
-        if (currentIdx < rawData.length - 1) { currentIdx++; renderQuestion(); }
+        if (currentIdx < rawData.length - 1) { 
+            currentIdx++; 
+            saveLocalState();
+            renderQuestion(true); 
+        }
     }
 
     function updateStats() {
-        let answeredCount = 0, correctCount = 0;
+        let answeredCount = 0, correctCount = 0, flaggedCount = 0;
         userState.forEach(state => {
             if (state && state.answered) {
                 answeredCount++;
                 if (state.isCorrect) correctCount++;
             }
+            if (state && state.isFlagged) {
+                flaggedCount++;
+            }
         });
         document.getElementById('progress-text').textContent = `${answeredCount} / ${rawData.length}`;
+        
+        const flaggedEl = document.getElementById('flagged-text');
+        if (flaggedEl) {
+            flaggedEl.textContent = flaggedCount;
+        }
+
         document.getElementById('score-text').textContent = correctCount;
         
         const accuracy = answeredCount === 0 ? 0 : Math.round((correctCount / answeredCount) * 100);
