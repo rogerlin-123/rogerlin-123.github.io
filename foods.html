@@ -268,3 +268,394 @@
             transition: transform 0.2s, box-shadow 0.2s;
             display: flex;
             flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .food-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(44, 37, 32, 0.08);
+        }
+
+        .card-header {
+            margin-bottom: 12px;
+        }
+
+        .card-tags {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            font-size: 0.75rem;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .tag-region {
+            background-color: #eef2f0;
+            color: var(--accent-primary);
+        }
+
+        .tag-category {
+            background-color: #fdf2ee;
+            color: var(--accent-secondary);
+        }
+
+        .food-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .food-address {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 4px;
+        }
+
+        .card-links {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            border-top: 1px dashed var(--border-color);
+            padding-top: 12px;
+            margin-top: auto;
+        }
+
+        .food-link {
+            font-size: 0.8rem;
+            padding: 6px 12px;
+            background-color: #fafafa;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-main);
+            text-decoration: none;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .food-link:hover {
+            background-color: var(--accent-primary);
+            color: white;
+            border-color: var(--accent-primary);
+        }
+
+        .status-message {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 40px;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .spinner {
+            border: 3px solid rgba(0,0,0,0.1);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border-left-color: var(--accent-primary);
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px auto;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>美食珍藏口袋名單</h1>
+        <p>記錄走訪過的美味足跡，同步串接雲端試算表</p>
+    </header>
+
+    <div class="action-bar">
+        <button id="toggleFormBtn" class="btn-toggle-form" onclick="toggleForm()">
+            ✨ 點擊新增美食口袋名單
+        </button>
+    </div>
+
+    <div id="formPanelContainer" class="form-panel-container">
+        <div class="panel">
+            <div class="panel-title-container">
+                <div class="panel-title">新增收藏美食</div>
+                <button type="button" class="btn-close-form" onclick="toggleForm()">×</button>
+            </div>
+            <form id="foodForm">
+                <div class="form-group">
+                    <label for="region">地區</label>
+                    <input type="text" id="region" class="form-control" placeholder="例如：板橋-致理、桃園市" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="category">料理類別</label>
+                    <input type="text" id="category" class="form-control" placeholder="例如：日式輕食、複合式餐廳" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="name">店家名稱</label>
+                    <input type="text" id="name" class="form-control" placeholder="請輸入店名" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="address">店家地址</label>
+                    <input type="text" id="address" class="form-control" placeholder="請輸入完整地址">
+                </div>
+
+                <div class="form-group">
+                    <div class="links-title-container">
+                        <label>相關連結</label>
+                        <button type="button" class="btn-add-link" onclick="addLinkRow()">＋ 增加連結</button>
+                    </div>
+                    <div id="linksContainer">
+                        <div class="link-row">
+                            <input type="text" class="form-control link-title" placeholder="名稱(如地圖)" value="Google地圖">
+                            <input type="url" class="form-control link-url" placeholder="https://..." required>
+                            <button type="button" class="btn-remove-link" onclick="removeLinkRow(this)">×</button>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" id="submitBtn" class="btn-submit">儲存此店家</button>
+            </form>
+        </div>
+    </div>
+
+    <div>
+        <div class="filter-bar">
+            <input type="text" id="searchBar" class="form-control" placeholder="🔍 搜尋店名、地址或標籤...">
+            <select id="filterRegion" class="form-control" style="width: auto; min-width: 120px;">
+                <option value="">全部地區</option>
+            </select>
+            <select id="filterCategory" class="form-control" style="width: auto; min-width: 120px;">
+                <option value="">全部類別</option>
+            </select>
+        </div>
+
+        <div id="foodGrid" class="food-grid">
+            </div>
+    </div>
+</div>
+
+<script>
+    // 🔗 您的專屬 Google Apps Script Web App API 網址
+    const API_URL = 'https://script.google.com/macros/s/AKfycbyjOags62Xw9fJSQJvdVFI7ALVojxfbvfmgdiHVtWfq52uP0CW1of7hUqQBotsaUlIA/exec'; 
+
+    let allFoods = [];
+
+    // 初始載入
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchFoodList();
+        
+        // 綁定篩選與搜尋事件
+        document.getElementById('searchBar').addEventListener('input', filterAndRender);
+        document.getElementById('filterRegion').addEventListener('change', filterAndRender);
+        document.getElementById('filterCategory').addEventListener('change', filterAndRender);
+        
+        // 綁定表單提交
+        document.getElementById('foodForm').addEventListener('submit', handleFormSubmit);
+    });
+
+    // 控制表單動態開關的 Function
+    function toggleForm() {
+        const container = document.getElementById('formPanelContainer');
+        const btn = document.getElementById('toggleFormBtn');
+        
+        if (container.classList.contains('show')) {
+            container.classList.remove('show');
+            btn.innerHTML = '✨ 點擊新增美食口袋名單';
+            btn.style.backgroundColor = 'var(--accent-primary)';
+        } else {
+            container.classList.add('show');
+            btn.innerHTML = '▲ 收起新增表單';
+            btn.style.backgroundColor = 'var(--text-muted)';
+            // 展開時滑動到表單位置，優化操作體驗
+            setTimeout(() => {
+                container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 200);
+        }
+    }
+
+    // 獲取美食清單資料
+    function fetchFoodList() {
+        const grid = document.getElementById('foodGrid');
+        grid.innerHTML = '<div class="status-message"><div class="spinner"></div>正在讀取雲端美食清單...</div>';
+
+        fetch(API_URL)
+            .then(res => {
+                if (!res.ok) throw new Error('網路回應不成功');
+                return res.json();
+            })
+            .then(data => {
+                allFoods = data;
+                updateFilterOptions();
+                filterAndRender();
+            })
+            .catch(err => {
+                console.error('讀取失敗:', err);
+                grid.innerHTML = '<div class="status-message" style="color:#cc5a5a;">❌ 無法連線至雲端資料庫。請確認 GAS 部署權限設定為「任何人 (Anyone)」。</div>';
+            });
+    }
+
+    // 動態新增一組連結輸入框
+    function addLinkRow() {
+        const container = document.getElementById('linksContainer');
+        const row = document.createElement('div');
+        row.className = 'link-row';
+        row.innerHTML = `
+            <input type="text" class="form-control link-title" placeholder="名稱(如官網)">
+            <input type="url" class="form-control link-url" placeholder="https://..." required>
+            <button type="button" class="btn-remove-link" onclick="removeLinkRow(this)">×</button>
+        `;
+        container.appendChild(row);
+    }
+
+    // 刪除一組連結輸入框
+    function removeLinkRow(button) {
+        const row = button.parentElement;
+        const container = document.getElementById('linksContainer');
+        if (container.children.length > 1) {
+            row.remove();
+        } else {
+            alert('請至少保留一組連結欄位！');
+        }
+    }
+
+    // 處理表單提交（新增資料）
+    function handleFormSubmit(e) {
+        e.preventDefault();
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.disabled = true;
+        submitBtn.textContent = '正在儲存中...';
+
+        const linkRows = document.querySelectorAll('.link-row');
+        const linksArray = [];
+        linkRows.forEach(row => {
+            const title = row.querySelector('.link-title').value.trim() || '外部連結';
+            const url = row.querySelector('.link-url').value.trim();
+            if (url) {
+                linksArray.push({ title, url });
+            }
+        });
+
+        const foodData = {
+            id: 'food_' + Date.now(),
+            region: document.getElementById('region').value.trim(),
+            category: document.getElementById('category').value.trim(),
+            name: document.getElementById('name').value.trim(),
+            address: document.getElementById('address').value.trim(),
+            links: linksArray
+        };
+
+        fetch(API_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(foodData)
+        })
+        .then(() => {
+            alert('美食收藏成功！資料已同步寫入雲端試算表。');
+            resetForm();
+            toggleForm(); // 儲存成功後自動收起表單
+            fetchFoodList(); // 重新整理清單
+        })
+        .catch(err => {
+            console.error(err);
+            alert('儲存失敗，請檢查網路或 API 設定。');
+        })
+        .finally(() => {
+            submitBtn.disabled = false;
+            submitBtn.textContent = '儲存此店家';
+        });
+    }
+
+    // 重設表單與連結欄位
+    function resetForm() {
+        document.getElementById('foodForm').reset();
+        const container = document.getElementById('linksContainer');
+        container.innerHTML = `
+            <div class="link-row">
+                <input type="text" class="form-control link-title" placeholder="名稱(如地圖)" value="Google地圖">
+                <input type="url" class="form-control link-url" placeholder="https://..." required>
+                <button type="button" class="btn-remove-link" onclick="removeLinkRow(this)">×</button>
+            </div>
+        `;
+    }
+
+    // 更新篩選下拉選單的選項
+    function updateFilterOptions() {
+        const regions = [...new Set(allFoods.map(item => item.Region).filter(Boolean))];
+        const categories = [...new Set(allFoods.map(item => item.Category).filter(Boolean))];
+
+        const regSelect = document.getElementById('filterRegion');
+        const catSelect = document.getElementById('filterCategory');
+
+        regSelect.innerHTML = '<option value="">全部地區</option>';
+        catSelect.innerHTML = '<option value="">全部類別</option>';
+
+        regions.forEach(r => regSelect.innerHTML += `<option value="${r}">${r}</option>`);
+        categories.forEach(c => catSelect.innerHTML += `<option value="${c}">${c}</option>`);
+    }
+
+    // 綜合過濾與渲染卡片
+    function filterAndRender() {
+        const keyword = document.getElementById('searchBar').value.toLowerCase();
+        const selectedRegion = document.getElementById('filterRegion').value;
+        const selectedCategory = document.getElementById('filterCategory').value;
+        const grid = document.getElementById('foodGrid');
+
+        const filtered = allFoods.filter(item => {
+            const matchesKeyword = 
+                (item.Name && item.Name.toLowerCase().includes(keyword)) ||
+                (item.Address && item.Address.toLowerCase().includes(keyword)) ||
+                (item.Category && item.Category.toLowerCase().includes(keyword)) ||
+                (item.Region && item.Region.toLowerCase().includes(keyword));
+            
+            const matchesRegion = !selectedRegion || item.Region === selectedRegion;
+            const matchesCategory = !selectedCategory || item.Category === selectedCategory;
+
+            return matchesKeyword && matchesRegion && matchesCategory;
+        });
+
+        if (filtered.length === 0) {
+            grid.innerHTML = '<div class="status-message">🔍 沒有符合篩選條件的美食口袋名單。</div>';
+            return;
+        }
+
+        grid.innerHTML = filtered.map(item => {
+            let linksHtml = '';
+            if (item.Links && Array.isArray(item.Links)) {
+                linksHtml = item.Links.map(l => 
+                    `<a href="${l.url}" target="_blank" class="food-link">🔗 ${l.title || '連結'}</a>`
+                ).join('');
+            }
+
+            return `
+                <div class="food-card">
+                    <div class="card-header">
+                        <div class="card-tags">
+                            <span class="tag tag-region">${item.Region || '未分類地區'}</span>
+                            <span class="tag tag-category">${item.Category || '未分類類別'}</span>
+                        </div>
+                        <div class="food-name">${item.Name}</div>
+                    </div>
+                    <div>
+                        <div class="food-address">📍 ${item.Address || '暫無地址資訊'}</div>
+                    </div>
+                    <div class="card-links">
+                        ${linksHtml || '<span style="color:#b5aeae; font-size:0.8rem;">暫無相關連結</span>'}
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+</script>
+
+</body>
+</html>
