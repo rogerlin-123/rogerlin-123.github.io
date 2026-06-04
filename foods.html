@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>美食珍藏口袋名單</title>
+    <style>
+        :root {
+            --bg-color: #fbf9f6;
+            --card-bg: #ffffff;
+            --text-main: #2c2520;
+            --text-muted: #70645c;
+            --accent-primary: #4a6b5d;
+            --accent-secondary: #d98a6c;
+            --border-color: #e6e1da;
+            --shadow: 0 4px 12px rgba(44, 37, 32, 0.05);
+            --radius: 12px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); line-height: 1.6; padding: 20px; }
+        .container { max-width: 1100px; margin: 0 auto; }
+        header { text-align: center; margin-bottom: 25px; padding: 15px 0; }
+        header h1 { font-size: 2rem; font-weight: 700; margin-bottom: 8px; letter-spacing: 1px; }
+        header p { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 15px; }
+        .action-bar { display: flex; justify-content: center; margin-bottom: 25px; }
+
+        .btn-toggle-form {
+            background-color: var(--accent-primary); color: white; border: none; padding: 10px 24px;
+            font-size: 0.95rem; font-weight: 600; border-radius: 30px; cursor: pointer;
+            box-shadow: 0 4px 10px rgba(74, 107, 93, 0.2); transition: all 0.3s ease;
+        }
+        .btn-toggle-form:hover { background-color: #3b5449; transform: translateY(-1px); box-shadow: 0 6px 14px rgba(74, 107, 93, 0.25); }
+
+        .form-panel-container { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-in-out, opacity 0.3s ease, margin-bottom 0.4s ease; opacity: 0; margin-bottom: 0; }
+        .form-panel-container.show { max-height: 900px; opacity: 1; margin-bottom: 30px; }
+        .panel { background: var(--card-bg); border-radius: var(--radius); padding: 25px; box-shadow: var(--shadow); border: 1px solid var(--border-color); max-width: 600px; margin: 0 auto; }
+        
+        .panel-title-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-left: 4px solid var(--accent-primary); padding-left: 10px; }
+        .panel-title { font-size: 1.2rem; font-weight: 600; }
+        .btn-close-form { background: none; border: none; color: var(--text-muted); font-size: 1.4rem; cursor: pointer; line-height: 1; padding: 0 5px; }
+        .btn-close-form:hover { color: #cc5a5a; }
+
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 0.9rem; font-weight: 600; margin-bottom: 6px; color: var(--text-main); }
+        .form-control { width: 100%; padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 0.95rem; background-color: #fafafa; transition: all 0.2s ease; }
+        .form-control:focus { outline: none; border-color: var(--accent-primary); background-color: #fff; box-shadow: 0 0 0 3px rgba(74, 107, 93, 0.1); }
+
+        .links-title-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .btn-add-link { background: none; border: none; color: var(--accent-primary); font-size: 0.85rem; font-weight: 600; cursor: pointer; }
+        .link-row { display: grid; grid-template-columns: 100px 1fr auto; gap: 8px; margin-bottom: 8px; align-items: center; }
+        .btn-remove-link { background: none; border: none; color: #cc5a5a; cursor: pointer; font-size: 1.2rem; padding: 0 4px; }
+
+        .btn-submit { width: 100%; padding: 12px; background-color: var(--accent-primary); color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 10px; transition: background-color 0.2s; }
+        .btn-submit:hover { background-color: #3b5449; }
+        .btn-submit.mode-edit { background-color: var(--accent-secondary); }
+        .btn-submit.mode-edit:hover { background-color: #c27659; }
+        .btn-submit:disabled { background-color: #a0b0a8; cursor: not-allowed; }
+
+        .filter-bar { display: grid; grid-template-columns: 1fr auto auto; gap: 12px; margin-bottom: 25px; background: white; padding: 12px; border-radius: var(--radius); border: 1px solid var(--border-color); box-shadow: var(--shadow); }
+        @media (max-width: 600px) { .filter-bar { grid-template-columns: 1fr; } }
+
+        .food-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        .food-card { background: white; border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); border: 1px solid var(--border-color); transition: transform 0.2s, box-shadow 0.2s; display: flex; flex-direction: column; justify-content: space-between; }
+        .food-card:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(44, 37, 32, 0.08); }
+
+        .card-top-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 8px; }
+        .card-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+        .tag { font-size: 0.75rem; padding: 2px 8px; border-radius: 4px; background: #f0ede8; color: var(--text-muted); font-weight: 600; }
+        
+        .card-actions { display: flex; gap: 6px; }
+        .btn-edit-card { background: #f0ede8; border: none; color: var(--text-muted); padding: 4px 8px; font-size: 0.75rem; border-radius: 4px; cursor: pointer; font-weight: 600; transition: all 0.2s; }
+        .btn-edit-card:hover { background-color: var(--accent-secondary); color: white; }
+        
+        /* 刪除按鈕專屬樣式 */
+        .btn-delete-card { background: #ffebeb; border: none; color: #cc5a5a; padding: 4px 8px; font-size: 0.75rem; border-radius: 4px; cursor: pointer; font-weight: 600; transition: all 0.2s; }
+        .btn-delete-card:hover { background-color: #cc5a5a; color: white; }
+
+        .food-name { font-size: 1.2rem; font-weight: 600; color: var(--text-main); margin-bottom: 4px; }
+        .food-address { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px; }
+        .card-links { display: flex; gap: 8px; flex-wrap: wrap; border-top: 1px dashed var(--border-color); padding-top: 12px; margin-top: auto; }
+        .food-link { font-size: 0.8rem; padding: 6px 12px; background-color: #fafafa; border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-main); text-decoration: none; transition: all 0.2s; font-weight: 500; }
+        .food-link:hover { background-color: var(--accent-primary); color: white; border-color: var(--accent-primary); }
+
+        .status-message { grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-muted); font-size: 0.95rem; }
+        .spinner { border: 3px solid rgba(0,0,0,0.1); width: 30px; height: 30px; border-radius: 50%; border-left-color: var(--accent-primary); animation: spin 1s linear infinite; margin: 0 auto 10px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>美食珍藏口袋名單</h1>
+        <p>記錄走訪過的美味足跡，同步串接雲端試算表</p>
+    </header>
+
+    <div class="action-bar">
+        <button id="toggleFormBtn" class="btn-toggle-form" onclick="toggleForm()">✨ 點擊新增美食口袋名單</button>
+    </div>
+
+    <div id="formPanelContainer" class="form-panel-container">
+        <div class="panel">
+            <div class="panel-title-container">
+                <div class="panel-title" id="formPanelTitle">新增收藏美食</div>
+                <button type="button" class="btn-close-form" onclick="closeForm()">×</button>
+            </div>
+            <form id="foodForm">
+                <input type="hidden" id="editFoodId" value="">
+                <div class="form-group">
+                    <label>地區</label>
+                    <input type="text" id="region" class="form-control" placeholder="例如：板橋-致理、桃園市" required>
+                </div>
+                <div class="form-group">
+                    <label>料理類別</label>
+                    <input type="text" id="category" class="form-control" placeholder="例如：日式輕食、複合式餐廳" required>
+                </div>
+                <div class="form-group">
+                    <label>店家名稱</label>
+                    <input type="text" id="name" class="form-control" placeholder="請輸入店名" required>
+                </div>
+                <div class="form-group">
+                    <label>店家地址</label>
+                    <input type="text" id="address" class="form-control" placeholder="請輸入完整地址">
+                </div>
+                <div class="form-group">
+                    <div class="links-title-container">
+                        <label>相關連結</label>
+                        <button type="button" class="btn-add-link" onclick="addLinkRow()">＋ 增加連結</button>
+                    </div>
+                    <div id="linksContainer">
+                        <div class="link-row">
+                            <input type="text" class="form-control link-title" placeholder="名稱" value="Google地圖">
+                            <input type="url" class="form-control link-url" placeholder="https://..." required>
+                            <button type="button" class="btn-remove-link" onclick="removeLinkRow(this)">×</button>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" id="submitBtn" class="btn-submit">儲存此店家</button>
+            </form>
+        </div>
+    </div>
+
+    <div>
+        <div class="filter-bar">
+            <input type="text" id="searchBar" class="form-control" placeholder="🔍 搜尋店名、地址或標籤...">
+            <select id="filterRegion" class="form-control" style="width: auto; min-width: 120px;"><option value="">全部地區</option></select>
+            <select id="filterCategory" class="form-control" style="width: auto; min-width: 120px;"><option value="">全部類別</option></select>
+        </div>
+        <div id="foodGrid" class="food-grid"></div>
+    </div>
+</div>
+
+<script>
+    // 🔴 務必替換成您自己的 GAS 網址！
+    const API_URL = 'https://script.google.com/macros/s/AKfycbyjOags62Xw9fJSQJvdVFI7ALVojxfbvfmgdiHVtWfq52uP0CW1of7hUqQBotsaUlIA/exec'; 
+
+    let allFoods = [];
+
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchFoodList();
+        document.getElementById('searchBar').addEventListener('input', filterAndRender);
+        document.getElementById('filterRegion').addEventListener('change', filterAndRender);
+        document.getElementById('filterCategory').addEventListener('change', filterAndRender);
+        document.getElementById('foodForm').addEventListener('submit', handleFormSubmit);
+    });
+
+    function toggleForm() {
+        const container = document.getElementById('formPanelContainer');
+        container.classList.contains('show') ? closeForm() : openFormForAdd();
+    }
+
+    function openFormForAdd() {
+        resetForm();
+        document.getElementById('editFoodId').value = '';
+        document.getElementById('formPanelTitle').textContent = '新增收藏美食';
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.textContent = '儲存此店家'; submitBtn.className = 'btn-submit';
+        document.getElementById('formPanelContainer').classList.add('show');
+        document.getElementById('toggleFormBtn').innerHTML = '▲ 收起新增表單';
+        document.getElementById('toggleFormBtn').style.backgroundColor = 'var(--text-muted)';
+    }
+
+    function closeForm() {
+        document.getElementById('formPanelContainer').classList.remove('show');
+        document.getElementById('toggleFormBtn').innerHTML = '✨ 點擊新增美食口袋名單';
+        document.getElementById('toggleFormBtn').style.backgroundColor = 'var(--accent-primary)';
+        resetForm();
+    }
+
+    function startEdit(foodId) {
+        const item = allFoods.find(f => String(f.ID) === String(foodId));
+        if (!item) return;
+
+        document.getElementById('editFoodId').value = item.ID;
+        document.getElementById('region').value = item.Region || '';
+        document.getElementById('category').value = item.Category || '';
+        document.getElementById('name').value = item.Name || '';
+        document.getElementById('address').value = item.Address || '';
+
+        const container = document.getElementById('linksContainer');
+        container.innerHTML = ''; 
+        if (item.Links && Array.isArray(item.Links) && item.Links.length > 0) {
+            item.Links.forEach(link => {
+                const row = document.createElement('div'); row.className = 'link-row';
+                row.innerHTML = `<input type="text" class="form-control link-title" value="${link.title || ''}">
+                                 <input type="url" class="form-control link-url" value="${link.url || ''}" required>
+                                 <button type="button" class="btn-remove-link" onclick="removeLinkRow(this)">×</button>`;
+                container.appendChild(row);
+            });
+        } else { addLinkRow(); }
+
+        document.getElementById('formPanelTitle').textContent = `✏️ 正在修改：${item.Name}`;
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.textContent = '確認更新店家資料'; submitBtn.className = 'btn-submit mode-edit';
+        
+        const panelContainer = document.getElementById('formPanelContainer');
+        panelContainer.classList.add('show');
+        document.getElementById('toggleFormBtn').innerHTML = '▲ 收起修改表單';
+        document.getElementById('toggleFormBtn').style.backgroundColor = 'var(--accent-secondary)';
+        setTimeout(() => panelContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 200);
+    }
+
+    // ⚡ 新增的刪除功能
+    function deleteFood(foodId, foodName) {
+        if (!confirm(`⚠️ 確定要刪除「${foodName}」嗎？\n此動作無法復原喔！`)) {
+            return;
+        }
+
+        const grid = document.getElementById('foodGrid');
+        grid.innerHTML = '<div class="status-message"><div class="spinner"></div>正在刪除資料...</div>';
+
+        const requestData = { id: foodId, action: 'DELETE' };
+
+        fetch(API_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(requestData)
+        })
+        .then(() => {
+            alert('✅ 刪除成功！');
+            fetchFoodList(); // 重新讀取清單
+        })
+        .catch(err => {
+            console.error(err);
+            alert('刪除失敗，請檢查網路狀態。');
+            fetchFoodList(); // 失敗也重新載入恢復原狀
+        });
+    }
+
+    function fetchFoodList() {
+        const grid = document.getElementById('foodGrid');
+        grid.innerHTML = '<div class="status-message"><div class="spinner"></div>正在讀取雲端美食清單...</div>';
+
+        fetch(API_URL)
+            .then(res => res.json())
+            .then(data => {
+                allFoods = data.map(item => {
+                    if (item.Links && typeof item.Links === 'string') {
+                        try { item.Links = JSON.parse(item.Links); } catch(e) { item.Links = []; }
+                    }
+                    return item;
+                });
+                updateFilterOptions(); filterAndRender();
+            })
+            .catch(err => {
+                grid.innerHTML = '<div class="status-message" style="color:#cc5a5a;">❌ 無法連線至雲端資料庫。</div>';
+            });
+    }
+
+    function addLinkRow() {
+        const container = document.getElementById('linksContainer');
+        const row = document.createElement('div'); row.className = 'link-row';
+        row.innerHTML = `<input type="text" class="form-control link-title" placeholder="名稱(如官網)">
+                         <input type="url" class="form-control link-url" placeholder="https://..." required>
+                         <button type="button" class="btn-remove-link" onclick="removeLinkRow(this)">×</button>`;
+        container.appendChild(row);
+    }
+
+    function removeLinkRow(button) {
+        if (document.getElementById('linksContainer').children.length > 1) button.parentElement.remove();
+        else alert('請至少保留一組連結欄位！');
+    }
+
+    function handleFormSubmit(e) {
+        e.preventDefault();
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.disabled = true; submitBtn.textContent = '正在同步至雲端...';
+
+        const linkRows = document.querySelectorAll('.link-row');
+        const linksArray = [];
+        linkRows.forEach(row => {
+            const url = row.querySelector('.link-url').value.trim();
+            if (url) linksArray.push({ title: row.querySelector('.link-title').value.trim() || '外部連結', url });
+        });
+
+        const currentId = document.getElementById('editFoodId').value;
+        const isEditMode = currentId !== '';
+
+        const foodData = {
+            id: isEditMode ? currentId : 'food_' + Date.now(),
+            region: document.getElementById('region').value.trim(),
+            category: document.getElementById('category').value.trim(),
+            name: document.getElementById('name').value.trim(),
+            address: document.getElementById('address').value.trim(),
+            links: linksArray,
+            action: isEditMode ? 'UPDATE' : 'CREATE'
+        };
+
+        fetch(API_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(foodData) })
+        .then(() => { alert(isEditMode ? '修改成功！' : '收藏成功！'); closeForm(); fetchFoodList(); })
+        .catch(() => alert('同步失敗，請檢查網路。'))
+        .finally(() => { submitBtn.disabled = false; submitBtn.textContent = isEditMode ? '確認更新店家資料' : '儲存此店家'; });
+    }
+
+    function resetForm() {
+        document.getElementById('foodForm').reset();
+        document.getElementById('editFoodId').value = '';
+        document.getElementById('linksContainer').innerHTML = `<div class="link-row"><input type="text" class="form-control link-title" value="Google地圖"><input type="url" class="form-control link-url" placeholder="https://..." required><button type="button" class="btn-remove-link" onclick="removeLinkRow(this)">×</button></div>`;
+    }
+
+    function updateFilterOptions() {
+        const regSelect = document.getElementById('filterRegion'); const catSelect = document.getElementById('filterCategory');
+        regSelect.innerHTML = '<option value="">全部地區</option>' + [...new Set(allFoods.map(i => i.Region).filter(Boolean))].map(r => `<option value="${r}">${r}</option>`).join('');
+        catSelect.innerHTML = '<option value="">全部類別</option>' + [...new Set(allFoods.map(i => i.Category).filter(Boolean))].map(c => `<option value="${c}">${c}</option>`).join('');
+    }
+
+    function filterAndRender() {
+        const keyword = document.getElementById('searchBar').value.toLowerCase();
+        const selReg = document.getElementById('filterRegion').value; const selCat = document.getElementById('filterCategory').value;
+        const grid = document.getElementById('foodGrid');
+
+        const filtered = allFoods.filter(item => {
+            const matchKW = (item.Name||'').toLowerCase().includes(keyword) || (item.Address||'').toLowerCase().includes(keyword) || (item.Category||'').toLowerCase().includes(keyword) || (item.Region||'').toLowerCase().includes(keyword);
+            return matchKW && (!selReg || item.Region === selReg) && (!selCat || item.Category === selCat);
+        });
+
+        if (filtered.length === 0) { grid.innerHTML = '<div class="status-message">🔍 沒有符合條件的美食名單。</div>'; return; }
+
+        grid.innerHTML = filtered.map(item => `
+            <div class="food-card">
+                <div class="card-header">
+                    <div class="card-top-row">
+                        <div class="card-tags">
+                            <span class="tag">${item.Region || '未分類'}</span>
+                            <span class="tag">${item.Category || '未分類'}</span>
+                        </div>
+                        <div class="card-actions">
+                            <button class="btn-edit-card" onclick="startEdit('${item.ID}')">✏️ 編輯</button>
+                            <button class="btn-delete-card" onclick="deleteFood('${item.ID}', '${item.Name}')">🗑️ 刪除</button>
+                        </div>
+                    </div>
+                    <div class="food-name">${item.Name}</div>
+                </div>
+                <div class="food-address">📍 ${item.Address || '暫無地址資訊'}</div>
+                <div class="card-links">
+                    ${(item.Links && Array.isArray(item.Links)) ? item.Links.map(l => `<a href="${l.url}" target="_blank" class="food-link">🔗 ${l.title || '連結'}</a>`).join('') : '<span style="color:#b5aeae; font-size:0.8rem;">暫無相關連結</span>'}
+                </div>
+            </div>`).join('');
+    }
+</script>
+
+</body>
+</html>
