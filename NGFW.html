@@ -549,6 +549,19 @@
         document.getElementById('records-modal').style.display = 'none';
     }
 
+	// 監聽全域鍵盤事件：按下 ESC 鍵時自動關閉紀錄視窗
+document.addEventListener('keydown', function(event) {
+    // 判斷按下的按鍵是否為 ESC 鍵 (相容不同瀏覽器的寫法)
+    if (event.key === "Escape" || event.key === "Esc" || event.keyCode === 27) {
+        
+        // 確保視窗目前是開啟狀態才執行關閉 (假設您的 Modal ID 是 records-modal)
+        const modal = document.getElementById('records-modal');
+        if (modal && modal.style.display === 'flex') {
+            closeRecords(); // 呼叫您原本用來關閉視窗的函式
+        }
+    }
+});
+
     // === 新增快捷鍵功能 ===
     // 1. 支援鍵盤「左方向鍵」與「右方向鍵」切換題目
     document.addEventListener('keydown', function(event) {
