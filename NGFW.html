@@ -294,8 +294,8 @@
         { id: "Q119", question: "An administrator is configuring firewalls via a Panorama template to forward logs to a newly provisioned Strata Logging Service instance. The operational requirement is to maintain existing logging to on-premises Panorama log collectors for immediate, low latency queries while also forwarding logs to Strata Logging Service for long-term archival. The administrator has already configured and enabled cloud logging connectivity.\n\nWhich additional step is necessary to meet the operational requirement?", isMulti: false, options: { A: "Enable duplicate logging (cloud and on-premises) under Device -> Setup -> Management in the appropriate templates.", B: "Enable log syncing and commit the template changes to both the on-premises and cloud collectors.", C: "In the collector group settings, add the Strata Logging Service as a secondary destination for the on-premises collector.", D: "Add the Panorama log collector and Strata Logging Service IP addresses to the cloud logging service routes to ensure dual path cloud and on-premises reachability." }, correct: ["A"], explanation: "<div class='correct-ans'>Q119 正確答案：A</div><p><b>📝 官方觀念出處：</b> Panorama / Strata Logging Service Integration</p><p><b>✅ 正解解析：</b><br>為了讓日誌雙向發送 (既傳雲端又留地端 Panorama)，必須在 Template 的 <b>Device > Setup > Management > Cloud Logging</b> 中手動勾選 <b>Enable Duplicate Logging (Cloud and On-Premise)</b>。</p>" },
         { id: "Q120", question: "An administrator needs to perform several maintenance tasks on a managed firewall directly from the Panorama console without using the Context Switch feature.\n\nWhich set of tasks can the administrator fully execute from the Panorama UI?", isMulti: false, options: { A: "Edit a post-rule.\nCreate a new certificate profile.\nConfigure the firewall's hostname.", B: "Download and install a new content update.\nView current firewall session details.\nInitiate a device reboot.", C: "Create a new zone.\nConfigure a new virtual router.\nView the local ACC on the firewall.", D: "Modify the IP address of a Layer 3 interface.\nConfigure a new local administrator account.\nEdit a pre-rule." }, correct: ["A"], explanation: "<div class='correct-ans'>Q120 正確答案：A</div><p><b>📝 官方觀念出處：</b> Panorama Management / Templates and Device Groups</p><p><b>✅ 正解解析：</b><br>不使用 Context Switch 代表操作必須是 Device Group 或是 Template 層級的配置。<b>(A)</b> 包含的操作：Edit a post-rule (Device Group)、Create certificate profile (Template)、Configure hostname (Template) 都可以直接在 Panorama 上設定。</p>" },
         { id: "Q121", question: "When deploying a pair of Palo Alto Networks firewalls in an active/active high availability (HA) cluster what is the dedicated role of the HA3 link?", isMulti: false, options: { A: "Control plane synchronization for heartbeats and state information", B: "Packet forwarding for session setup and asymmetric traffic", C: "Management plane synchronization for configurations and policies", D: "Data plane synchronization for session tables and forwarding tables" }, correct: ["B"], explanation: "<div class='correct-ans'>Q121 正確答案：B</div><p><b>📝 官方觀念出處：</b> High Availability (HA) / Active-Active Concepts</p><p><b>✅ 正解解析：</b><br>在雙活 (Active/Active) HA 架構中，<b>HA3 介面</b> 的唯一專屬功用是：負責在雙節點間進行<b>「封包轉發 (Packet forwarding)」</b>，用以解決非對稱路由以及連線建立同步的封包傳遞問題。</p>" }
-	];
-	    // ...請貼入剩餘的考題...    ];
+    ];
+        // ...請貼入剩餘的考題...    ];
     // ===================================================================================
 
     // 系統狀態
@@ -552,7 +552,7 @@
     // === 新增快捷鍵功能 ===
     // 1. 支援鍵盤「左方向鍵」與「右方向鍵」切換題目
     document.addEventListener('keydown', function(event) {
-        // 1. ESC 鍵：關閉檢視紀錄視窗 (支援上一題提到的優化)
+        // 1. ESC 鍵：關閉檢視紀錄視窗
         if (event.key === "Escape" || event.key === "Esc" || event.keyCode === 27) {
             const modal = document.getElementById('records-modal');
             if (modal && modal.style.display === 'flex') {
@@ -561,10 +561,28 @@
             return;
         }
 
-        // 避免在輸入題號時觸發跳題或快捷作答
-        if (event.target.tagName.toLowerCase() === 'input') return;
+        // 處理焦點在「前往題號」輸入框時的行為
+        if (event.target.tagName.toLowerCase() === 'input') {
+            if (event.key === 'Enter' && event.target.id === 'jump-input') {
+                jumpToQuestion();
+            }
+            return; // 焦點在輸入框時，忽略後續的快捷鍵
+        }
         
-        // 2. 左右方向鍵：切換題目
+        // 2. Enter 鍵：提交答案 或 換下一題 (支援截圖紅色框功能)
+        if (event.key === 'Enter') {
+            const submitBtn = document.getElementById('submit-btn');
+            // 如果提交按鈕還在畫面上 (尚未作答)，則送出答案
+            if (submitBtn && submitBtn.style.display !== 'none') {
+                submitAnswer();
+            } else {
+                // 如果已經作答完畢 (提交按鈕隱藏)，按 Enter 則直接跳下一題
+                changeQuestion(1);
+            }
+            return;
+        }
+
+        // 3. 左右方向鍵：切換題目
         if (event.key === 'ArrowRight') {
             changeQuestion(1);
             return;
@@ -573,7 +591,7 @@
             return;
         }
         
-        // 3. 數字鍵 1~6 對應 A~F 作答 (支援一般數字鍵與右側九宮格數字鍵)
+        // 4. 數字鍵 1~6 對應 A~F 作答 (支援一般數字鍵與右側九宮格數字鍵)
         const keyMap = { 
             '1': 'A', '2': 'B', '3': 'C', '4': 'D', '5': 'E', '6': 'F',
             'Numpad1': 'A', 'Numpad2': 'B', 'Numpad3': 'C', 'Numpad4': 'D', 'Numpad5': 'E', 'Numpad6': 'F' 
