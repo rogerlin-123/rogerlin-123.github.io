@@ -110,6 +110,7 @@
                 <div><kbd class="bg-white border rounded px-1 shadow-sm">←</kbd> / <kbd class="bg-white border rounded px-1 shadow-sm">→</kbd>：上/下一題</div>
                 <div><kbd class="bg-white border rounded px-1 shadow-sm">Enter</kbd>：提交答案 / 下一題</div>
                 <div><kbd class="bg-white border rounded px-1 shadow-sm">M</kbd>：標記/取消標記本題</div>
+                <div><kbd class="bg-white border rounded px-1 shadow-sm">C</kbd>：清除本題</div>
             </div>
         </aside>
 
@@ -1264,6 +1265,11 @@ document.addEventListener('keydown', (e) => {
     // M 鍵: 標記/取消標記本題
     if (e.key.toLowerCase() === 'm') {
         toggleFlag();
+    }
+
+    // C 鍵: 清除本題進度
+    if (e.key.toLowerCase() === 'c') {
+        clearCurrentQuestion();
     }
 });
 
