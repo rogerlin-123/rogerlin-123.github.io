@@ -120,7 +120,8 @@
                 <div class="mb-1"><kbd>1</kbd> ~ <kbd>6</kbd> 選擇選項 A~F</div>
                 <div class="mb-1"><kbd>←</kbd> / <kbd>→</kbd> 上 / 下一題</div>
                 <div class="mb-1"><kbd>Enter</kbd> 提交 / 下一題</div>
-                <div><kbd>M</kbd> 標記 / 取消標記本題</div>
+                <div class="mb-1"><kbd>M</kbd> 標記 / 取消標記本題</div>
+                <div class="mb-1"><kbd>C</kbd> 清除本題</div>
             </div>
         </aside>
 
@@ -1064,6 +1065,12 @@
             if (e.key.toLowerCase() === 'm') {
                 toggleFlag();
             }
+
+            // C 鍵: 清除本題進度
+              if (e.key.toLowerCase() === 'c') {
+                clearCurrentQuestion();
+            }
+            
         });
 
         // Init
