@@ -106,7 +106,7 @@
 
             <div class="bg-amber-50 p-3 text-xs text-amber-800 border-t border-amber-200 leading-relaxed" title="快捷鍵說明">
                 <div class="font-bold mb-1"><i class="fa-solid fa-keyboard"></i> 快捷鍵支援：</div>
-                <div><kbd class="bg-white border rounded px-1 shadow-sm">1</kbd> ~ <kbd class="bg-white border rounded px-1 shadow-sm">6</kbd>：選擇選項 A~F</div>
+                <div><kbd class="bg-white border rounded px-1 shadow-sm">1</kbd> ~ <kbd class="bg-white border rounded px-1 shadow-sm">5</kbd>：選擇選項 A~E</div>
                 <div><kbd class="bg-white border rounded px-1 shadow-sm">←</kbd> / <kbd class="bg-white border rounded px-1 shadow-sm">→</kbd>：上/下一題</div>
                 <div><kbd class="bg-white border rounded px-1 shadow-sm">Enter</kbd>：提交答案 / 下一題</div>
                 <div><kbd class="bg-white border rounded px-1 shadow-sm">M</kbd>：標記/取消標記本題</div>
@@ -1232,7 +1232,8 @@ document.addEventListener('keydown', (e) => {
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
 
     // 1-6 數字鍵選擇選項 A-F
-    const keyMap = {'1': 'A', '2': 'B', '3': 'C', '4': 'D', '5': 'E', '6': 'F'};
+    // const keyMap = {'1': 'A', '2': 'B', '3': 'C', '4': 'D', '5': 'E', '6': 'F'};
+    const keyMap = {'1': 'A', '2': 'B', '3': 'C', '4': 'D', '5': 'E'};
     if (keyMap[e.key] && !isAnswered) {
         const optionIndex = e.key.charCodeAt(0) - 49; // '1' -> 0
         const cards = document.querySelectorAll('.option-card');
