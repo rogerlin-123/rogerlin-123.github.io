@@ -1649,7 +1649,8 @@ function restartQuiz() {
     currentIndex = 0;
     quizResults = {};
     selectedAnswers = [];
-    flaggedQuestions.clear();
+    //  flaggedQuestions.clear();   加在前面，按下「清空進度」就只會清除作答紀錄與正確率，您辛苦標記的紅旗（小紅籤）就會全部保留下來了
+    flaggedQuestions.clear();   
     isAnswered = false;
     progressBar.style.width = '0%';
     updateStats();
