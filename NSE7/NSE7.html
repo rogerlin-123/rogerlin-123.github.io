@@ -1,0 +1,1536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fortinet FCSS Enterprise Firewall 7.6 Practice Quiz</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .highlight { background-color: #fef08a; }
+        .fade-in { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Custom Checkbox/Radio Styles */
+        .option-card { cursor: pointer; transition: all 0.2s; }
+        .option-card:hover { background-color: #f1f5f9; }
+        .option-card.selected { border-color: #3b82f6; background-color: #eff6ff; ring: 2px solid #3b82f6; }
+        
+        .option-card.correct-answer { border-color: #22c55e; background-color: #f0fdf4; }
+        .option-card.wrong-answer { border-color: #ef4444; background-color: #fef2f2; }
+        
+        .disabled-click { pointer-events: none; opacity: 0.9; }
+
+        /* Palette Styles */
+        .palette-item {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            font-weight: 600;
+            border-radius: 0.5rem;
+            border-width: 2px;
+            transition: all 0.2s;
+            cursor: pointer;
+            position: relative;
+        }
+        .palette-item:hover { transform: scale(1.05); }
+        .palette-item.current { border-color: #3b82f6; background-color: #eff6ff; color: #1d4ed8; }
+        .palette-item.correct { border-color: #22c55e; background-color: #f0fdf4; color: #15803d; }
+        .palette-item.wrong { border-color: #ef4444; background-color: #fef2f2; color: #b91c1c; }
+        .palette-item.neutral { border-color: #e2e8f0; background-color: #f8fafc; color: #64748b; }
+        .palette-item.neutral:hover { border-color: #cbd5e1; }
+        
+        /* 標記 (Flag) 小紅旗樣式 */
+        .palette-item.flagged::after {
+            content: '\f024'; font-family: 'Font Awesome 6 Free'; font-weight: 900;
+            position: absolute; top: -5px; right: -5px; color: #ef4444; font-size: 0.75rem;
+            background: white; border-radius: 50%; padding: 2px; box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        
+        /* 鍵盤提示標籤樣式 */
+        kbd {
+            display: inline-block; padding: 0.1rem 0.4rem; font-size: 0.75rem; 
+            font-weight: 700; background-color: #ffffff; border: 1px solid #cbd5e1; 
+            border-radius: 0.25rem; color: #475569; box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col overflow-x-hidden">
+
+    <nav class="sticky top-0 z-50 bg-slate-900 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="flex items-center gap-3">
+                    <i class="fa-solid fa-graduation-cap text-red-500 text-2xl"></i>
+                    <h1 class="text-xl font-bold tracking-tight">Fortinet FCSS <span class="text-slate-400 font-normal hidden sm:inline">Enterprise Firewall Administrator 7.6 Practice Quiz</span></h1>
+                </div>
+                
+                <div class="flex items-center gap-3">
+                     <div class="text-sm font-medium bg-slate-800 px-3 py-1.5 rounded-full border border-slate-700">
+                        <span id="current-progress">Question 1</span> / <span id="total-count">--</span>
+                    </div>
+                    <button onclick="togglePalette()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-sm transition-colors flex items-center gap-2 shadow-sm font-medium">
+                        <i class="fa-solid fa-table-cells"></i> <span class="hidden sm:inline">Questions</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-grow w-full max-w-7xl mx-auto flex flex-col lg:flex-row items-start justify-center pt-8 pb-20 px-4 gap-6">
+        
+        <aside class="w-full lg:w-64 flex-shrink-0 bg-white rounded-2xl shadow-xl border-t-4 border-slate-900 sticky top-24 z-10 flex flex-col overflow-hidden">
+            <div class="p-4 bg-slate-50 border-b border-slate-200 text-center">
+                <h2 class="font-bold text-slate-800 text-lg">認證模擬</h2>
+                <div class="text-xs text-slate-500 mt-1">FCSS Enterprise Firewall</div>
+            </div>
+            
+            <div class="p-4 flex flex-col gap-3 flex-grow">
+                <button onclick="restartQuiz()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-2 rounded shadow transition-colors text-sm">
+                    <i class="fa-solid fa-rotate-right mr-2"></i>清空進度
+                </button>
+                
+                <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 text-center mt-2">
+                    <div class="text-xs text-slate-500 font-bold mb-1">作答進度</div>
+                    <div class="text-xl font-bold text-slate-800" id="stat-progress">0 / 0</div>
+                </div>
+
+                <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 text-center cursor-pointer hover:bg-red-50 transition-colors" onclick="nextFlag()" title="點擊尋找下一個標記">
+                    <div class="text-xs text-slate-500 font-bold mb-1">標記題數</div>
+                    <div class="text-xl font-bold text-red-600" id="stat-flagged">0</div>
+                </div>
+
+                <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 text-center">
+                    <div class="text-xs text-slate-500 font-bold mb-1">答對題數</div>
+                    <div class="text-xl font-bold text-green-600" id="stat-correct">0</div>
+                </div>
+
+                <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 text-center">
+                    <div class="text-xs text-slate-500 font-bold mb-1">正確率</div>
+                    <div class="text-xl font-bold text-blue-600" id="stat-accuracy">0%</div>
+                </div>
+            </div>
+
+            <div class="bg-amber-50 p-4 text-xs text-amber-800 border-t border-amber-200 leading-relaxed">
+                <div class="font-bold mb-2 text-sm"><i class="fa-solid fa-keyboard mr-1"></i> 快捷鍵說明</div>
+                <div class="mb-1"><kbd>1</kbd> ~ <kbd>6</kbd> 選擇選項 A~E</div>
+                <div class="mb-1"><kbd>←</kbd> / <kbd>→</kbd> 上 / 下一題</div>
+                <div class="mb-1"><kbd>Enter</kbd> 提交 / 下一題</div>
+                <div class="mb-1"><kbd>M</kbd> 標記 / 取消標記本題</div>
+                <div class="mb-1"><kbd>N</kbd> 清除本題</div>
+            </div>
+        </aside>
+
+        <div class="w-full lg:max-w-4xl flex flex-col relative z-10 min-w-0 shadow-xl rounded-2xl overflow-hidden bg-white">
+            
+            <div class="bg-slate-50 border-b border-slate-200 p-3 flex justify-between items-center flex-wrap gap-2">
+                <div class="text-sm font-bold text-slate-600 flex items-center gap-2">
+                    <span id="q-id-display" class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs">第 1 題 (ID: Q1)</span>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="clearCurrentQuestion()" class="bg-slate-500 hover:bg-slate-600 text-white px-3 py-1.5 rounded text-sm transition-colors shadow-sm flex items-center gap-1">
+                        <i class="fa-solid fa-eraser"></i> <span class="hidden sm:inline">清除本題</span>
+                    </button>
+                    <button onclick="toggleFlag()" id="btn-flag" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded text-sm transition-colors shadow-sm flex items-center gap-1">
+                        <i class="fa-solid fa-flag"></i> <span class="hidden sm:inline">標記本題</span>
+                    </button>
+                    <button onclick="prevFlag()" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1.5 rounded text-sm transition-colors shadow-sm flex items-center gap-1">
+                        <i class="fa-solid fa-caret-left"></i> <span class="hidden sm:inline">尋找標記</span>
+                    </button>
+                    <button onclick="nextFlag()" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1.5 rounded text-sm transition-colors shadow-sm flex items-center gap-1">
+                        <span class="hidden sm:inline">尋找標記</span> <i class="fa-solid fa-caret-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="w-full bg-slate-200 h-1.5">
+                <div id="progress-bar" class="bg-blue-600 h-1.5 transition-all duration-300" style="width: 0%"></div>
+            </div>
+
+            <div id="quiz-content" class="p-6 md:p-8 flex-grow flex flex-col">
+                </div>
+
+            <div id="footer-controls" class="bg-slate-50 border-t border-slate-200 p-4 md:p-6 flex justify-between items-center">
+                <button id="prev-btn" onclick="prevQuestion()" class="px-5 py-2 rounded-lg border border-slate-300 text-slate-600 hover:bg-white hover:text-slate-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                    <i class="fa-solid fa-arrow-left mr-2"></i> <span class="hidden sm:inline">Previous</span>
+                </button>
+
+                <div class="flex gap-3">
+                    <button id="submit-btn" onclick="submitAnswer()" class="px-6 py-2 rounded-lg bg-blue-600 text-white font-bold hover:bg-blue-700 shadow-md transition-transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed">
+                        Submit Answer <span class="ml-2 text-blue-200 text-xs font-normal border border-blue-400 rounded px-1 hidden sm:inline">Enter</span>
+                    </button>
+                    <button id="next-btn" onclick="nextQuestion()" class="px-6 py-2 rounded-lg bg-slate-800 text-white hover:bg-slate-900 transition-colors hidden">
+                        <span class="hidden sm:inline">Next</span> <i class="fa-solid fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <div id="palette-modal" class="fixed inset-0 z-[60] hidden">
+        <div class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity opacity-0" id="palette-backdrop" onclick="togglePalette()"></div>
+        
+        <div class="absolute right-0 top-0 h-full w-80 bg-white shadow-2xl transform transition-transform duration-300 translate-x-full flex flex-col" id="palette-panel">
+            <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
+                <h3 class="font-bold text-slate-800 flex items-center gap-2"><i class="fa-solid fa-list-ol text-blue-600"></i> Navigation</h3>
+                <button onclick="togglePalette()" class="text-slate-400 hover:text-slate-600 transition-colors w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-200">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+            
+            <div class="flex-grow overflow-y-auto p-4 custom-scrollbar">
+                <div id="palette-grid" class="grid grid-cols-5 gap-2">
+                    </div>
+            </div>
+            
+            <div class="p-4 border-t border-slate-200 bg-slate-50 text-xs text-slate-500 grid grid-cols-2 gap-2">
+                <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-blue-100 border border-blue-500"></div> Current</div>
+                <div class="flex items-center gap-2"><div class="w-3 h-3 rounded bg-white border border-slate-300"></div> Unanswered</div>
+                <div class="flex items-center gap-2"><div class="w-3 h-3 rounded bg-green-100 border border-green-500"></div> Correct</div>
+                <div class="flex items-center gap-2"><div class="w-3 h-3 rounded bg-red-100 border border-red-500"></div> Incorrect</div>
+                <div class="flex items-center gap-2 col-span-2 mt-1"><i class="fa-solid fa-flag text-red-500"></i> Flagged / Marked</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // 【請在此處貼上你原本完整的 65 題 questionsData 陣列】
+        // 為了避免 Token 限制，此處僅放一題作為格式示意，請把這段換成你完整的資料。
+        // ==========================================
+        const questionsData = [
+            {
+                id: 1,
+                q_en: "Refer to the exhibit. The partial output of an OSPF command is shown. You are checking the OSPF status of a FortiGate device when you receive the output shown in the exhibit. Based on the output, which two statements about FortiGate are correct? (Choose two)",
+                options: [
+                    "A. FortiGate is a backup designated router.",
+                    "B. FortiGate supports OSPF ECMP.",
+                    "C. FortiGate is in the area 0.0.0.5.",
+                    "D. FortiGate can inject external routing information."
+                ],
+                answer: "B, D",
+                explanation: "Injecting External Information (Option D): The last line of the exhibit explicitly states, 'This router is an ASBR'. An ASBR connects OSPF to another domain and injects external routes. OSPF ECMP Support (Option B): The output indicates 'Conforms to RFC2328', which supports ECMP."
+            },
+            {
+                id: 2,
+                q_en: "Refer to the exhibit, which shows a physical topology and a traffic log. The administrator is checking on FortiAnalyzer traffic from the device with IP address 10.1.10.1, located behind the FortiGate ISFW device. The firewall policy in on the ISFW device does not have UTM enabled and the administrator is surprised to see a log with the action Malware. What are two reasons FortiAnalyzer would display this log?  (Choose two)",
+                options: [
+                    "A. Security rating is enabled in ISFW.",
+                    "B. The firewall policy in NGFW-1 has UTM enabled.",
+                    "C. ISFW is not connected to FortiAnalyzer and must go through NGFW-1.",
+                    "D. ISFW is in a Security Fabric environment."
+                ],
+                answer: "B, D",
+                explanation: "ISFW is part of a Security Fabric (Option D) and shares logs. NGFW-1 has UTM enabled (Option B) and detects the malware upstream, which is correlated in FortiAnalyzer."
+            },
+            {
+                id: 3,
+                q_en: "Refer to the exhibit, which shows the ADVPN IPsec interface representing the VPN IPsec phase 1 from Hub A to Spoke 1 and Spoke 2, and from Hub B to Spoke 3 and Spoke 4. An administrator must configure an ADVPN using IBGP and EBGP to connect overlay network 1 with 2.\n\nWhat must the administrator configure in the phase 1 VPN IPsec configuration of the ADVPN tunnels?",
+                options: [
+                    "A. set auto-discovery-sender enable and set network-id x",
+                    "B. set auto-discovery-forwarder enable and set remote-as x",
+                    "C. set auto-discovery-crossover enable and set enforce-multihop enable",
+                    "D. set auto-discovery-receiver enable and set npu-offload enable"
+                ],
+                answer: "A",
+                explanation: "Setting auto-discovery-sender enable and specifying a network-id allows the tunnels to properly identify and route the ADVPN overlay networks."
+            },
+            {
+                id: 4,
+                q_en: "Refer to the exhibit. An HA configuration of an active-active (A-A) cluster with the same HA uptime is shown. You want HQ-NGFW-2 to handle the Core2 VDOM traffic. Which modification must you make to achieve this outcome?
+				",
+                options: [
+                    "A. Reboot HQ-NGFW-2.",
+                    "B. Change the priority from 100 to 160 for HQ-NGFW-2.",
+                    "C. Change the priority from 120 to 200 for HQ-NGFW-2.",
+                    "D. Enable override in virtual cluster 2 for HQ-NGFW-2."
+                ],
+                answer: "C",
+                explanation: "Priority determines the primary unit when uptime is same. HQ-NGFW-1 has priority 150 for Core2. HQ-NGFW-2 (currently 120) needs a higher priority than 150. Option C sets it to 200."
+            },
+            {
+                id: 5,
+                q_en: "What is the initial step performed by FortiGate when handling the first packets of a session?",
+                options: [
+                    "A. Installation of the session key in the network processor (NP)",
+                    "B. Data encryption and decryption",
+                    "C. Security inspections such as ACL, HPE, and IP integrity header checking",
+                    "D. Offloading the packets directly to the content processor (CP)"
+                ],
+                answer: "C",
+                explanation: "The first steps involve DoS checks, ACLs, HPE, and header integrity checks before session creation or offloading."
+            },
+            {
+                id: 6,
+                q_en: "Refer to the exhibit, which shows a partial troubleshooting command output. An administrator is extensively using IPsec on FortiGate. Many tunnels show information similar to the output shown in the exhibit.\n\nWhat can the administrator conclude?",
+                options: [
+                    "A. IPsec SAs cannot be offloaded.",
+                    "B. The two IPsec SAs, inbound and outbound, are copied to the NPU.",
+                    "C. Only the outbound IPsec SA is copied to the NPU.",
+                    "D. Only the inbound IPsec SA is copied to the NPU."
+                ],
+                answer: "A",
+                explanation: "npu_flag=20 (hex 0x20) indicates the SA is NOT offloaded to the NPU, often due to unsupported algorithms."
+            },
+            {
+                id: 7,
+                q_en: "A vulnerability scan report has revealed that a user has generated traffic to the website example.com (10.10.10.10) using a weak SSL/TLS version supported by the HTTPS web server.\n\nWhat can the firewall administrator do to block all outdated SSL/TLS versions on any HTTPS web server to prevent possible attacks on user traffic?",
+                options: [
+                    "A. Configure the unsupported SSL version and set the minimum allowed SSL version in the HTTPS settings of the SSL/SSH inspection profile.",
+                    "B. Enable auto-detection of outdated SSL/TLS versions in the SSL/SSH inspection profile to block vulnerable websites.",
+                    "C. Install the required certificate in the client's browser or use Active Directory policies to block specific websites as defined in the SSL/SSH inspection profile.",
+                    "D. Use the latest certificate, Fortinet_SSL_ECDSA256, and replace the CA certificate in the SSL/SSH inspection profile."
+                ],
+                answer: "A",
+                explanation: "Setting the minimum allowed SSL/TLS version in the SSL/SSH inspection profile forces clients to use secure versions or get blocked."
+            },
+            {
+                id: 8,
+                q_en: "The IT department discovered during the last network migration that all zero phase selectors in phase 2 IPsec configurations impacted network operations. What are two valid approaches to prevent this during future migrations? (Choose two)",
+                options: [
+                    "A. Use routing protocols to specify allowed subnets over the tunnel.",
+                    "B. Configure an IPsec-aggregate to create redundancy between each firewall peer.",
+                    "C. Clearly indicate to the VPN which segments will be encrypted in the phase two selectors.",
+                    "D. Configure an IP address on the IPsec interface of each firewall to establish unique peer connections and avoid impacting network operations."
+                ],
+                answer: "A, C",
+                explanation: "Using routing protocols (A) controls advertisements. Specific Phase 2 selectors (C) restrict what traffic enters the tunnel."
+            },
+            {
+                id: 9,
+                q_en: "Refer to the exhibits. The configuration of a user's Windows PC, which has a default MTU of 1500 bytes, along with FortiGate interfaces set to an MTU of 1000 bytes, and the results of PC1 pinging server 172.16.0.254 are shown. Why is the user in Windows PC1 unable to ping server 172.16.0.254 and is seeing the message: Packet needs to be fragmented but DF set?",
+                options: [
+                    "A. Option ip.flags.mf must be set to enable on FortiGate. The user has to adjust the ping MTU to 1000 to succeed.",
+                    "B. Fragmented packets must be encrypted. To connect any application successfully, the user must install the Fortinet_CA certificate in the Microsoft Management Console.",
+                    "C. FortiGate honors the do not fragment bit and the packets are dropped. The user has to adjust the ping MTU to 972 to succeed.",
+                    "D. The user must trigger different traffic because path MTU discovery techniques do not recognize ICMP payloads."
+                ],
+                answer: "C",
+                explanation: "The DF (Don't Fragment) bit prevents the router from fragmenting the packet to fit the smaller MTU (1000). The packet is dropped. The user must lower the packet size manually."
+            },
+            {
+                id: 10,
+                q_en: "A company's guest internet policy, operating in proxy mode, blocks access to Artificial Intelligence Technology sites using FortiGuard. However, a guest user accessed a page in this category using port 8443.\n\nWhich configuration changes are required for FortiGate to analyze HTTPS traffic on nonstandard ports like 8443 when full SSL inspection is active in the guest policy?",
+                options: [
+                    "A. Add a URL wildcard domain to the website CA certificate and use it in the SSL/SSH Inspection Profile.",
+                    "B. In the Protocol Port Mapping section of the SSL/SSH Inspection Profile, enter 443, 8443 to analyze both standard (443) and non-standard (8443) HTTPS ports.",
+                    "C. To analyze nonstandard ports in web filter profiles, use TLSv1.3 in the SSL/SSH Inspection Profile.",
+                    "D. Administrators can block traffic on nonstandard ports by enabling the SNI check in the SSL/SSH Inspection Profile."
+                ],
+                answer: "B",
+                explanation: "Proxy-based inspection defaults to standard ports. Non-standard ports must be explicitly added in Protocol Port Mapping."
+            },
+            {
+                id: 11,
+                q_en: "Refer to the exhibit. An administrator is deploying a hub and spokes network and using OSPF as dynamic protocol.\n\nWhich configuration is mandatory for neighbor adjacency?",
+                options: [
+                    "A. Set bfd enable in the router configuration",
+                    "B. Set network-type point-to-multipoint in the hub interface",
+                    "C. Set rfc1583-compatible enable in the router configuration",
+                    "D. Set virtual-link enable in the hub interface"
+                ],
+                answer: "B",
+                explanation: "In OSPF over IPsec VPN (hub-and-spoke), 'point-to-multipoint' is required to allow multiple neighbors on the same interface without DR/BDR election issues."
+            },
+            {
+                id: 12,
+                q_en: "An administrator wants to scale the IBGP sessions and optimize the routing table in an IBGP network. Which parameter should the administrator configure?",
+                options: [
+                    "A. network-import-check",
+                    "B. ibgp-enforce-multihop",
+                    "C. neighbor-group",
+                    "D. route-reflector-client"
+                ],
+                answer: "D",
+                explanation: "Route Reflectors (route-reflector-client) eliminate the need for a full-mesh IBGP topology, scaling the network."
+            },
+            {
+                id: 13,
+                q_en: "A company that acquired multiple branches across different countries needs to install new FortiGate devices on each of those branches. However, the IT staff lacks sufficient knowledge to implement the initial configuration on the FortiGate devices.\n\nWhich three approaches can the company take to successfully deploy advanced initial configurations on remote branches? (Choose three)",
+                options: [
+                    "A. Use metadata variables to dynamically assign values according to each FortiGate device.",
+                    "B. Use provisioning templates and install configuration settings at the device layer.",
+                    "C. Use the Global ADOM to deploy global object configurations to each FortiGate device.",
+                    "D. Apply Jinja in the FortiManager scripts for large-scale and advanced deployments.",
+                    "E. Add FortiGate devices on FortiManager as model devices, and use ZTP or LTP to connect to FortiGate devices."
+                ],
+                answer: "A, D, E",
+                explanation: "Metadata (A) for device-specific values. Jinja scripts (D) for large-scale and advanced deployments. Model devices + ZTP (E) for zero-touch deployment."
+            },
+            {
+                id: 14,
+                q_en: "Refer to the exhibit. The routing tables of FortiGate_A and FortiGate_B are shown. FortiGate_A and FortiGate_B are in the same autonomous system. The administrator wants to dynamically add only route 172.16.1.248/30 on FortiGate_A. What must the administrator configure?",
+                options: [
+                    "A. The prefix 172.16.1.248/30 in the BGP Networks section on FortiGate_B",
+                    "B. A BGP route map out for 172.16.1.248/30 on FortiGate_B",
+                    "C. Enable Redistribute Connected in the BGP section on FortiGate_B.",
+                    "D. A BGP route map in for 172.16.1.248/30 on FortiGate_A"
+                ],
+                answer: "A",
+                explanation: "Adding the prefix to the BGP Networks section on FortiGate_B is the standard way to advertise it dynamically into the BGP table without using complex route maps."
+            },
+            {
+                id: 15,
+                q_en: "Refer to the exhibit, which shows an enterprise network connected to an internet service provider. The administrator must configure the BGP section of FortiGate A to give internet access to the enterprise network.\n\nWhich command must the administrator use to establish a connection with the internet service provider?",
+                options: [
+                    "A. config neighbor",
+                    "B. config redistribute bgp",
+                    "C. config router route-map",
+                    "D. config redistribute ospf"
+                ],
+                answer: "A",
+                explanation: "'config neighbor' is the fundamental command to define the BGP peer (ISP) IP and AS number."
+            },
+            {
+                id: 16,
+                q_en: "What action can be taken on a FortiGate to block traffic using IPS protocol decoders, focusing on network transmission patterns and application signatures?",
+                options: [
+                    "A. Use the DNS filter to block application signatures and protocol decoders.",
+                    "B. Use application control to limit non-URL-based software handling.",
+                    "C. Enable application detection-based SD-WAN rules.",
+                    "D. Configure a web filter profile in flow mode."
+                ],
+                answer: "B",
+                explanation: "Application Control uses IPS protocol decoders to identify and control applications (non-URL based) via signatures."
+            },
+            {
+                id: 17,
+                q_en: "A FortiGate device with UTM profiles is reaching the resource limits, and the administrator expects the traffic in the enterprise network to increase.\nThe administrator has received an additional FortiGate of the same model.\nWhich two protocols should the administrator use to integrate the additional FortiGate device into this enterprise network? (Choose two)",
+                options: [
+                    "A. FGSP with external load balancers",
+                    "B. FGCP in active-active mode and with switches",
+                    "C. FGCP in active-passive mode and with VDOM disabled",
+                    "D. VRRP with switches"
+                ],
+                answer: "A, B",
+                explanation: "FGSP (A) allows session syncing with external LBs. FGCP Active-Active (B) distributes UTM processing across cluster members."
+            },
+            {
+                id: 18,
+                q_en: "Refer to the exhibit, which shows the VDOM section of a FortiGate device. An administrator discovers that webfilter stopped working in Core1 and Core2 after a maintenance window.\n\nWhich two reasons could explain why webfilter stopped working? (Choose two)",
+                options: [
+                    "A. The root VDOM does not have access to FortiManager in a closed network.",
+                    "B. The root VDOM does not have a VDOM link to connect with the Core1 and Core2 VDOMs.",
+                    "C. The Core1 and Core2 VDOMs must also be enabled as Management VDOMs to receive FortiGuard updates",
+                    "D. The root VDOM does not have access to any valid public FDN."
+                ],
+                answer: "A, D",
+                explanation: "The management VDOM (usually root) needs access to either a valid public FDN (for FortiGuard) or a local FortiManager in a closed network to fetch web filter ratings."
+            },
+            {
+                id: 19,
+                q_en: "During the maintenance window, an administrator must sniff all the traffic going through a specific firewall policy, which is handled by NP6 interfaces. The output of the sniffer trace provides just a few packets.\n\nWhy is the output of sniffer trace limited?",
+                options: [
+                    "A. The traffic corresponding to the firewall policy is encrypted.",
+                    "B. auto-asic-offload is set to enable in the firewall policy.",
+                    "C. inspection-mode is set to proxy in the firewall policy.",
+                    "D. The option npudbg is not added in the diagnose sniff packet command."
+                ],
+                answer: "B",
+                explanation: "Offloaded traffic (handled by NP6) bypasses the CPU, so the software sniffer won't see it unless offloading is disabled."
+            },
+            {
+                id: 20,
+                q_en: "Refer to the exhibit. A physical topology along with a traffic log is shown. You are using FortiAnalyzer to monitor traffic from the device with IP address 10.0.2.51, which is located behind the FortiGate internal segmentation firewall (ISFW) device. Unified threat management (UTM) is not enabled in the firewall policy on the HQ-ISFW device, and you are surprised to see a log with the action Malware, as shown in the exhibit. What are two reasons why FortiAnalyzer would display this log? (Choose two) (VS Q02)",
+                options: [
+                    "A. HQ-ISFW is not connected to FortiAnalyzer and traffic must go through HQ-NGFW-1.",
+                    "B. UTM is enabled in the firewall policy in HQ-NGFW-1.",
+                    "C. HQ-ISFW is in a Security Fabric environment.",
+                    "D. Security rating is enabled in HQ-ISFW."
+                ],
+                answer: "B, C",
+                explanation: "Fabric environment (C) shares logs. Upstream HQ-NGFW-1 has UTM (B) and detects the threat."
+            },
+            {
+                id: 21,
+                q_en: "Refer to the exhibit, which shows a partial enterprise network. An administrator would like the area 0.0.0.0 to detect the external network.\n\nWhat must the administrator configure?",
+                options: [
+                    "A. Enable RIP redistribution on FortiGate B.",
+                    "B. Configure a distribute-route-map-in on FortiGate B.",
+                    "C. Configure a virtual link between FortiGate A and B.",
+                    "D. Set the area 0.0.0.l type to stub on FortiGate A and B."
+                ],
+                answer: "A",
+                explanation: "To import routes from one protocol (RIP) into another (OSPF), redistribution must be enabled on the ASBR (FortiGate B)."
+            },
+            {
+                id: 22,
+                q_en: "A company's users on an IPsec VPN between FortiGate A and B have experienced intermittent issues since implementing VXLAN. The administrator suspects that packets exceeding the 1500-byte default MTU are causing the problems.\n\nIn which situation would adjusting the interface’s maximum MTU value help resolve issues caused by protocols that add extra headers to IP packets?",
+                options: [
+                    "A. Adjust the MTU on interfaces only if FortiGate has the FortiGuard enterprise bundle, which allows MTU modification.",
+                    "B. Adjust the MTU on interfaces in all FortiGate devices that support the latest family of Fortinet SPUs: NP7, CP9 and SP5.",
+                    "C. Adjust the MTU on interfaces in controlled environments where all devices along the path allow MTU interface changes.",
+                    "D. Adjust the MTU on interfaces only in wired connections like PPPoE, optic fiber, and ethernet cable."
+                ],
+                answer: "C",
+                explanation: "Jumbo frames (higher MTU) only work if supported and configured on *every* device in the path."
+            },
+            {
+                id: 23,
+                q_en: "Refer to the exhibit, which shows a revision history window in the FortiManager device layer. The IT team is trying to identify the administrator responsible for the most recent update in the FortiGate device database.\n\nWhich conclusion can you draw about this scenario?",
+                options: [
+                    "A. This retrieved process was automatically triggered by a Remote FortiGate Directly (via CLI) script.",
+                    "B. The user script_manager is an API user from the Fortinet Developer Network (FDN) retrieving a configuration.",
+                    "C. To identify the user who created the event, check it on the Configuration and Installation widget on FortiGate within the FortiManager device layer.",
+                    "D. Find the user in the FortiManager system logs and use the type=script command to find the administrator user in the user field."
+                ],
+                answer: "D",
+                explanation: "The script_manager is a system user. The actual admin is recorded in the FortiManager system logs, which can be found by filtering with type=script."
+            },
+            {
+                id: 24,
+                q_en: "Refer to the exhibit, which shows a command output. FortiGate_A and FortiGate_B are members of an FGSP cluster in an enterprise network.\n\nWhile testing the cluster using the ping command, the administrator monitors packet loss and found that the session output on FortiGate_B is as shown in the exhibit.\n\nWhat could be the cause of this output on FortiGate_B?",
+                options: [
+                    "A. The session synchronization is encrypted.",
+                    "B. session-pickup-connectionless is set to disable on FortiGate_B.",
+                    "C. FortiGate_B is configured in passive mode.",
+                    "D. FortiGate_A and FortiGate_B have the same standalone-group-id value."
+                ],
+                answer: "B",
+                explanation: "ICMP is connectionless. By default, FGSP doesn't sync connectionless sessions unless 'session-pickup-connectionless' is enabled."
+            },
+            {
+                id: 25,
+                q_en: "Refer to the exhibit, which shows an enterprise network connected to an internet service provider. An administrator must configure a loopback as a BGP source to connect to the ISP.\n\nWhich two commands are required to establish the connection? (Choose two)",
+                options: [
+                    "A. ebgp-enforce-multihop",
+                    "B. update-source",
+                    "C. ibgp-enforce-multihop",
+                    "D. recursive-next-hop"
+                ],
+                answer: "A, B",
+                explanation: "update-source (B) tells BGP to use the loopback IP. ebgp-enforce-multihop (A) is needed because the loopback isn't directly connected to the ISP's physical interface."
+            },
+            {
+                id: 26,
+                q_en: "Refer to the exhibit, which shows a hub and spokes deployment. An administrator is deploying several spokes, including the BGP configuration for the spokes to connect to the hub.\n\nWhich two commands allow the administrator to minimize the configuration? (Choose two)",
+                options: [
+                    "A. neighbor-group",
+                    "B. route-reflector-client",
+                    "C. neighbor-range",
+                    "D. ibgp-enforce-multihop"
+                ],
+                answer: "A, C",
+                explanation: "neighbor-group (A) templates common settings. neighbor-range (C) allows dynamic peers from a subnet without individual config."
+            },
+            {
+                id: 27,
+                q_en: "An administrator must minimize CPU and RAM use on a FortiGate firewall while also enabling essential security features, such as web filtering and application control for HTTPS traffic.\n\nWhich SSL inspection setting helps reduce system load while also enabling security features, such as web filtering and application control for encrypted HTTPS traffic?",
+                options: [
+                    "A. Use full SSL inspection to thoroughly inspect encrypted payloads.",
+                    "B. Disable SSL inspection entirely to conserve resources.",
+                    "C. Configure SSL inspection to handle HTTPS traffic efficiently.",
+                    "D. Enable SSL certificate inspection mode to perform basic checks without decrypting traffic."
+                ],
+                answer: "D",
+                explanation: "Certificate inspection checks SNI/CN headers without decrypting payload, saving resources while allowing domain-based filtering."
+            },
+            {
+                id: 28,
+                q_en: "Refer to the exhibit. The partial output of an OSPF command is shown. While checking the OSPF status of FortiGate, you receive the output shown in the exhibit. Based on the output, which two statements about FortiGate are correct? (Choose two)",
+                options: [
+                    "A. FortiGate has OSPF ECMP enabled.",
+                    "B. FortiGate is a backup designated router.",
+                    "C. FortiGate injects external routing information.",
+                    "D. FortiGate is connected to multiple areas."
+                ],
+                answer: "A, D",
+                explanation: "Output says \"This router is an ABR\" (Area Border Router), which implies connection to multiple areas (Option D). Output says \"Conforms to RFC2328\", supporting ECMP (Option A)."
+            },
+            {
+                id: 29,
+                q_en: "Refer to the exhibit. A pre-run CLI template that is used in zero-touch provisioning (ZTP) and low-touch provisioning (LTP) with FortiManager is shown. The template is not assigned even though the configuration has already been installed on FortiGate.\n\nWhat is true about this scenario?",
+                options: [
+                    "A. The administrator did not assign the template correctly when adding the model device because pre-CLI templates remain permanently assigned to the firewall",
+                    "B. Pre-run CLI templates are automatically unassigned after their initial installation",
+                    "C. Pre-run CLI templates for ZTP and LTP must be unassigned manually after the first installation to avoid conflicting error objects when importing a policy package",
+                    "D. The administrator must use post-run CLI templates that are designed for ZTP and LTP"
+                ],
+                answer: "B",
+                explanation: "Pre-run templates are for one-time provisioning. FortiManager automatically unassigns them after execution to prevent loops or overwrites."
+            },
+            {
+                id: 30,
+                q_en: "To secure your enterprise network traffic, which step does FortiGate perform first, when handling the first packets of a session? ",
+                options: [
+                    "A. Installation of the session key in the network processor (NP)",
+                    "B. Decryption",
+                    "C. A reverse path forwarding (RPF) check",
+                    "D. IP integrity header checking"
+                ],
+                answer: "D",
+                explanation: "IP integrity header checking is one of the very first sanity checks performed on ingress packets."
+            },
+            {
+                id: 31,
+                q_en: "Refer to the exhibit, which shows a LAN interface connected from FortiGate to two FortiSwitch devices. What two conclusions can you draw from the corresponding LAN interface? (Choose two)",
+                options: [
+                    "A. You must enable STP or RSTP on FortiGate and FortiSwitch to avoid layer 2 loopbacks.",
+                    "B. The LAN interface must use a 802.3ad type interface.",
+                    "C. This connection is using a FortiLInk to manage VLANs on FortiGate.",
+                    "D. FortiGate is using an SD-WAN-type interface to connect to a FortiSwitch device with MCLAG."
+                ],
+                answer: "B, C",
+                explanation: "Managing switches implies FortiLink (C). Connecting to two switches usually requires an aggregate (802.3ad) interface (B) (MCLAG)."
+            },
+            {
+                id: 32,
+                q_en: "Refer to the exhibit, which shows the ADVPN network topology and partial BGP configuration. Which two parameters must an administrator configure in the config neighbor range for spokes shown in the exhibit? (Choose two)",
+                options: [
+                    "A. set max-neighbor-num 2",
+                    "B. set neighbor-group advpn",
+                    "C. set route-reflector-client enable",
+                    "D. set prefix 172.16.1.0 255.255.255.0"
+                ],
+                answer: "B, D",
+                explanation: "Apply the group settings (B) and define the allowed subnet prefix (D) for the dynamic neighbors."
+            },
+            {
+                id: 33,
+                q_en: "Which two statements about IKEv2 are true if an administrator decides to implement IKEv2 in the VPN topology? (Choose two)",
+                options: [
+                    "A. It includes stronger Diffie-Hellman (DH) groups, such as Elliptic Curve (ECP) groups.",
+                    "B. It supports interoperability with devices using IKEv1.",
+                    "C. It exchanges a minimum of two messages to establish a secure tunnel.",
+                    "D. It supports the extensible authentication protocol (EAP)."
+                ],
+                answer: "A, D",
+                explanation: "IKEv2 supports EAP (D) and modern crypto like ECP (A). It is not backward compatible with IKEv1."
+            },
+            {
+                id: 34,
+                q_en: "Refer to the exhibit, which shows an OSPF network. Which configuration must the administrator apply to optimize the OSPF database?",
+                options: [
+                    "A. Set a route map in the AS boundary FortiGate.",
+                    "B. Set the area 0.0.0.1 to the type STUB in the area border FortiGate.",
+                    "C. Set an access list in the AS boundary FortiGate.",
+                    "D. Set the area 0.0.0.1 to the type NSSA in the area border FortiGate."
+                ],
+                answer: "B",
+                explanation: "Configuring an area as STUB prevents external LSAs from flooding into it, reducing the database size."
+            },
+            {
+                id: 35,
+                q_en: "Refer to the exhibit. A FortiGate segmented into VDOMs is shown. You must ensure effective and accelerated internet access for all of the VDOMs in this enterprise network. How can you achieve this? ",
+                options: [
+                    "A. Connect a physical interface from each VDOM to the root VDOM.",
+                    "B. Create VDOM links.",
+                    "C. Configure network processing unit (NPU) vlinks.",
+                    "D. Create VLANs over network processing unit (NPU) vlinks."
+                ],
+                answer: "D",
+                explanation: "To scale effectively and provide accelerated inter-VDOM traffic for multiple VDOMs, creating VLANs over NPU vlinks is the optimal approach."
+            },
+            {
+                id: 36,
+                q_en: "Refer to the exhibit, which shows the FortiGuard Distribution Network of a FortiGate device.\nFortiGuard Distribution Network on FortiGate\nAn administrator is trying to find the web filter database signature on FortiGate to resolve issues with websites not being filtered correctly in a flow-mode web filter profile.\n\nWhy is the web filter database version not visible on the GUI, such as with IPS definitions?",
+                options: [
+                    "A. The web filter database is stored locally, but the administrator must run over CLI diagnose autoupdate versions.",
+                    "B. The web filter database is stored locally on FortiGate, but it is hidden behind the GUI. It requires enabling debug mode to make it visible.",
+                    "C. The web filter database is not hosted on FortiGate: FortiGate queries FortiGuard or FortiManager for web filter ratings on demand.",
+                    "D. The web filter database is only accessible after manual syncing with a valid FDS server using diagnose test update info."
+                ],
+                answer: "C",
+                explanation: "Full web filter databases are huge. FortiGate queries the cloud (FortiGuard) in real-time."
+            },
+//            {
+//                id: 36,
+//                q_en: "Refer to the exhibit, which shows the FortiGuard Distribution Network of a FortiGate device.\nFortiGuard Distribution Network on FortiGate\nAn administrator is trying to find the web filter database signature on FortiGate to resolve issues with websites not being filtered correctly in a flow-mode web filter profile.\n\nWhy is the web filter database version not visible on the GUI, such as with IPS definitions?",
+//                options: [
+//                    "A. The web filter database is stored locally, but the administrator must run over CLI diagnose autoupdate versions.",
+//                    "B. The web filter database is stored locally on FortiGate, but it is hidden behind the GUI. It requires enabling debug mode to make it visible.",
+//                    "C. The web filter database is not hosted on FortiGate: FortiGate queries FortiGuard or FortiManager for web filter ratings on demand.",
+//                    "D. The web filter database is only accessible after manual syncing with a valid FDS server using diagnose test update info."
+//                ],
+//                answer: "C",
+//                explanation: "Full web filter databases are huge. FortiGate queries the cloud (FortiGuard) in real-time."
+//            },
+            {
+                id: 37,
+                q_en: "Refer to the exhibit, which shows the packet capture output of a three-way handshake between FortiGate and FortiManager Cloud. What two conclusions can you draw from the exhibit? (Choose two)",
+                options: [
+                    "A. FortiGate will receive a certificate that supports multiple domains because FortiManager operates in a cloud computing environment.",
+                    "B. FortiGate is connecting to the same IP server and will receive an independent certificate for its connection between FortiGate and FortiManager Cloud.",
+                    "C. If the TLS handshake contains 17 cipher suites it means the TLS version must be 1.0 on this three-way handshake.",
+                    "D. The wildcard for the domain *.fortinet-ca2.support.fortinet.com must be supported by FortiManager Cloud."
+                ],
+                answer: "B, D",
+                explanation: "FortiGate connects to the server IP and gets an independent certificate (B). Cloud services often rely on wildcard certificates to support multiple subdomains natively (D)."
+            },
+            {
+                id: 38,
+                q_en: "Refer to the exhibit, which shows an ADVPN network. An administrator must configure an ADVPN using IBGP and EBGP to connect overlay network 1 with 2.\n\nWhat two options must the administrator configure in BGP? (Choose two)",
+                options: [
+                    "A. set ebgp-enforce-multihop enable",
+                    "B. set next-hop-self enable",
+                    "C. set ibgp-enforce-multihop advpn",
+                    "D. set attribute-unchanged next-hop"
+                ],
+                answer: "A, D",
+                explanation: "ebgp-enforce-multihop (A) is required for indirect eBGP peers. Preserving the next-hop (attribute-unchanged next-hop) (D) is necessary in ADVPN so spokes can establish direct tunnels instead of routing through the hub."
+            },
+            {
+                id: 39,
+                q_en: "An administrator received a FortiAnalyzer alert that a 1 TB disk filled up in a day. Upon investigation, they found thousands of unusual DNS log requests, such as JHCMQK.website.com, with no answers. They later discovered that DNS exfiltration was occurring through both UDP and TLS.\n\nHow can the administrator prevent this data theft technique?",
+                options: [
+                    "A. Create an inline-CASB to protect against DNS exfiltration.",
+                    "B. Configure a File Filter profile to prevent DNS exfiltration.",
+                    "C. Enable DNS Filter to protect against DNS exfiltration.",
+                    "D. Use an IPS profile and DNS exfiltration-related signatures."
+                ],
+                answer: "D",
+                explanation: "IPS profiles include specific signatures to detect and block DNS tunneling/exfiltration techniques."
+            },
+            {
+                id: 40,
+                q_en: "What does the command set forward-domain &lt;domain_ID&gt; in a transparent VDOM interface do?",
+                options: [
+                    "A. It configures the interface to prioritize traffic based on the domain ID, enhancing quality of service for specified VLANs.",
+                    "B. It isolates traffic within a specific VLAN by assigning a broadcast domain to an interface based on the VLAN ID.",
+                    "C. It restricts the interface to managing traffic only from the specified VLAN, effectively segregating network traffic.",
+                    "D. It assigns a unique domain ID to the interface, allowing it to operate across multiple VLANs within the same VDOM."
+                ],
+                answer: "B",
+                explanation: "Forward domains in transparent mode create isolated broadcast domains, separating traffic between interfaces."
+            },
+            {
+                id: 41,
+                q_en: "Refer to the exhibit, which shows a network diagram. An administrator would like to modify the MED value advertised from FortiGate_1 to a BGP neighbor in the autonomous system 30.\n\nWhat must the administrator configure on FortiGate_1 to implement this?",
+                options: [
+                    "A. route-map-out",
+                    "B. network-import-check",
+                    "C. prefix-list-out",
+                    "D. distribute-list-out"
+                ],
+                answer: "A",
+                explanation: "Route-maps are used to modify attributes (like MED, Local Preference) for routes advertised to neighbors."
+            },
+            {
+                id: 42,
+                q_en: "An administrator must standardize the deployment of FortiGate devices across branches with consistent interface roles and policy packages using FortiManager.\n\nWhat is the recommended best practice for interface assignment in this scenario?",
+                options: [
+                    "A. Enable metadata variables to use dynamic configurations in the standard interfaces of FortiManager.",
+                    "B. Use the Install On feature in the policy package to automatically assign different interfaces based on the branch.",
+                    "C. Create interfaces using device database scripts to use them on the same policy package of FortiGate devices.",
+                    "D. Create normalized interface types per-platform to automatically recognize device layer interfaces based on the FortiGate model and interface name."
+                ],
+                answer: "D",
+                explanation: "Normalized interfaces allow FortiManager to map logical interface names used in global policies to the actual physical interfaces on different FortiGate models per-platform automatically."
+            },
+            {
+                id: 43,
+                q_en: "An administrator is checking an enterprise network and sees a suspicious packet with the MAC address e0:23:ff:fc:00:86.\n\nWhat two conclusions can the administrator draw? (Choose two)",
+                options: [
+                    "A. The suspicious packet is related to a cluster that has VDOMs enabled.",
+                    "B. The network includes FortiGate devices configured with the FGSP protocol.",
+                    "C. The suspicious packet is related to a cluster with a group-id value lower than 255.",
+                    "D. The suspicious packet corresponds to port 7 on a FortiGate device."
+                ],
+                answer: "A, D",
+                explanation: "e0:23:ff = HA virtual MAC with VDOMs. Last byte 86 = 80 (vcluster) + 06 (interface index). Index 6 is Port 7."
+            },
+            {
+                id: 44,
+                q_en: "Refer to the exhibits. The exhibits show a network topology, a firewall policy, and an SSL/SSH inspection profile configuration.\n\nWhy is FortiGate unable to detect HTTPS attacks on firewall policy ID 3 targeting the Linux server?",
+                options: [
+                    "A. The administrator must set the policy to inspection mode to analyze the HTTPS packets as expected.",
+                    "B. The administrator must enable HTTPS in the protocol port mapping of the deep-inspection SSL/SSH inspection profile.",
+                    "C. The administrator must enable SSL inspection of the SSL server and upload the certificate of the Linux server website to the SSL/SSH inspection profile.",
+                    "D. The administrator must enable cipher suites in the SSL/SSH inspection profile to decrypt the message."
+                ],
+                answer: "C",
+                explanation: "To inspect inbound HTTPS to a server, 'Protecting SSL Server' mode is needed, requiring the server's private key/cert to decrypt."
+            },
+            {
+                id: 45,
+                q_en: "Refer to the exhibit, which contains the partial output of an OSPF command. An administrator is checking the OSPF status of a FortiGate device and receives the output shown in the exhibit.\n\nWhat two conclusions can the administrator draw? (Choose two)",
+                options: [
+                    "A. The FortiGate device is a backup designated router",
+                    "B. The FortiGate device is connected to multiple areas",
+                    "C. The FortiGate device injects external routing information",
+                    "D. The FortiGate device has OSPF ECMP enabled"
+                ],
+                answer: "B, C",
+                explanation: "An ABR (Area Border Router) connects to multiple areas (B), and an ASBR (Autonomous System Boundary Router) injects external routing information (C)."
+            },
+            {
+                id: 46,
+                q_en: "An administrator is extensively using VXLAN on FortiGate.\n\nWhich specialized acceleration hardware does FortiGate need to improve its performance?",
+                options: [
+                    "A. NP7",
+                    "B. SP5",
+                    "C. CP9",
+                    "D. NTurbo"
+                ],
+                answer: "A",
+                explanation: "NP7 (Network Processor 7) provides hardware acceleration specifically for VXLAN encapsulation and decapsulation, significantly improving performance compared to CPU processing."
+            },
+            {
+                id: 47,
+                q_en: "An administrator applied a block-all IPS profile for client and server targets to secure the server, but the database team reported the application stopped working immediately after.\n\nHow can an administrator apply IPS in a way that ensures it does not disrupt existing applications in the network?",
+                options: [
+                    "A. Use an IPS profile with all signatures in monitor mode and verify patterns before blocking.",
+                    "B. Limit the IPS profile to server targets only to avoid blocking connections from the server to clients.",
+                    "C. Select flow mode in the IPS profile to accurately analyze application patterns.",
+                    "D. Set the IPS profile signature action to default to discard all possible false positives."
+                ],
+                answer: "A",
+                explanation: "Monitor mode logs actions without blocking packets, allowing admins to tune the profile safely."
+            },
+            {
+                id: 48,
+                q_en: "A user reports that their computer was infected with malware after accessing a secured HTTPS website. However, when the administrator checks the FortiGate logs, they do not see that the website was detected as insecure despite having an SSL certificate and correct profiles applied on the policy.\n\nHow can an administrator ensure that FortiGate can analyze encrypted HTTPS traffic on a website?",
+                options: [
+                    "A. The administrator must enable reputable websites to allow only SSL/TLS websites rated by FortiGuard web filter.",
+                    "B. The administrator must enable URL extraction from SNI on the SSL certificate inspection to ensure the TLS three-way handshake is correctly analyzed by FortiGate.",
+                    "C. The administrator must enable DNS over TLS to protect against fake Server Name Indication (SNI) that cannot be analyzed in common DNS requests on HTTPS websites.",
+                    "D. The administrator must enable full SSL inspection in the SSL/SSH Inspection Profile to decrypt packets and ensure they are analyzed as expected."
+                ],
+                answer: "D",
+                explanation: "Only Full SSL Inspection decrypts the payload to find malware hidden inside the encrypted stream."
+            },
+            {
+                id: 49,
+                q_en: "An administrator needs to install an IPS profile without triggering false positives that can impact applications and cause problems with the user's normal traffic flow.\n\nWhich action can the administrator take to prevent false positives on IPS analysis?",
+                options: [
+                    "A. Use the IPS profile extension to select an operating system, protocol, and application for all the network internal services and users to prevent false positives.",
+                    "B. Enable Scan Outgoing Connections to avoid clicking suspicious links or attachments that can deliver botnet malware and create false positives.",
+                    "C. Use an IPS profile with action monitor, however, the administrator must be aware that this can compromise network integrity.",
+                    "D. Install missing or expired SSUTLS certificates on the client PC to prevent expected false positives."
+                ],
+                answer: "C",
+                explanation: "Setting the IPS profile action to monitor allows the administrator to evaluate signatures and analyze traffic without dropping packets, helping to tune out false positives before enforcing blocks."
+            },
+            {
+                id: 50,
+                q_en: "Refer to the exhibits. A policy package conflict status and information from the import device wizard in the Core1 VDOM are shown. When you import a policy package, the following message appears for the Web_restrictions web filter profile and the deep-inspection SSL-SSH profile: \"The following objects were found having conflicts. Please confirm your settings, then continue.\" The Web_restrictions and deep-inspection profiles are used by other FortiGate devices within FortiManager. Which step must you take to resolve the issue? ",
+                options: [
+                    "A. Retrieve the FortiGate configuration to automatically export correct objects and policies.",
+                    "B. Create uniquely named objects on FortiGate and reimport them into the policy package.",
+                    "C. Select the FortiManager configuration that accepts changes on FortiManager and preserves existing configurations on FortiGate devices.",
+                    "D. Use non-default object values because FortiManager is unable to alter default values."
+                ],
+                answer: "B",
+                explanation: "Renaming the local object resolves the namespace conflict with the global/package object."
+            },
+            {
+                id: 51,
+                q_en: "Refer to the exhibit, which shows a corporate network and a new remote office network. An administrator must integrate the new remote office network with the corporate enterprise network.\n\nWhat must the administrator do to allow routing between the two networks?",
+                options: [
+                    "A. The administrator must implement BGP to inject the new remote office network into the corporate FortiGate device",
+                    "B. The administrator must configure a static route to the subnet 192.168.l.0/24 on the corporate FortiGate device.",
+                    "C. The administrator must configure virtual links on both FortiGate devices.",
+                    "D. The administrator must implement OSPF over IPsec on both FortiGate devices."
+                ],
+                answer: "D",
+                explanation: "Internet connection requires VPN (IPsec). OSPF over IPsec allows dynamic routing exchange."
+            },
+            {
+                id: 52,
+                q_en: "You are using Virtual eXtensible LAN (VXLAN) extensively on FortiGate. Which specialized acceleration hardware must you use to improve FortiGate performance? (VS Q46)",
+                options: [
+                    "A. NP7",
+                    "B. SP5",
+                    "C. CP9",
+                    "D. NTurbo"
+                ],
+                answer: "A",
+                explanation: "The NP7 processor is designed to offload VXLAN encapsulation/decapsulation tasks, offering significant performance gains for this specific protocol."
+            },
+            {
+                id: 53,
+                q_en: "Refer to the exhibit, which contains a partial VPN configuration.\n\nWhat can you conclude from this VPN IPsec phase 1 configuration?",
+                options: [
+                    "A. This configuration is the best for networks with regular traffic intervals, providing a balance between connectivity assurance and resource utilization.",
+                    "B. Peer IDs are unencrypted and exposed, creating a security risk.",
+                    "C. FortiGate will not add a route to its routing or forwarding information base when the dynamic tunnel is negotiated.",
+                    "D. A separate interface is created for each dial-up tunnel, which can be slower and more resource intensive, especially in large networks."
+                ],
+                answer: "A",
+                explanation: "The setting set dpd on-idle allows the tunnel to stay up without constant keep-alives unless traffic is idle, conserving resources while maintaining readiness for regular traffic. set type dynamic implies a dial-up/hub scenario."
+            },
+            {
+                id: 54,
+                q_en: "An administrator must enable direct communication between multiple spokes in a company's network. Each spoke has more than one internet connection. The requirement is for the spokes to connect directly without passing through the hub, and for the links to automatically switch to the best available connection.\n\nHow can this automatic detection and optimal link utilization between spokes be achieved?",
+                options: [
+                    "A. Set up OSPF routing over static VPN tunnels between spokes.",
+                    "B. Utilize ADVPN 2.0 to facilitate dynamic direct tunnels and automatic link optimization.",
+                    "C. Establish static VPN tunnels between spokes with predefined backup routes.",
+                    "D. Implement SD-WAN policies at the hub to manage spoke link quality."
+                ],
+                answer: "B",
+                explanation: "ADVPN 2.0 integrates SD-WAN with shortcuts, allowing health-check based path selection for spoke-to-spoke tunnels."
+            },
+            {
+                id: 55,
+                q_en: "An administrator is designing an ADVPN network for a large enterprise with spokes that have varying numbers of internet links. They want to avoid a high number of routes and peer connections at the hub.\n\nWhich method should be used to simplify routing and peer management?",
+                options: [
+                    "A. Deploy a full-mesh VPN topology to eliminate hub dependency.",
+                    "B. Implement static routing over IPsec interfaces for each spoke.",
+                    "C. Use a dynamic routing protocol using loopback interfaces to streamline peers and routes.",
+                    "D. Establish a traditional hub-and-spoke VPN topology with policy routes."
+                ],
+                answer: "C",
+                explanation: "BGP on Loopbacks allows peering independent of physical overlays/interfaces, simplifying topology."
+            },
+            {
+                id: 56,
+                q_en: "Refer to the exhibit, which shows a network diagram showing the addition of site 2 with an overlapping network segment to the existing VPN IPsec connection between the hub and site 1.\n\nWhich IPsec phase 2 configuration must an administrator make on the FortiGate hub to enable equal-cost multi-path (ECMP) routing when multiple remote sites connect with overlapping subnets?",
+                options: [
+                    "A. Set route-overlap to either use-new or use-old",
+                    "B. Set net-device to ecmp",
+                    "C. Set single-source to enable",
+                    "D. Set route-overlap to allow"
+                ],
+                answer: "D",
+                explanation: "Setting 'route-overlap' to 'allow' permits multiple phase 2 tunnels with overlapping subnets to coexist, which is required to establish ECMP routing across these tunnels."
+            },
+            {
+                id: 57,
+                q_en: "An administrator configured the FortiGate devices in an enterprise network to join the Fortinet Security Fabric. The administrator has a list of IP addresses that must be blocked by the data center firewall. This list is updated daily.\n\nHow can the administrator automate a firewall policy with the daily updated list?",
+                options: [
+                    "A. With FortiNAC",
+                    "B. With FortiAnalyzer",
+                    "C. With a Security Fabric automation",
+                    "D. With an external connector from Threat Feeds"
+                ],
+                answer: "D",
+                explanation: "Threat Feeds (External Connectors) fetch external lists (HTTP/text) for use in policies."
+            },
+            {
+                id: 58,
+                q_en: "Refer to the exhibit, which contains the partial output of an OSPF command. An administrator is checking the OSPF status of a FortiGate device and receives the output shown in the exhibit.\n\nWhich statement on this FortiGate device is correct?",
+                options: [
+                    "A. The FortiGate device can inject external routing information.",
+                    "B. The FortiGate device is in the area 0.0.0.5.",
+                    "C. The FortiGate device does not support OSPF ECMP.",
+                    "D. The FortiGate device is a backup designated router."
+                ],
+                answer: "A",
+                explanation: "Output says 'This router is an ASBR'. ASBRs inject external routes."
+            },
+            {
+                id: 59,
+                q_en: "Refer to the exhibits. The Administrators section of a root FortiGate device and the Security Fabric Settings section of a downstream FortiGate device are shown. When prompted to sign in with Security Fabric in the downstream FortiGate device, a user enters the AdminSSO credentials.\n\nWhat is the next status for the user?",
+                options: [
+                    "A. The user is prompted to create an SSO administrator account for AdminSSO.",
+                    "B. The user receives an authentication failure message.",
+                    "C. The user accesses the downstream FortiGate with super_admin_readonly privileges.",
+                    "D. The user accesses the downstream FortiGate with super_admin privileges."
+                ],
+                answer: "C",
+                explanation: "Fabric SSO inherits the permissions defined at the IdP (Root)."
+            },
+            {
+                id: 60,
+                q_en: "An administrator is setting up an ADVPN configuration and wants to ensure that peer IDs are not exposed during VPN establishment.\n\nWhich protocol can the administrator use to enhance security?",
+                options: [
+                    "A. Use IKEv2, which encrypts peer IDs and prevents exposure.",
+                    "B. Opt for SSL VPN web mode because it does not use peer IDs at all.",
+                    "C. Choose IKEv1 aggressive mode because it simplifies peer identification.",
+                    "D. Stick with IKEv1 main mode because it offers better performance."
+                ],
+                answer: "A",
+                explanation: "IKEv2 encrypts identities. IKEv1 Aggressive sends them in cleartext."
+            },
+            {
+                id: 61,
+                q_en: "How does 'set tcp-mss-sender' and 'set tcp-mss-receiver' affect TCP packets?",
+                options: [
+                    "A. The maximum segment size permitted in the firewall policy determines whether TCP packets are allowed or denied.",
+                    "B. Applying commands in a firewall policy determines the largest payload a device can handle in a single TCP segment.",
+                    "C. The administrator must consider the payload size of the packet and the size of the IP header to configure a correct value in the firewall policy.",
+                    "D. The TCP packet modifies the packet size only if the size of the packet is less than the one the administrator configured in the firewall policy."
+                ],
+                answer: "B",
+                explanation: "It modifies the MSS value in the SYN packet, effectively capping the max payload size to prevent fragmentation."
+            },
+            {
+                id: 62,
+                q_en: "Refer to the exhibit, which shows the HA status of an active-passive cluster. An administrator wants FortiGate_B to handle the Core2 VDOM traffic.\n\nWhich modification must the administrator apply to achieve this?",
+                options: [
+                    "A. The administrator must disable override on FortiGate_A.",
+                    "B. The administrator must change the priority from 100 to 160 for FortiGate_B.",
+                    "C. The administrator must change the load balancing method on FortiGate_B.",
+                    "D. The administrator must change the priority from 128 to 200 for FortiGate_B."
+                ],
+                answer: "D",
+                explanation: "To preempt FG_A (150), FG_B must have a higher priority (e.g., 200)."
+            },
+            {
+                id: 63,
+                q_en: "Refer to the exhibit, which contains a partial command output. The administrator has configured BGP on FortiGate. The status of this new BGP configuration is shown in the exhibit.\n\nWhat configuration must the administrator consider next?",
+                options: [
+                    "A. Configure a static route to 100.65.4.1.",
+                    "B. Configure the local AS to 65300.",
+                    "C. Contact the remote peer administrator to enable BGP",
+                    "D. Enable ebgp-enforce-multihop."
+                ],
+                answer: "D",
+                explanation: "EBGP via Loopback = Not directly connected physically = Requires ebgp-enforce-multihop."
+            },
+            {
+                id: 64,
+                q_en: "Refer to the exhibit, which shows an ADVPN network. The client behind Spoke-1 generates traffic to the device located behind Spoke-2.\n\nWhat is the first message that the hub sends to Spoke-1 to bring up the dynamic tunnel?",
+                options: [
+                    "A. Shortcut query",
+                    "B. Shortcut offer",
+                    "C. Shortcut reply",
+                    "D. Shortcut forward"
+                ],
+                answer: "B",
+                explanation: "Hub sends 'Shortcut Offer' to the initiator to suggest a direct path."
+            },
+            {
+                id: 65,
+                q_en: "Why does the ISDB block layers 3 and 4 of the OSI model when applying content filtering? (Choose two)",
+                options: [
+                    "A. FortiGate has a predefined list of all IPs and ports for specific applications downloaded from FortiGuard.",
+                    "B. The ISDB blocks the IP addresses and ports of an application predefined by FortiGuard.",
+                    "C. The ISDB works in proxy mode, allowing the analysis of packets in layers 3 and 4 of the OSI model.",
+                    "D. The ISDB limits access by URL and domain."
+                ],
+                answer: "A, B",
+                explanation: "ISDB is a database of IP/Ports (L3/L4) for applications, allowing filtering without deep inspection."
+            }
+        ];
+        // ==========================================
+
+        // Core Logic
+        let currentIndex = 0;
+        let selectedAnswers = []; // Store selected options ["A", "B"]
+        let isAnswered = false;
+        let quizResults = {}; // Store correctness per question: { 1: true, 2: false }
+        let flaggedQuestions = new Set(); // 儲存被標記的題目 ID
+
+        const quizContent = document.getElementById('quiz-content');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const submitBtn = document.getElementById('submit-btn');
+        const progressBar = document.getElementById('progress-bar');
+        const currentProgress = document.getElementById('current-progress');
+        const totalCount = document.getElementById('total-count');
+        const footerControls = document.getElementById('footer-controls');
+
+        // Palette Logic
+        const paletteModal = document.getElementById('palette-modal');
+        const paletteBackdrop = document.getElementById('palette-backdrop');
+        const palettePanel = document.getElementById('palette-panel');
+        const paletteGrid = document.getElementById('palette-grid');
+
+        // ==== 鍵盤事件監聽 (快捷鍵實作) ====
+        document.addEventListener('keydown', (e) => {
+            // 避免在輸入框中觸發
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+            // 1-5 數字鍵選擇選項 A-E
+            // const keyMap = {'1': 'A', '2': 'B', '3': 'C', '4': 'D', '5': 'E', '6': 'F'};
+            const keyMap = {'1': 'A', '2': 'B', '3': 'C', '4': 'D', '5': 'E'};
+            if (keyMap[e.key] && !isAnswered) {
+                const optionIndex = e.key.charCodeAt(0) - 49; // '1' -> 0
+                const cards = document.querySelectorAll('.option-card');
+                if (cards[optionIndex]) {
+                    const currentQ = questionsData[currentIndex];
+                    const isMultiple = currentQ.answer.includes(',');
+                    toggleOption(keyMap[e.key], isMultiple, cards[optionIndex]);
+                }
+            }
+
+            // 左方向鍵: 上一題
+            if (e.key === 'ArrowLeft') {
+                prevQuestion();
+            }
+            
+            // 右方向鍵: 下一題
+            if (e.key === 'ArrowRight') {
+                nextQuestion();
+            }
+
+            // Enter 鍵: 提交或下一題
+            if (e.key === 'Enter') {
+                // 若已經答完且在看結果頁面，Enter 也可以觸發 restart (可選)
+                if (document.getElementById('result-banner') && !document.getElementById('result-banner').classList.contains('hidden') && currentIndex === questionsData.length) return; 
+
+                if (!isAnswered && selectedAnswers.length > 0) {
+                    submitAnswer();
+                } else if (isAnswered || selectedAnswers.length === 0) {
+                    nextQuestion();
+                }
+            }
+
+            // M 鍵: 標記/取消標記本題
+            if (e.key.toLowerCase() === 'm') {
+                toggleFlag();
+            }
+
+            // N 鍵: 清除本題進度
+              if (e.key.toLowerCase() === 'n') {
+                clearCurrentQuestion();
+            }
+            
+        });
+
+        // Init
+        document.addEventListener("DOMContentLoaded", () => {
+            totalCount.innerText = questionsData.length + " Questions";
+            updateStats();
+            renderQuestion(currentIndex);
+        });
+
+        // 標記本題 (Flag)
+        function toggleFlag() {
+            const currentQId = questionsData[currentIndex].id;
+            const btnFlag = document.getElementById('btn-flag');
+            
+            if (flaggedQuestions.has(currentQId)) {
+                flaggedQuestions.delete(currentQId);
+                btnFlag.classList.replace('bg-red-700', 'bg-red-500');
+                btnFlag.innerHTML = '<i class="fa-regular fa-flag"></i> <span class="hidden sm:inline">標記本題</span>';
+            } else {
+                flaggedQuestions.add(currentQId);
+                btnFlag.classList.replace('bg-red-500', 'bg-red-700');
+                btnFlag.innerHTML = '<i class="fa-solid fa-flag"></i> <span class="hidden sm:inline">取消標記</span>';
+            }
+            
+            updateStats();
+            if (!paletteModal.classList.contains('hidden')) renderPaletteGrid();
+        }
+
+        // 尋找下一個標記
+        function nextFlag() {
+            if (flaggedQuestions.size === 0) { alert('目前沒有任何標記的題目。'); return; }
+            for (let pos = currentIndex + 1; pos < questionsData.length; pos++) {
+                if (flaggedQuestions.has(questionsData[pos].id)) {
+                    currentIndex = pos;
+                    renderQuestion(currentIndex);
+                    return;
+                }
+            }
+            // 若後面沒有，循環找最前面的
+            for (let pos = 0; pos <= currentIndex; pos++) {
+                if (flaggedQuestions.has(questionsData[pos].id)) {
+                    currentIndex = pos;
+                    renderQuestion(currentIndex);
+                    return;
+                }
+            }
+        }
+
+        // 尋找上一個標記
+        function prevFlag() {
+            if (flaggedQuestions.size === 0) { alert('目前沒有任何標記的題目。'); return; }
+            for (let pos = currentIndex - 1; pos >= 0; pos--) {
+                if (flaggedQuestions.has(questionsData[pos].id)) {
+                    currentIndex = pos;
+                    renderQuestion(currentIndex);
+                    return;
+                }
+            }
+            // 若前面沒有，找最後面的
+            for (let pos = questionsData.length - 1; pos >= currentIndex; pos--) {
+                if (flaggedQuestions.has(questionsData[pos].id)) {
+                    currentIndex = pos;
+                    renderQuestion(currentIndex);
+                    return;
+                }
+            }
+        }
+
+        // 清除本題進度
+        function clearCurrentQuestion() {
+            const currentQId = questionsData[currentIndex].id;
+            delete quizResults[currentQId];
+            selectedAnswers = [];
+            isAnswered = false;
+            updateStats();
+            renderQuestion(currentIndex);
+        }
+
+        // 更新左側統計數據
+        function updateStats() {
+            const total = questionsData.length;
+            const answeredCount = Object.keys(quizResults).length;
+            const correctCount = Object.values(quizResults).filter(r => r === true).length;
+            const flaggedCount = flaggedQuestions.size;
+            const percentage = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+
+            document.getElementById('stat-progress').innerText = `${answeredCount} / ${total}`;
+            document.getElementById('stat-flagged').innerText = flaggedCount;
+            document.getElementById('stat-correct').innerText = correctCount;
+            document.getElementById('stat-accuracy').innerText = `${percentage}%`;
+        }
+
+        function renderQuestion(index) {
+            const q = questionsData[index];
+            
+            // 初始化狀態
+            isAnswered = quizResults.hasOwnProperty(q.id);
+            if (!isAnswered) selectedAnswers = []; 
+
+            // 更新標記按鈕 UI
+            const btnFlag = document.getElementById('btn-flag');
+            if (flaggedQuestions.has(q.id)) {
+                btnFlag.classList.replace('bg-red-500', 'bg-red-700');
+                btnFlag.innerHTML = '<i class="fa-solid fa-flag"></i> <span class="hidden sm:inline">取消標記</span>';
+            } else {
+                btnFlag.classList.replace('bg-red-700', 'bg-red-500');
+                btnFlag.innerHTML = '<i class="fa-regular fa-flag"></i> <span class="hidden sm:inline">標記本題</span>';
+            }
+
+            document.getElementById('q-id-display').innerText = `第 ${index + 1} 題 (ID: Q${q.id})`;
+            
+            // Image Logic
+            const paddedId = String(q.id).padStart(2, '0');
+            const imgFilename = `png/q${paddedId}.png`;
+            const hasExhibit = q.q_en.toLowerCase().includes("exhibit") || q.q_en.toLowerCase().includes("refer to");
+
+            let exhibitHtml = `
+                <div class="my-6 flex flex-col items-center justify-center">
+                     <img src="${imgFilename}" 
+                          alt="Exhibit for Question ${q.id}" 
+                          class="max-w-full h-auto rounded-lg border border-slate-300 shadow-sm transition-opacity duration-300"
+                          style="display: none;"
+                          onload="this.style.display='block'"
+                          onerror="this.style.display='none'; ${hasExhibit ? `document.getElementById('placeholder-${q.id}').classList.remove('hidden');` : ''}"
+                     >
+                     ${hasExhibit ? `
+                     <div id="placeholder-${q.id}" class="hidden w-full bg-slate-50 border-2 border-dashed border-slate-300 rounded-lg h-32 flex flex-col items-center justify-center text-slate-400">
+                         <i class="fa-regular fa-image text-3xl mb-2"></i>
+                         <span class="text-xs font-semibold">Q${q.id} Exhibit (png/q${paddedId}.png)</span>
+                         <span class="text-xs text-center px-2">To view the image, please ensure the file <b>q${paddedId}.png</b> is located in the <b>png</b> folder.</span>
+                     </div>
+                     ` : ''}
+                </div>
+            `;
+
+            // Options Logic
+            const isMultiple = q.answer.includes(',');
+            const typeText = isMultiple ? '<span class="text-xs bg-slate-200 text-slate-600 px-2 py-0.5 rounded ml-2">Multiple Choice</span>' : '';
+
+            let optionsHtml = q.options.map((opt, i) => {
+                const letter = String.fromCharCode(65 + i); // 0->A, 1->B
+                return `
+                <div class="option-card border border-slate-200 rounded-lg p-4 mb-3 flex items-start gap-3" 
+                     onclick="toggleOption('${letter}', ${isMultiple}, this)" data-letter="${letter}">
+                    <div class="flex-shrink-0 w-6 h-6 rounded-full border-2 border-slate-300 flex items-center justify-center mt-0.5 option-indicator">
+                        ${isMultiple ? '<div class="w-3 h-3 rounded-sm bg-blue-500 hidden"></div>' : '<div class="w-3 h-3 rounded-full bg-blue-500 hidden"></div>'}
+                    </div>
+                    <div class="text-slate-700 text-sm md:text-base leading-relaxed select-none">
+                        <span class="font-bold mr-2 text-slate-400">${letter}.</span>${opt.substring(3)}
+                    </div>
+                </div>`;
+            }).join('');
+
+            // Render
+            quizContent.innerHTML = `
+                <div class="flex justify-between items-start mb-4 fade-in">
+                    <span class="bg-slate-800 text-white text-sm font-bold px-3 py-1 rounded">第 ${index + 1} 題</span>
+                    ${typeText}
+                </div>
+                
+                <div class="mb-2 fade-in">
+                    <p class="font-bold text-slate-800 text-lg md:text-xl mb-3 leading-snug">${q.q_en}</p>
+                </div>
+
+                <div class="fade-in">
+                    ${exhibitHtml}
+                </div>
+
+                <div id="options-container" class="mt-4 mb-6 fade-in">
+                    ${optionsHtml}
+                </div>
+
+                <div id="explanation-area" class="hidden mt-4 bg-green-50 rounded-lg p-6 border border-green-100 fade-in">
+                    <div id="result-banner" class="mb-4 p-3 rounded-lg font-bold text-lg text-center"></div>
+                    <div class="flex items-center gap-2 mb-3 flex-wrap">
+                        <span class="font-bold text-green-700"><i class="fa-solid fa-check-circle mr-1"></i> Correct Answer:</span>
+                        <span class="font-bold text-xl text-green-800">${q.answer}</span>
+                        <span class="ml-2 text-sm text-slate-600">| Your answer: <span id="your-answer-display" class="font-semibold">(none)</span></span>
+                    </div>
+                    <div class="text-sm text-slate-700 space-y-3">
+                        <p><span class="font-semibold text-slate-900">Explanation:</span> ${q.explanation}</p>
+                    </div>
+                </div>
+            `;
+
+            // Update UI State
+            footerControls.classList.remove('hidden');
+            updateProgress();
+            
+            // 如果這題之前已經答過了，直接顯示結果狀態
+            if (isAnswered) {
+                document.getElementById('explanation-area').classList.remove('hidden');
+                submitBtn.classList.add('hidden');
+                nextBtn.classList.remove('hidden');
+                // 視覺上鎖死選項
+                document.querySelectorAll('.option-card').forEach(card => card.classList.add('disabled-click'));
+            } else {
+                submitBtn.classList.remove('hidden');
+                submitBtn.disabled = true;
+                nextBtn.classList.add('hidden');
+            }
+
+            nextBtn.innerHTML = 'Next <i class="fa-solid fa-arrow-right ml-2"></i>';
+            nextBtn.className = "px-6 py-2 rounded-lg bg-slate-800 text-white hover:bg-slate-900 transition-colors hidden";
+            prevBtn.disabled = index === 0;
+            
+            // Update palette highlight if open
+            if(!paletteModal.classList.contains('hidden')){
+                renderPaletteGrid();
+            }
+        }
+
+        function toggleOption(letter, isMultiple, cardElement) {
+            if (isAnswered) return;
+
+            const indicator = cardElement.querySelector('.option-indicator > div');
+            
+            if (isMultiple) {
+                if (selectedAnswers.includes(letter)) {
+                    selectedAnswers = selectedAnswers.filter(a => a !== letter);
+                    cardElement.classList.remove('selected');
+                    indicator.classList.add('hidden');
+                } else {
+                    selectedAnswers.push(letter);
+                    cardElement.classList.add('selected');
+                    indicator.classList.remove('hidden');
+                }
+            } else {
+                selectedAnswers = [letter];
+                document.querySelectorAll('.option-card').forEach(el => {
+                    el.classList.remove('selected');
+                    el.querySelector('.option-indicator > div').classList.add('hidden');
+                });
+                cardElement.classList.add('selected');
+                indicator.classList.remove('hidden');
+            }
+            submitBtn.disabled = selectedAnswers.length === 0;
+        }
+
+        function submitAnswer() {
+            isAnswered = true;
+            const q = questionsData[currentIndex];
+            const correctAnswers = q.answer.split(',').map(s => s.trim());
+
+            const isCorrect = correctAnswers.length === selectedAnswers.length && 
+                              correctAnswers.every(val => selectedAnswers.includes(val));
+            
+            quizResults[q.id] = isCorrect;
+            updateStats();
+
+            // Visual Feedback
+            const optionCards = document.querySelectorAll('.option-card');
+            optionCards.forEach((card) => {
+                const letter = card.getAttribute('data-letter');
+                const indicator = card.querySelector('.option-indicator');
+                
+                card.classList.add('disabled-click');
+                
+                if (correctAnswers.includes(letter)) {
+                    card.classList.add('correct-answer');
+                    indicator.innerHTML = '<i class="fa-solid fa-check text-green-600"></i>';
+                    indicator.classList.remove('border-slate-300');
+                    indicator.classList.add('border-green-500');
+                } else if (selectedAnswers.includes(letter)) {
+                    card.classList.add('wrong-answer');
+                    indicator.innerHTML = '<i class="fa-solid fa-xmark text-red-600"></i>';
+                    indicator.classList.remove('border-slate-300');
+                    indicator.classList.add('border-red-500');
+                }
+            });
+
+            // Update Your answer display
+            const yourAns = document.getElementById('your-answer-display');
+            if (yourAns) {
+                yourAns.textContent = selectedAnswers.length ? selectedAnswers.sort().join(', ') : '(none)';
+                yourAns.className = 'font-semibold ' + (isCorrect ? 'text-green-700' : 'text-red-700');
+            }
+
+            // Update Result Banner
+            const banner = document.getElementById('result-banner');
+            if (banner) {
+                if (isCorrect) {
+                    banner.innerHTML = '<i class="fa-solid fa-circle-check mr-2"></i> 答對! Correct!';
+                    banner.className = 'mb-4 p-3 rounded-lg font-bold text-lg text-center bg-green-200 text-green-800 border-2 border-green-500';
+                } else {
+                    banner.innerHTML = '<i class="fa-solid fa-circle-xmark mr-2"></i> 答錯! Incorrect';
+                    banner.className = 'mb-4 p-3 rounded-lg font-bold text-lg text-center bg-red-200 text-red-800 border-2 border-red-500';
+                }
+            }
+
+            document.getElementById('explanation-area').classList.remove('hidden');
+            submitBtn.classList.add('hidden');
+            nextBtn.classList.remove('hidden');
+            
+            if (currentIndex === questionsData.length - 1) {
+                nextBtn.innerHTML = 'View Results <i class="fa-solid fa-chart-pie ml-2"></i>';
+                nextBtn.classList.remove('bg-slate-800', 'hover:bg-slate-900');
+                nextBtn.classList.add('bg-indigo-600', 'hover:bg-indigo-700');
+            }
+
+            setTimeout(() => {
+                document.getElementById('explanation-area').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
+        }
+
+        function nextQuestion() {
+            if (currentIndex < questionsData.length - 1) {
+                currentIndex++;
+                renderQuestion(currentIndex);
+            } else {
+                showResults();
+            }
+        }
+
+        function prevQuestion() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                renderQuestion(currentIndex);
+            }
+        }
+
+        function showResults() {
+            const total = questionsData.length;
+            const correctCount = Object.values(quizResults).filter(r => r === true).length;
+            const answeredCount = Object.keys(quizResults).length;
+            const percentage = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+            
+            let message = "";
+            let colorClass = "";
+            let icon = "";
+
+            if (percentage === 100) {
+                message = "Perfect! You are ready for the exam!";
+                colorClass = "text-green-600";
+                icon = "fa-trophy";
+            } else if (percentage >= 80) {
+                message = "Great job! Excellent score.";
+                colorClass = "text-blue-600";
+                icon = "fa-thumbs-up";
+            } else if (percentage >= 60) {
+                message = "Not bad, keep it up!";
+                colorClass = "text-yellow-600";
+                icon = "fa-star-half-stroke";
+            } else {
+                message = "Don't be discouraged, keep practicing!";
+                colorClass = "text-red-600";
+                icon = "fa-book-open-reader";
+            }
+
+            quizContent.innerHTML = `
+                <div class="flex flex-col items-center justify-center h-full py-10 fade-in">
+                    <div class="w-24 h-24 rounded-full bg-slate-100 flex items-center justify-center mb-6">
+                        <i class="fa-solid ${icon} text-5xl ${colorClass}"></i>
+                    </div>
+                    
+                    <h2 class="text-3xl font-bold text-slate-800 mb-2">Quiz Completed</h2>
+                    
+                    <div class="grid grid-cols-4 gap-4 w-full max-w-2xl mb-8 mt-6">
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center">
+                            <div class="text-slate-400 text-xs uppercase font-bold tracking-wider mb-1">Total</div>
+                            <div class="text-2xl font-bold text-slate-800">${total}</div>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center">
+                            <div class="text-slate-400 text-xs uppercase font-bold tracking-wider mb-1">Answered</div>
+                            <div class="text-2xl font-bold text-slate-800">${answeredCount}</div>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center">
+                            <div class="text-slate-400 text-xs uppercase font-bold tracking-wider mb-1">Correct</div>
+                            <div class="text-2xl font-bold text-green-600">${correctCount}</div>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center">
+                            <div class="text-slate-400 text-xs uppercase font-bold tracking-wider mb-1">Accuracy</div>
+                            <div class="text-2xl font-bold ${colorClass}">${percentage}%</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-50 border-l-4 border-slate-300 p-4 w-full max-w-lg mb-8 rounded-r text-slate-700 italic text-center">
+                        "${message}"
+                    </div>
+
+                    <button onclick="restartQuiz()" class="px-8 py-3 rounded-full bg-slate-900 text-white font-bold hover:bg-slate-800 hover:scale-105 transition-all shadow-lg">
+                        <i class="fa-solid fa-rotate-right mr-2"></i> Restart Quiz
+                    </button>
+                </div>
+            `;
+
+            footerControls.classList.add('hidden');
+            progressBar.style.width = '100%';
+        }
+
+        function restartQuiz() {
+            currentIndex = 0;
+            quizResults = {};
+            selectedAnswers = [];
+            flaggedQuestions.clear();
+            isAnswered = false;
+            progressBar.style.width = '0%';
+            updateStats();
+            renderQuestion(currentIndex);
+        }
+
+        function updateProgress() {
+            const pct = ((currentIndex + 1) / questionsData.length) * 100;
+            progressBar.style.width = `${pct}%`;
+            currentProgress.innerText = `Question ${currentIndex + 1}`;
+        }
+
+        // Palette Functions
+        function togglePalette() {
+            const isHidden = paletteModal.classList.contains('hidden');
+            if (isHidden) {
+                // Open
+                paletteModal.classList.remove('hidden');
+                // Force reflow for animation
+                void palettePanel.offsetWidth;
+                paletteBackdrop.classList.remove('opacity-0');
+                palettePanel.classList.remove('translate-x-full');
+                renderPaletteGrid();
+            } else {
+                // Close
+                paletteBackdrop.classList.add('opacity-0');
+                palettePanel.classList.add('translate-x-full');
+                setTimeout(() => {
+                    paletteModal.classList.add('hidden');
+                }, 300); // Wait for transition
+            }
+        }
+
+        function renderPaletteGrid() {
+            paletteGrid.innerHTML = '';
+            questionsData.forEach((q, index) => {
+                const el = document.createElement('div');
+                el.className = 'palette-item';
+                el.innerText = q.id;
+                
+                // Determine Status
+                let statusClass = 'neutral';
+                if (index === currentIndex) {
+                    statusClass = 'current';
+                } else if (quizResults.hasOwnProperty(q.id)) {
+                    statusClass = quizResults[q.id] ? 'correct' : 'wrong';
+                }
+
+                el.classList.add(statusClass);
+                
+                // 加上小紅旗
+                if (flaggedQuestions.has(q.id)) el.classList.add('flagged');
+
+                el.onclick = () => {
+                    currentIndex = index;
+                    renderQuestion(index);
+                    togglePalette(); // Close sidebar
+                };
+                
+                paletteGrid.appendChild(el);
+            });
+        }
+
+    </script>
+</body>
+</html>
