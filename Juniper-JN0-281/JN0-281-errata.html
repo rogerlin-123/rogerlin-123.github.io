@@ -1,0 +1,804 @@
+<meta charset="utf-8">
+<title>JN0-281 題庫勘誤</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<style>
+  :root{
+    --ground:#F6F7F9;
+    --surface:#FFFFFF;
+    --surface-2:#EEF1F6;
+    --ink:#131821;
+    --ink-2:#3D4757;
+    --muted:#69748A;
+    --rule:#DDE3EC;
+    --rule-strong:#C3CCDA;
+    --accent:#1B4D8F;
+    --accent-soft:#E8EFF9;
+    --critical:#B02418;
+    --critical-soft:#FBEAE7;
+    --caution:#8A5800;
+    --caution-soft:#FAF0DB;
+    --conflict:#5C3C9E;
+    --conflict-soft:#EEEAFA;
+    --scope:#1F6470;
+    --scope-soft:#E3F1F3;
+    --ok:#1A6B47;
+    --ok-soft:#E3F2EA;
+    --code-bg:#F1F4F9;
+    --shadow:0 1px 2px rgba(19,24,33,.05);
+
+    --f-ui:'IBM Plex Sans','Noto Sans TC','Microsoft JhengHei',system-ui,sans-serif;
+    --f-mono:'IBM Plex Mono','Noto Sans TC',ui-monospace,'Cascadia Mono',Consolas,monospace;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --ground:#0D1117;
+      --surface:#151B24;
+      --surface-2:#1B232E;
+      --ink:#E7ECF3;
+      --ink-2:#BCC6D4;
+      --muted:#8A96A8;
+      --rule:#262F3C;
+      --rule-strong:#3A4553;
+      --accent:#7FA9E8;
+      --accent-soft:#16243A;
+      --critical:#F08A7C;
+      --critical-soft:#2E1714;
+      --caution:#E0B056;
+      --caution-soft:#2B2110;
+      --conflict:#B49BEC;
+      --conflict-soft:#221A36;
+      --scope:#6FBECB;
+      --scope-soft:#12272B;
+      --ok:#63C295;
+      --ok-soft:#10261C;
+      --code-bg:#0F151D;
+      --shadow:0 1px 2px rgba(0,0,0,.3);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0D1117;
+    --surface:#151B24;
+    --surface-2:#1B232E;
+    --ink:#E7ECF3;
+    --ink-2:#BCC6D4;
+    --muted:#8A96A8;
+    --rule:#262F3C;
+    --rule-strong:#3A4553;
+    --accent:#7FA9E8;
+    --accent-soft:#16243A;
+    --critical:#F08A7C;
+    --critical-soft:#2E1714;
+    --caution:#E0B056;
+    --caution-soft:#2B2110;
+    --conflict:#B49BEC;
+    --conflict-soft:#221A36;
+    --scope:#6FBECB;
+    --scope-soft:#12272B;
+    --ok:#63C295;
+    --ok-soft:#10261C;
+    --code-bg:#0F151D;
+    --shadow:0 1px 2px rgba(0,0,0,.3);
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--ground);
+    color:var(--ink);
+    font-family:var(--f-ui);
+    font-size:16px;
+    line-height:1.7;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:880px;margin:0 auto;padding:0 24px 96px;}
+  a{color:var(--accent);}
+  a:focus-visible,code a:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px;}
+  code,kbd,pre{font-family:var(--f-mono);}
+
+  /* ---------- masthead ---------- */
+  .masthead{
+    border-bottom:2px solid var(--ink);
+    padding:56px 0 22px;
+    margin-bottom:34px;
+  }
+  .eyebrow{
+    font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--accent);font-weight:600;margin:0 0 14px;
+    display:flex;flex-wrap:wrap;gap:10px;align-items:center;
+  }
+  .eyebrow .sep{color:var(--rule-strong);}
+  h1{
+    font-size:clamp(2rem,5vw,2.9rem);line-height:1.15;margin:0 0 16px;
+    font-weight:700;letter-spacing:-.02em;text-wrap:balance;
+  }
+  .lede{font-size:1.075rem;color:var(--ink-2);margin:0 0 22px;max-width:60ch;}
+  .lede strong{color:var(--ink);font-weight:600;}
+  .docmeta{
+    display:flex;flex-wrap:wrap;gap:6px 20px;
+    font-size:.8rem;color:var(--muted);
+    font-family:var(--f-mono);
+  }
+  .docmeta b{color:var(--ink-2);font-weight:500;}
+
+  /* ---------- verdict ---------- */
+  .verdict{
+    background:var(--ok-soft);
+    border:1px solid var(--ok);
+    border-radius:4px;
+    padding:16px 20px;
+    margin:0 0 34px;
+    display:flex;gap:14px;align-items:flex-start;
+  }
+  .verdict .mark{color:var(--ok);font-weight:700;font-size:.8rem;letter-spacing:.1em;
+    text-transform:uppercase;white-space:nowrap;padding-top:2px;font-family:var(--f-ui);}
+  .verdict p{margin:0;color:var(--ink-2);font-size:.95rem;}
+  .verdict p strong{color:var(--ink);}
+
+  /* ---------- stats ---------- */
+  .stats{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));
+    gap:1px;background:var(--rule);border:1px solid var(--rule);
+    border-radius:4px;overflow:hidden;margin:0 0 18px;
+  }
+  .stat{background:var(--surface);padding:14px 16px;}
+  .stat .n{
+    font-size:1.65rem;font-weight:600;line-height:1.1;
+    font-variant-numeric:tabular-nums;letter-spacing:-.01em;
+  }
+  .stat .n small{font-size:.95rem;color:var(--muted);font-weight:400;}
+  .stat .k{font-size:.75rem;color:var(--muted);margin-top:3px;}
+  .stat[data-t="critical"] .n{color:var(--critical);}
+  .stat[data-t="caution"]  .n{color:var(--caution);}
+  .stat[data-t="conflict"] .n{color:var(--conflict);}
+  .stat[data-t="ok"]       .n{color:var(--ok);}
+
+  /* ---------- jump index ---------- */
+  .jump{
+    display:flex;flex-wrap:wrap;gap:7px;align-items:center;
+    padding:0 0 40px;border-bottom:1px solid var(--rule);margin-bottom:44px;
+  }
+  .jump .lbl{font-size:.75rem;color:var(--muted);margin-right:4px;}
+  .jump a{
+    font-family:var(--f-mono);font-size:.78rem;font-weight:500;
+    text-decoration:none;padding:3px 9px;border-radius:3px;
+    border:1px solid var(--rule-strong);color:var(--ink-2);background:var(--surface);
+    transition:border-color .15s,color .15s;
+  }
+  .jump a:hover{border-color:var(--accent);color:var(--accent);}
+  .jump a[data-t="critical"]{border-color:var(--critical);color:var(--critical);background:var(--critical-soft);}
+
+  /* ---------- sections ---------- */
+  section{margin-bottom:56px;}
+  .sec-head{
+    display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;
+    padding-bottom:10px;margin-bottom:26px;border-bottom:1px solid var(--rule-strong);
+  }
+  .sec-head h2{font-size:1.32rem;font-weight:600;margin:0;letter-spacing:-.01em;}
+  .sec-head .count{
+    font-family:var(--f-mono);font-size:.78rem;color:var(--muted);
+    font-variant-numeric:tabular-nums;
+  }
+  .sec-head .note{font-size:.83rem;color:var(--muted);margin-left:auto;}
+
+  /* ---------- entry ---------- */
+  .entry{
+    --sev:var(--rule-strong); --sev-soft:var(--surface-2);
+    background:var(--surface);
+    border:1px solid var(--rule);
+    border-left:3px solid var(--sev);
+    border-radius:0 4px 4px 0;
+    padding:20px 22px 22px;
+    margin-bottom:16px;
+    box-shadow:var(--shadow);
+    scroll-margin-top:20px;
+  }
+  .entry[data-sev="critical"]{--sev:var(--critical);--sev-soft:var(--critical-soft);}
+  .entry[data-sev="caution"] {--sev:var(--caution); --sev-soft:var(--caution-soft);}
+  .entry[data-sev="conflict"]{--sev:var(--conflict);--sev-soft:var(--conflict-soft);}
+  .entry[data-sev="scope"]   {--sev:var(--scope);   --sev-soft:var(--scope-soft);}
+
+  .entry-head{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:12px;}
+  .qid{
+    font-family:var(--f-mono);font-size:.95rem;font-weight:500;
+    color:var(--sev);letter-spacing:-.01em;
+  }
+  .chip{
+    font-size:.7rem;font-weight:600;letter-spacing:.06em;
+    padding:2px 8px;border-radius:3px;
+    background:var(--sev-soft);color:var(--sev);
+    border:1px solid var(--sev);
+  }
+  .entry-head h3{font-size:1.02rem;font-weight:600;margin:0;flex:1 1 220px;letter-spacing:-.005em;}
+
+  .stem{
+    font-family:var(--f-mono);font-size:.85rem;line-height:1.6;
+    color:var(--ink-2);background:var(--code-bg);
+    border-radius:3px;padding:10px 13px;margin:0 0 14px;
+    overflow-x:auto;
+  }
+
+  .ab{display:flex;flex-direction:column;gap:1px;background:var(--rule);
+    border:1px solid var(--rule);border-radius:3px;overflow:hidden;margin-bottom:14px;}
+  .ab-row{display:flex;gap:12px;background:var(--surface);padding:9px 13px;align-items:baseline;flex-wrap:wrap;}
+  .ab-row .k{
+    flex:0 0 62px;font-size:.73rem;font-weight:600;letter-spacing:.05em;
+    text-transform:uppercase;color:var(--muted);
+  }
+  .ab-row .v{flex:1 1 200px;font-size:.9rem;}
+  .ab-row.wrong .k{color:var(--critical);}
+  .ab-row.wrong .v{color:var(--ink-2);}
+  .ab-row.wrong .v .strike{text-decoration:line-through;text-decoration-color:var(--critical);
+    text-decoration-thickness:1.5px;}
+  .ab-row.right .k{color:var(--ok);}
+  .ab-row.right .v{color:var(--ink);font-weight:500;}
+
+  .entry p{margin:0 0 11px;font-size:.94rem;color:var(--ink-2);}
+  .entry p:last-child{margin-bottom:0;}
+  .entry p strong{color:var(--ink);font-weight:600;}
+  .entry ul{margin:0 0 11px;padding-left:20px;font-size:.94rem;color:var(--ink-2);}
+  .entry li{margin:3px 0;}
+  .entry li::marker{color:var(--muted);}
+
+  code{
+    background:var(--code-bg);border-radius:3px;padding:1px 5px;
+    font-size:.855em;color:var(--ink);
+  }
+  .ab-row .v code{background:transparent;padding:0;}
+
+  pre.cli{
+    background:var(--code-bg);border:1px solid var(--rule);
+    border-radius:3px;padding:12px 14px;margin:0 0 12px;
+    overflow-x:auto;font-size:.8rem;line-height:1.75;color:var(--ink-2);
+  }
+  pre.cli .p{color:var(--muted);user-select:none;}
+  pre.cli .c{color:var(--ok);}
+  pre.cli .x{color:var(--critical);}
+  pre.cli b{color:var(--ink);font-weight:500;}
+
+  .tip{
+    background:var(--sev-soft);border-radius:3px;
+    padding:10px 13px;margin:13px 0 0;
+    font-size:.88rem;color:var(--ink-2);
+  }
+  .tip b{color:var(--sev);font-weight:600;}
+
+  /* ---------- reference table ---------- */
+  .tablewrap{overflow-x:auto;border:1px solid var(--rule);border-radius:4px;background:var(--surface);}
+  table{border-collapse:collapse;width:100%;font-size:.88rem;}
+  caption{
+    text-align:left;padding:14px 16px 0;font-size:.8rem;color:var(--muted);
+  }
+  th,td{padding:8px 16px;text-align:left;border-bottom:1px solid var(--rule);}
+  thead th{
+    font-size:.72rem;text-transform:uppercase;letter-spacing:.07em;
+    color:var(--muted);font-weight:600;border-bottom:1px solid var(--rule-strong);
+  }
+  tbody tr:last-child td{border-bottom:none;}
+  td.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:right;width:1%;white-space:nowrap;}
+  td code{font-size:.9em;}
+  tr[data-hl] td{background:var(--accent-soft);}
+  tr[data-hl] td.num{color:var(--accent);font-weight:500;}
+
+  /* ---------- checked list ---------- */
+  .checked{
+    display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));
+    gap:7px;margin:0;padding:0;list-style:none;
+  }
+  .checked li{
+    font-family:var(--f-mono);font-size:.78rem;
+    background:var(--ok-soft);color:var(--ok);
+    border:1px solid var(--ok);border-radius:3px;
+    padding:5px 9px;display:flex;justify-content:space-between;gap:6px;
+  }
+  .checked li span{color:var(--ink-2);font-size:.72rem;}
+
+  .method{
+    display:grid;gap:1px;background:var(--rule);
+    border:1px solid var(--rule);border-radius:4px;overflow:hidden;
+  }
+  .method div{background:var(--surface);padding:11px 16px;display:flex;gap:14px;flex-wrap:wrap;align-items:baseline;}
+  .method .k{flex:0 0 150px;font-size:.83rem;color:var(--muted);}
+  .method .v{flex:1 1 240px;font-size:.9rem;color:var(--ink-2);}
+  .method .v b{color:var(--ok);font-weight:600;}
+
+  footer{
+    border-top:1px solid var(--rule);padding-top:20px;
+    font-size:.82rem;color:var(--muted);
+  }
+  footer p{margin:0 0 6px;}
+
+  @media (prefers-reduced-motion:reduce){
+    *{transition:none!important;animation:none!important;}
+  }
+  @media (max-width:560px){
+    .wrap{padding:0 16px 64px;}
+    .masthead{padding-top:36px;}
+    .ab-row .k{flex-basis:100%;}
+    .method .k{flex-basis:100%;}
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow">
+      <span>Juniper JN0-281</span><span class="sep">/</span>
+      <span>Data Center, Associate (JNCIA-DC)</span><span class="sep">/</span>
+      <span>勘誤表</span>
+    </p>
+    <h1>JN0-281 題庫勘誤與解說</h1>
+    <p class="lede">
+      逐題比對 <strong>JN0-281 V12.65.pdf</strong> 與 <strong>JN0-281.html</strong> 共 197 題的結果。
+      轉檔本身沒有問題 —— 以下列出的是<strong>題庫原文就錯的答案</strong>，背之前請先看這一頁。
+    </p>
+    <p class="docmeta">
+      <span><b>校對日期</b> 2026-09-14</span>
+      <span><b>題數</b> 197</span>
+      <span><b>版本</b> V12.65</span>
+    </p>
+  </header>
+
+  <div class="verdict">
+    <span class="mark">結論</span>
+    <p><strong>HTML 忠實反映了 PDF，轉檔無誤。</strong>197 題答案、選項、33 張圖全部對得上，14 組重複題答案也一致。問題出在 PDF 題庫本身：約 <strong>190/197（96%）</strong>可靠，但有 3 題答案明確錯誤、4 題設計瑕疵，且混入了 Cisco 語法題。</p>
+  </div>
+
+  <div class="stats">
+    <div class="stat" data-t="ok">
+      <div class="n">197<small>/197</small></div>
+      <div class="k">答案一致<br>HTML ↔ PDF</div>
+    </div>
+    <div class="stat" data-t="critical">
+      <div class="n">3</div>
+      <div class="k">明確錯誤</div>
+    </div>
+    <div class="stat" data-t="caution">
+      <div class="n">4</div>
+      <div class="k">題目瑕疵</div>
+    </div>
+    <div class="stat" data-t="conflict">
+      <div class="n">4</div>
+      <div class="k">前後矛盾</div>
+    </div>
+    <div class="stat" data-t="ok">
+      <div class="n">11<small>/11</small></div>
+      <div class="k">圖表題抽查<br>全數正確</div>
+    </div>
+  </div>
+
+  <nav class="jump">
+    <span class="lbl">受影響題號</span>
+    <a href="#q154" data-t="critical">Q154</a>
+    <a href="#q105" data-t="critical">Q105</a>
+    <a href="#q167" data-t="critical">Q167</a>
+    <a href="#q86">Q86</a>
+    <a href="#q178">Q178</a>
+    <a href="#q64">Q64</a>
+    <a href="#q68">Q68</a>
+    <a href="#q93">Q93 / Q136</a>
+    <a href="#q6">Q6 / Q7</a>
+    <a href="#q63">Q63 / Q90</a>
+    <a href="#q74">Q74</a>
+    <a href="#q163">Q163</a>
+  </nav>
+
+  <!-- ============ 1. 明確錯誤 ============ -->
+  <section>
+    <div class="sec-head">
+      <h2>明確錯誤</h2>
+      <span class="count">3 題</span>
+      <span class="note">照背會答錯 —— 請以正解為準</span>
+    </div>
+
+    <article class="entry" data-sev="critical" id="q154">
+      <div class="entry-head">
+        <span class="qid">Q154</span>
+        <span class="chip">答案錯誤</span>
+        <h3>靜態路由的設定階層</h3>
+      </div>
+      <p class="stem">When configuring static routes, which command is typically used?</p>
+      <div class="ab">
+        <div class="ab-row wrong">
+          <span class="k">題庫答案</span>
+          <span class="v">A. <code class="strike">set protocols static route</code></span>
+        </div>
+        <div class="ab-row right">
+          <span class="k">正解</span>
+          <span class="v"><code>set routing-options static route</code> —— <b>不在四個選項內</b></span>
+        </div>
+      </div>
+      <p>Junos <strong>沒有 <code>[edit protocols static]</code> 這個階層</strong>。靜態路由屬於 protocol-independent routing，設定在 <code>[edit routing-options]</code> 之下；若在 routing instance 內，則是 <code>[edit routing-instances &lt;name&gt; routing-options]</code>。</p>
+      <pre class="cli"><span class="p">user@router# </span><span class="x">set protocols static route 10.0.0.0/8 next-hop 192.168.1.1</span>
+<span class="p">                    </span>^
+<span class="p">syntax error.</span>
+
+<span class="p">user@router# </span><span class="c">set routing-options static route 10.0.0.0/8 next-hop 192.168.1.1</span>
+<span class="p">user@router# </span><span class="c">set routing-options static route 10.0.0.0/8 qualified-next-hop 192.168.1.2 preference 7</span></pre>
+      <div class="tip"><b>注意 </b>同一份題庫的 <strong>Q169</strong>（「靜態路由設在哪個階層？」答 <code>routing-options</code>）是正確的 —— 兩題直接打架。以 Q169 為準。</div>
+    </article>
+
+    <article class="entry" data-sev="critical" id="q105">
+      <div class="entry-head">
+        <span class="qid">Q105</span>
+        <span class="chip">Cisco 語法</span>
+        <h3>查看 OSPF 鄰居的指令</h3>
+      </div>
+      <p class="stem">In OSPF, which command is commonly used to monitor neighbor relationships?</p>
+      <div class="ab">
+        <div class="ab-row wrong">
+          <span class="k">題庫答案</span>
+          <span class="v">A. <code class="strike">show ip ospf neighbors</code></span>
+        </div>
+        <div class="ab-row right">
+          <span class="k">正解</span>
+          <span class="v"><code>show ospf neighbor</code> —— <b>不在四個選項內</b></span>
+        </div>
+      </div>
+      <p><code>show ip ospf neighbors</code> 是 <strong>Cisco IOS</strong> 的寫法。Junos 的操作模式指令沒有 <code>ip</code> 這一層，而且用<strong>單數</strong> <code>neighbor</code>。</p>
+      <p>另外兩個選項雖然是合法的 Junos 指令，但查的不是鄰居狀態：</p>
+      <ul>
+        <li><code>show ospf database</code> —— 看 LSDB 裡的 LSA</li>
+        <li><code>show ospf interface</code> —— 看介面的 area、DR/BDR、鄰居數（題目誤寫成 <code>interfaces</code>）</li>
+      </ul>
+      <pre class="cli"><span class="p">user@router&gt; </span><span class="c">show ospf neighbor</span>
+<span class="p">Address          Interface       State     ID              Pri  Dead</span>
+<b>10.1.1.2</b>         ge-0/0/0.0      <b>Full</b>      10.255.0.2      128    36
+<b>10.1.2.2</b>         ge-0/0/1.0      <b>Full</b>      10.255.0.3      128    33</pre>
+    </article>
+
+    <article class="entry" data-sev="critical" id="q167">
+      <div class="entry-head">
+        <span class="qid">Q167</span>
+        <span class="chip">對 Juniper 不成立</span>
+        <h3>IBGP 與 EBGP 的主要差異</h3>
+      </div>
+      <p class="stem">What is the primary difference between IBGP and EBGP?</p>
+      <div class="ab">
+        <div class="ab-row wrong">
+          <span class="k">題庫答案</span>
+          <span class="v">B. <span class="strike">The administrative distance</span></span>
+        </div>
+        <div class="ab-row right">
+          <span class="k">正解</span>
+          <span class="v">A. The way they advertise routes（路由通告方式）</span>
+        </div>
+      </div>
+      <p><strong>Junos 中 IBGP 與 EBGP 的 route preference 都是 170</strong>，根本沒有差別，所以「administrative distance 不同」在 Juniper 上不成立。eBGP 20 / iBGP 200 那是 <strong>Cisco</strong> 的行為。</p>
+      <p>真正的核心差異是<strong>通告規則</strong>：從 IBGP peer 學到的路由，預設<strong>不會</strong>再通告給其他 IBGP peer（這正是需要 full mesh 或 route reflector 的原因）；EBGP 則沒有這個限制。</p>
+      <pre class="cli"><span class="p">user@router&gt; </span><span class="c">show route protocol bgp detail | match preference</span>
+<span class="p">  # EBGP 學到的路由</span>
+                Local <b>preference: 100</b>, Peer AS: 65201
+                <b>Preference: 170</b>
+<span class="p">  # IBGP 學到的路由 —— 同樣是 170</span>
+                Local <b>preference: 100</b>, Peer AS: 65101
+                <b>Preference: 170</b></pre>
+      <div class="tip"><b>對照 </b>同題庫 <strong>Q197</strong>（「從 IBGP peer 收到的路由預設不會通告給另一個 IBGP peer」答 A. IBGP, IBGP）講的就是這條規則，而且答對了。</div>
+    </article>
+  </section>
+
+  <!-- ============ 2. 題目瑕疵 ============ -->
+  <section>
+    <div class="sec-head">
+      <h2>題目瑕疵</h2>
+      <span class="count">4 題</span>
+      <span class="note">答案武斷或選項本身有問題</span>
+    </div>
+
+    <article class="entry" data-sev="caution" id="q86">
+      <div class="entry-head">
+        <span class="qid">Q86</span>
+        <span class="chip">四選項全對</span>
+        <h3>OSPF 的 LSA 類型</h3>
+      </div>
+      <p class="stem">Which LSA types are associated with OSPF? (Choose three)</p>
+      <div class="ab">
+        <div class="ab-row wrong">
+          <span class="k">題庫答案</span>
+          <span class="v">A, B, C（Type 1 / 2 / 3）</span>
+        </div>
+        <div class="ab-row right">
+          <span class="k">實情</span>
+          <span class="v">四個選項<b>全部都是合法的 OSPF LSA</b> —— 這題無解</span>
+        </div>
+      </div>
+      <p>選項 D「External LSA (Type 5)」是不折不扣的 OSPF LSA，被排除毫無依據。完整清單：</p>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th class="num">Type</th><th>名稱</th><th>由誰產生</th></tr></thead>
+          <tbody>
+            <tr><td class="num">1</td><td>Router LSA</td><td>每一台 OSPF router</td></tr>
+            <tr><td class="num">2</td><td>Network LSA</td><td>DR</td></tr>
+            <tr><td class="num">3</td><td>Summary (Network) LSA</td><td>ABR</td></tr>
+            <tr><td class="num">4</td><td>ASBR Summary LSA</td><td>ABR</td></tr>
+            <tr data-hl><td class="num">5</td><td>AS External LSA</td><td>ASBR ← 被題庫漏掉</td></tr>
+            <tr><td class="num">7</td><td>NSSA External LSA</td><td>NSSA 內的 ASBR</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tip"><b>考場策略 </b>真考題若出現同樣四個選項，代表題目被改過。依 Juniper 官方教材的出題習慣，Type 1 / 2 / 3 是 JNCIA 層級最常考的三個，照題庫答案選即可。</div>
+    </article>
+
+    <article class="entry" data-sev="caution" id="q178">
+      <div class="entry-head">
+        <span class="qid">Q178</span>
+        <span class="chip">答案可爭議</span>
+        <h3>影響 BGP 選路的屬性</h3>
+      </div>
+      <p class="stem">Fill in the blank: In BGP, the _____ attribute is used to influence the best path selection process.</p>
+      <div class="ab">
+        <div class="ab-row wrong">
+          <span class="k">題庫答案</span>
+          <span class="v">A. MED</span>
+        </div>
+        <div class="ab-row right">
+          <span class="k">更合理</span>
+          <span class="v">C. Local Preference</span>
+        </div>
+      </div>
+      <p>AS_PATH、Local Preference、Community <strong>四個選項全都會影響選路</strong>，題目沒有限定條件。若要選「最主要」的，Local Preference 更站得住腳：它在選路順序中排在 AS path 之前，是 AS 內部控制<strong>出向</strong>流量的主要工具；MED 只用來建議鄰居 AS 該從哪個入口進來，影響範圍小得多。</p>
+      <div class="tablewrap">
+        <table>
+          <caption>Junos BGP 選路順序（節錄前六步）</caption>
+          <thead><tr><th class="num">#</th><th>條件</th><th>取捨</th></tr></thead>
+          <tbody>
+            <tr><td class="num">1</td><td>Route preference</td><td>數值低者勝</td></tr>
+            <tr data-hl><td class="num">2</td><td>Local Preference</td><td>數值<b>高</b>者勝</td></tr>
+            <tr><td class="num">3</td><td>AS path 長度</td><td>短者勝</td></tr>
+            <tr><td class="num">4</td><td>Origin</td><td>IGP &lt; EGP &lt; Incomplete</td></tr>
+            <tr><td class="num">5</td><td>MED</td><td>數值低者勝</td></tr>
+            <tr><td class="num">6</td><td>EBGP / IBGP</td><td>EBGP 勝</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </article>
+
+    <article class="entry" data-sev="caution" id="q64">
+      <div class="entry-head">
+        <span class="qid">Q64</span>
+        <span class="chip">非預設行為</span>
+        <h3>MAC limiting 違規時的預設動作</h3>
+      </div>
+      <p class="stem">When a MAC limiting violation occurs, the switch performs which two actions by default? (Choose two.)</p>
+      <div class="ab">
+        <div class="ab-row wrong">
+          <span class="k">題庫答案</span>
+          <span class="v">C. <span class="strike">The port is disabled</span> + D. It drops the packet</span>
+        </div>
+        <div class="ab-row right">
+          <span class="k">實情</span>
+          <span class="v">只有 <b>D（drop）</b>是預設；關閉介面必須明確設定</span>
+        </div>
+      </div>
+      <p>Junos <code>interface-mac-limit</code> 的預設 <code>packet-action</code> 是 <strong>drop</strong> —— 超過上限的來源 MAC 其封包被丟棄，但<strong>介面保持 up</strong>。要讓介面被關掉，得自己指定 <code>shutdown</code>。</p>
+      <pre class="cli"><span class="p"># 預設：超限就丟包，介面不動</span>
+<span class="p">user@switch# </span><span class="c">set switch-options interface ge-0/0/1 interface-mac-limit 5</span>
+
+<span class="p"># 要關介面必須明講</span>
+<span class="p">user@switch# </span><span class="c">set switch-options interface ge-0/0/1 interface-mac-limit 5 packet-action </span><b>shutdown</b></pre>
+      <p>題庫的解說寫「port is automatically disabled」是把可設定的 <code>shutdown</code> 動作當成了預設。這是「選兩個」硬湊出來的第二個答案。</p>
+    </article>
+
+    <article class="entry" data-sev="caution" id="q68">
+      <div class="entry-head">
+        <span class="qid">Q68</span>
+        <span class="chip">觀念錯誤</span>
+        <h3>VLAN 減少了什麼</h3>
+      </div>
+      <p class="stem">VLANs help in reducing which of the following? (Choose two)</p>
+      <div class="ab">
+        <div class="ab-row wrong">
+          <span class="k">題庫答案</span>
+          <span class="v">A. Collision domains + B. Broadcast domains</span>
+        </div>
+        <div class="ab-row right">
+          <span class="k">實情</span>
+          <span class="v">兩個都站不住腳，只是「最不爛」的選項</span>
+        </div>
+      </div>
+      <ul>
+        <li><strong>碰撞網域</strong>與 VLAN 無關 —— 那是交換器本身解決的（每個 port 自成一個碰撞網域，見同題庫 Q10 與 Q128）。把所有 port 放進同一個 VLAN，碰撞網域數量也不會變。</li>
+        <li><strong>廣播網域</strong>被 VLAN 切開後是<strong>變多、變小</strong>，不是「減少」。一台交換器切 4 個 VLAN，就從 1 個廣播網域變成 4 個。</li>
+      </ul>
+      <p>精準的說法是：<strong>VLAN 縮小每個廣播網域的範圍（size），而非減少其數量</strong>。選項 C（Routing complexity，VLAN 反而增加）與 D（Encryption requirements，無關）更離譜，所以 A、B 只是矮子裡拔將軍。</p>
+    </article>
+  </section>
+
+  <!-- ============ 3. 前後矛盾 ============ -->
+  <section>
+    <div class="sec-head">
+      <h2>前後矛盾</h2>
+      <span class="count">4 組</span>
+      <span class="note">同一份題庫互打嘴巴</span>
+    </div>
+
+    <article class="entry" data-sev="conflict" id="q93">
+      <div class="entry-head">
+        <span class="qid">Q93 ⇄ Q136</span>
+        <span class="chip">互斥</span>
+        <h3>OSPF Router ID 怎麼選出來</h3>
+      </div>
+      <div class="ab">
+        <div class="ab-row wrong">
+          <span class="k">Q93</span>
+          <span class="v">答 A, B —— 其中 B：<span class="strike">預設取任一 active interface 的最高 IP</span></span>
+        </div>
+        <div class="ab-row wrong">
+          <span class="k">Q136</span>
+          <span class="v">答 D：<span class="strike">取最高的 loopback 介面 IP</span></span>
+        </div>
+        <div class="ab-row right">
+          <span class="k">Junos 實情</span>
+          <span class="v">手動設定 &gt; <code>lo0</code> 的位址 &gt; 第一個有位址的介面</span>
+        </div>
+      </div>
+      <p>兩題答案互斥，而且都不完全對。Junos 的挑選順序是：</p>
+      <ul>
+        <li><strong>1.</strong> <code>routing-options router-id</code> 明確指定（最優先，IP fabric 一定這樣做）</li>
+        <li><strong>2.</strong> <code>lo0</code> 上設定的 IP 位址</li>
+        <li><strong>3.</strong> 第一個有位址的介面</li>
+      </ul>
+      <p>「取最高 IP」是 <strong>Cisco</strong> 的規則，Junos 不是這樣挑的。Q93 的選項 A（可手動設定）本身正確。</p>
+      <pre class="cli"><span class="p">user@router# </span><span class="c">set routing-options router-id 10.255.0.1</span>
+
+<span class="p">user@router&gt; </span><span class="c">show ospf overview | match &quot;Router ID&quot;</span>
+  <b>Router ID: 10.255.0.1</b></pre>
+    </article>
+
+    <article class="entry" data-sev="conflict" id="q6">
+      <div class="entry-head">
+        <span class="qid">Q6 ⇄ Q7</span>
+        <span class="chip">說法分歧</span>
+        <h3>OSPF 在哪個狀態檢查 MTU</h3>
+      </div>
+      <div class="ab">
+        <div class="ab-row"><span class="k">Q6</span><span class="v">「哪個狀態檢查 MTU？」→ <b>Exchange</b></span></div>
+        <div class="ab-row"><span class="k">Q7</span><span class="v">「卡在 ExStart 的原因？」→ <b>MTU mismatch</b></span></div>
+      </div>
+      <p>兩題<strong>答案都可以接受</strong>，但並存容易讓人混淆。原因是 MTU 欄位放在 <strong>DBD 封包的標頭</strong>裡，而 DBD 從 <strong>ExStart</strong>（主從協商）就開始交換，到 <strong>Exchange</strong> 才真正帶 LSA 摘要。實務上 MTU 不符會讓鄰居在 ExStart / Exchange 之間反覆跳動。</p>
+      <div class="tip"><b>記法 </b>問「在哪個 state 檢查 MTU」→ 選 <strong>Exchange</strong>；問「卡在 ExStart 的原因」→ 選 <strong>MTU mismatch</strong>。兩題各答各的，不要互相套用。</div>
+      <pre class="cli"><span class="p">user@router&gt; </span><span class="c">show ospf neighbor</span>
+<span class="p">Address          Interface       State      ID            Pri  Dead</span>
+10.1.1.2         ge-0/0/0.0      <span class="x">ExStart</span>    10.255.0.2    128    38
+
+<span class="p"># 兩端 MTU 對不起來</span>
+<span class="p">user@router&gt; </span><span class="c">show interfaces ge-0/0/0 | match MTU</span>
+  Link-level type: Ethernet, <b>MTU: 1514</b>
+<span class="p">user@peer&gt;   </span><span class="c">show interfaces ge-0/0/0 | match MTU</span>
+  Link-level type: Ethernet, <b>MTU: 9192</b></pre>
+    </article>
+
+    <article class="entry" data-sev="conflict" id="q63">
+      <div class="entry-head">
+        <span class="qid">Q63 ⇄ Q90</span>
+        <span class="chip">單選題兩個對</span>
+        <h3>VLAN 排錯該用哪個指令</h3>
+      </div>
+      <div class="ab">
+        <div class="ab-row right"><span class="k">Q63</span><span class="v">「顯示 VLAN ID 與 port 對應」→ <code>show vlans</code> ✓ 正確</span></div>
+        <div class="ab-row"><span class="k">Q90</span><span class="v">「排查 VLAN 問題」→ <code>show ethernet-switching table</code> ⚠ 可爭議</span></div>
+      </div>
+      <p>Q90 是單選題，但 <code>show vlans</code> 同樣是有效答案，而題目完全沒界定要查什麼。兩個指令查的是不同層面：</p>
+      <ul>
+        <li><code>show vlans</code> —— VLAN 有哪些成員 port、tag 模式（<strong>設定面</strong>）</li>
+        <li><code>show ethernet-switching table</code> —— 每個 VLAN 學到哪些 MAC、從哪個 port 進來（<strong>轉送面</strong>）</li>
+      </ul>
+      <div class="tip"><b>考場策略 </b>看到「VLAN 與 port 的對應／成員關係」選 <code>show vlans</code>；看到「MAC 學習、通不通」選 <code>show ethernet-switching table</code>。</div>
+    </article>
+  </section>
+
+  <!-- ============ 4. 超出考綱 ============ -->
+  <section>
+    <div class="sec-head">
+      <h2>混入的非 Juniper 題</h2>
+      <span class="count">2 題</span>
+      <span class="note">敘述未必錯，但不該出現在 JNCIA-DC</span>
+    </div>
+
+    <article class="entry" data-sev="scope" id="q74">
+      <div class="entry-head">
+        <span class="qid">Q74</span>
+        <span class="chip">Cisco 語法</span>
+        <h3>定義 BGP neighbor 的指令</h3>
+      </div>
+      <p class="stem">When configuring BGP, which command is commonly used to define a BGP neighbor?</p>
+      <div class="ab">
+        <div class="ab-row wrong">
+          <span class="k">題庫答案</span>
+          <span class="v">B. <code class="strike">neighbor &lt;IP&gt; remote-as &lt;AS&gt;</code></span>
+        </div>
+        <div class="ab-row right">
+          <span class="k">Junos 寫法</span>
+          <span class="v"><code>set protocols bgp group &lt;name&gt; neighbor &lt;IP&gt; peer-as &lt;AS&gt;</code></span>
+        </div>
+      </div>
+      <p>題庫答案是 <strong>Cisco IOS</strong> 語法。Junos 用 <code>peer-as</code> 而非 <code>remote-as</code>，而且 neighbor 一定掛在 <strong>group</strong> 底下。四個選項裡沒有 Junos 的正確寫法。</p>
+      <pre class="cli"><span class="p">user@router# </span><span class="c">set protocols bgp group underlay type external</span>
+<span class="p">user@router# </span><span class="c">set protocols bgp group underlay local-as 65101</span>
+<span class="p">user@router# </span><span class="c">set protocols bgp group underlay neighbor 172.16.1.1 </span><b>peer-as</b><span class="c"> 65201</span></pre>
+    </article>
+
+    <article class="entry" data-sev="scope" id="q163">
+      <div class="entry-head">
+        <span class="qid">Q163</span>
+        <span class="chip">超出考綱</span>
+        <h3>BGP Weight 屬性</h3>
+      </div>
+      <p class="stem">What is the function of the 'Weight' attribute in BGP, and where is it used in the route selection process?</p>
+      <div class="ab">
+        <div class="ab-row right">
+          <span class="k">題庫答案</span>
+          <span class="v">C. Cisco 專屬屬性，在 Local Preference 之前評估 —— <b>敘述本身正確</b></span>
+        </div>
+        <div class="ab-row">
+          <span class="k">但是</span>
+          <span class="v"><b>Junos 完全沒有 Weight 這個概念</b></span>
+        </div>
+      </div>
+      <p>Weight 是 Cisco 的私有屬性，只在本機有效、不隨 update 傳遞。<strong>Junos 沒有對應的東西</strong>；要達到類似「只影響本機選路」的效果，Juniper 的做法是調 route preference 或用 policy 設 <code>local-preference</code>。</p>
+      <p>這題答對了也學不到 Junos 的知識，出現在 JNCIA-DC 題庫裡本身就是個訊號 —— <strong>這份題庫混了別家廠商的題目</strong>，Q74、Q105、Q167、Q93 都是同樣來源。</p>
+    </article>
+  </section>
+
+  <!-- ============ 參考表 ============ -->
+  <section>
+    <div class="sec-head">
+      <h2>Junos 預設 Route Preference</h2>
+      <span class="count">參考</span>
+      <span class="note">Q37 / Q58 / Q167 / Q172 都靠這張表</span>
+    </div>
+    <div class="tablewrap">
+      <table>
+        <caption>數值<strong>越低越優先</strong>。這是 JNCIA-DC 必背的一張表。</caption>
+        <thead><tr><th class="num">Pref</th><th>路由來源</th><th>備註</th></tr></thead>
+        <tbody>
+          <tr data-hl><td class="num">0</td><td>Direct / Local</td><td>最優先（Q58 答案）</td></tr>
+          <tr data-hl><td class="num">5</td><td>Static</td><td>Q37、Q172 答案</td></tr>
+          <tr><td class="num">10</td><td>OSPF internal</td><td>area 內與 area 間</td></tr>
+          <tr><td class="num">15</td><td>IS-IS Level 1 internal</td><td></td></tr>
+          <tr><td class="num">18</td><td>IS-IS Level 2 internal</td><td></td></tr>
+          <tr><td class="num">100</td><td>RIP</td><td></td></tr>
+          <tr><td class="num">130</td><td>Aggregate / Generated</td><td>預設 next hop 為 <code>reject</code>（Q59）</td></tr>
+          <tr><td class="num">150</td><td>OSPF AS external</td><td>Type 5 / Type 7</td></tr>
+          <tr data-hl><td class="num">170</td><td>BGP —— <strong>EBGP 與 IBGP 相同</strong></td><td>Q167 的關鍵</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ 驗證紀錄 ============ -->
+  <section>
+    <div class="sec-head">
+      <h2>校對範圍與結果</h2>
+      <span class="count">197 題</span>
+    </div>
+
+    <div class="method">
+      <div><span class="k">答案比對</span><span class="v">HTML 的 <code>questionsData</code> 逐題對 PDF 抽出的 <code>Answer:</code> —— <b>197/197 完全相同</b></span></div>
+      <div><span class="k">選項比對</span><span class="v">選項數量全數相同；4 處誘答選項文字有落差（Q88、Q137、Q163、Q60），<b>不影響作答</b></span></div>
+      <div><span class="k">題幹比對</span><span class="v">19 處差異全是 PDF 抽字時混入頁碼或截斷所致，<b>HTML 反而較正確</b>（如 Q137 的 <code>router I</code> → <code>router ID.</code>）</span></div>
+      <div><span class="k">圖片</span><span class="v">33 張全部對應，<b>無缺漏、無孤兒檔</b></span></div>
+      <div><span class="k">重複題</span><span class="v">14 組（Q3≒Q193 等），<b>答案彼此一致無衝突</b></span></div>
+    </div>
+
+    <p style="font-size:.9rem;color:var(--muted);margin:22px 0 12px;">圖表題已開圖逐一驗算，結果全部正確：</p>
+    <ul class="checked">
+      <li>Q30 <span>pref 5</span></li>
+      <li>Q35 <span>6 &lt; 7</span></li>
+      <li>Q52·148 <span>2000ms</span></li>
+      <li>Q56·71 <span>3-stage</span></li>
+      <li>Q108 <span>5-stage</span></li>
+      <li>Q122 <span>缺 peer-as</span></li>
+      <li>Q128 <span>3 碰撞域</span></li>
+      <li>Q133 <span>2700ms</span></li>
+      <li>Q142 <span>1 廣播域</span></li>
+      <li>Q190 <span>跨 pod</span></li>
+      <li>Q194 <span>ge-0/0/1</span></li>
+    </ul>
+  </section>
+
+  <footer>
+    <p>對照檔案：<code>JN0-281 V12.65.pdf</code>（85 頁）與 <code>JN0-281.html</code>（197 題）·<code>png/</code> 33 張圖</p>
+    <p>本頁只列出<strong>有問題</strong>的題目。未列出的 183 題經比對後未發現異常。</p>
+  </footer>
+
+</div>
