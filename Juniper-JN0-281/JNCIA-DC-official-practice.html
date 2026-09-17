@@ -1,0 +1,1589 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JNCIA-DC 官方練習題</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .fade-in { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Custom Checkbox/Radio Styles */
+        .option-card { cursor: pointer; transition: all 0.2s; }
+        .option-card:hover { background-color: #f1f5f9; }
+        .option-card.selected { border-color: #3b82f6; background-color: #eff6ff; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5); }
+        
+        .option-card.correct-answer { border-color: #22c55e; background-color: #f0fdf4; }
+        .option-card.wrong-answer { border-color: #ef4444; background-color: #fef2f2; }
+        
+        .disabled-click { pointer-events: none; opacity: 0.9; }
+
+        /* Palette Styles */
+        .palette-item {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            font-weight: 600;
+            border-radius: 0.5rem;
+            border-width: 2px;
+            transition: all 0.2s;
+            cursor: pointer;
+            position: relative;
+        }
+        .palette-item:hover { transform: scale(1.05); }
+        .palette-item.current { border-color: #3b82f6; background-color: #eff6ff; color: #1d4ed8; }
+        .palette-item.correct { border-color: #22c55e; background-color: #f0fdf4; color: #15803d; }
+        .palette-item.wrong { border-color: #ef4444; background-color: #fef2f2; color: #b91c1c; }
+        .palette-item.neutral { border-color: #e2e8f0; background-color: #f8fafc; color: #64748b; }
+        .palette-item.neutral:hover { border-color: #cbd5e1; }
+        
+        /* 標記 (Flag) 小紅旗樣式 */
+        .palette-item.flagged::after {
+            content: '\f024'; font-family: 'Font Awesome 6 Free'; font-weight: 900;
+            position: absolute; top: -5px; right: -5px; color: #ef4444; font-size: 0.75rem;
+            background: white; border-radius: 50%; padding: 2px; box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+
+        /* 鍵盤提示標籤樣式 */
+        kbd {
+            display: inline-block; padding: 0.1rem 0.4rem; font-size: 0.75rem; 
+            font-weight: 700; background-color: #ffffff; border: 1px solid #cbd5e1; 
+            border-radius: 0.25rem; color: #475569; box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+        }
+
+        .question-text { white-space: pre-wrap; }
+        .option-text { white-space: pre-wrap; }
+        .explanation-body p { margin: 0.4rem 0; }
+        .explanation-body strong { color: #0f172a; }
+        .explanation-body ul { padding-left: 1rem; }
+        .explanation-body li { margin: 0.2rem 0; }
+        .explanation-body code { font-family: 'Courier New', monospace; }
+        
+        /* 避免焦點殘留的藍色框框 */
+        button:focus { outline: none; }
+    
+/* ===== 勘誤註記 (errata) ===== */
+.errata{
+  border-left:4px solid var(--e);
+  background:var(--e-bg);
+  border-radius:0 .375rem .375rem 0;
+  padding:.75rem .9rem;
+  margin:0 0 1rem;
+  font-size:.875rem;
+  line-height:1.65;
+  color:#1e293b;
+}
+.errata-critical{--e:#b91c1c;--e-bg:#fef2f2;}
+.errata-caution {--e:#b45309;--e-bg:#fffbeb;}
+.errata-conflict{--e:#6d28d9;--e-bg:#f5f3ff;}
+.errata-scope   {--e:#0f766e;--e-bg:#f0fdfa;}
+.errata-ok      {--e:#15803d;--e-bg:#f0fdf4;}
+.errata-head{
+  display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-bottom:.4rem;
+}
+.errata-tag{
+  font-size:.7rem;font-weight:700;letter-spacing:.04em;
+  color:#fff;background:var(--e);
+  padding:.1rem .45rem;border-radius:.25rem;
+}
+.errata-src{font-size:.7rem;color:#64748b;}
+.errata p{margin:.35rem 0;}
+.errata p.errata-lead{margin:0 0 .45rem;color:var(--e);font-weight:600;}
+.errata code{
+  background:rgba(15,23,42,.07);border-radius:.2rem;
+  padding:.05rem .28rem;font-family:'Courier New',monospace;font-size:.9em;
+}
+.errata-cli{
+  background:#0f172a;color:#e2e8f0;
+  border-radius:.3rem;padding:.6rem .75rem;margin:.5rem 0;
+  font-family:'Courier New',monospace;font-size:.78rem;line-height:1.6;
+  white-space:pre;overflow-x:auto;
+}
+.errata p.errata-xref{
+  margin-top:.5rem;padding-top:.45rem;
+  border-top:1px dashed rgba(15,23,42,.18);
+  font-size:.82rem;color:#475569;
+}
+/* 題號旁的小警示徽章 */
+.errata-flag{
+  display:inline-flex;align-items:center;gap:.25rem;
+  font-size:.7rem;font-weight:700;
+  padding:.1rem .45rem;border-radius:.25rem;
+  background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;
+  vertical-align:middle;margin-left:.5rem;
+}
+/* 頂部版本提示條 */
+.errata-banner{
+  background:#fffbeb;border-bottom:1px solid #fde68a;
+  color:#92400e;font-size:.8rem;
+  padding:.5rem 1rem;text-align:center;
+}
+.errata-banner b{color:#78350f;}
+
+    
+/* ===== 中英對照解說 ===== */
+.en-head, .zh-head{
+  display:flex; align-items:center; gap:.5rem; margin:.2rem 0 .45rem;
+}
+.en-head::after, .zh-head::after{
+  content:''; flex:1; height:1px; background:#cbd5e1;
+}
+.en-badge, .zh-badge{
+  font-size:.68rem; font-weight:700; letter-spacing:.05em;
+  padding:.1rem .5rem; border-radius:.25rem; white-space:nowrap;
+}
+.en-badge{ background:#e2e8f0; color:#475569; }
+.zh-badge{ background:#1d4ed8; color:#ffffff; }
+.zh-wrap{ margin-top:1rem; padding-top:.65rem; border-top:1px solid #cbd5e1; }
+.zh-body{ font-size:.9rem; line-height:1.85; color:#1e293b; }
+.zh-body p{ margin:.45rem 0; }
+.zh-body ul{ padding-left:1.15rem; margin:.4rem 0; }
+.zh-body ol{ padding-left:1.35rem; margin:.4rem 0; }
+.zh-body li{ margin:.3rem 0; }
+.zh-body strong{ color:#0f172a; font-weight:600; }
+.zh-body em{ color:#475569; }
+.zh-body code{
+  font-family:'Courier New',monospace; background:rgba(15,23,42,.07);
+  border-radius:.2rem; padding:.05rem .3rem; font-size:.9em;
+}
+
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col overflow-x-hidden">
+
+    <!-- Navbar -->
+    <nav class="sticky top-0 z-50 bg-slate-900 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="flex items-center gap-3">
+                    <i class="fa-solid fa-graduation-cap text-red-500 text-2xl"></i>
+                    <h1 class="text-xl font-bold tracking-tight">Juniper <span class="text-slate-400 font-normal hidden sm:inline">JN0-281_JNCIA-DC Practice Quiz</span></h1>
+                </div>
+                
+                <div class="flex items-center gap-3">
+                     <div class="text-sm font-medium bg-slate-800 px-3 py-1.5 rounded-full border border-slate-700">
+                        <span id="current-progress">Question 1</span> / <span id="total-count">--</span>
+                    </div>
+                    <button onclick="toggleOrder()" id="order-btn" title="切換正序/逆序" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1.5 rounded-lg text-sm transition-colors flex items-center gap-2 shadow-sm font-medium">
+                        <i class="fa-solid fa-arrow-down"></i> <span class="hidden sm:inline">正序</span>
+                    </button>
+                    <button onclick="promptJump()" title="跳到指定題號" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 rounded-lg text-sm transition-colors flex items-center gap-2 shadow-sm font-medium">
+                        <i class="fa-solid fa-arrow-right-to-bracket"></i> <span class="hidden sm:inline">跳題</span>
+                    </button>
+                    <button onclick="togglePalette()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-sm transition-colors flex items-center gap-2 shadow-sm font-medium">
+                        <i class="fa-solid fa-table-cells"></i> <span class="hidden sm:inline">Questions</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <div class="errata-banner">取自 <b>Juniper 官方 JNCIA-DC Practice Exam</b> 截圖，共 <b>40 題</b>（已去除 1 組重複）。原始截圖<b>未顯示正解</b>，答案與解析由 Junos 實際行為推導，非官方答案卡。</div>
+
+    <!-- Main Content (2-Column Grid Layout) -->
+    <main class="flex-grow w-full max-w-7xl mx-auto flex flex-col lg:flex-row items-start justify-center pt-8 pb-20 px-4 gap-6">
+        
+        <!-- 左側面板：統計與狀態 -->
+        <aside class="w-full lg:w-64 flex-shrink-0 bg-white rounded-2xl shadow-xl border-t-4 border-slate-900 sticky top-24 z-10 flex flex-col overflow-hidden">
+            <div class="p-4 bg-slate-50 border-b border-slate-200 text-center">
+                <h2 class="font-bold text-slate-800 text-lg">JNCIA-DC 官方練習題</h2>
+                <div class="text-xs text-slate-500 mt-1">JN0-281_JNCIA-DC</div>
+                <div class="text-xs text-slate-500 mt-1">Juniper Official Practice Exam</div>
+            </div>
+            
+            <div class="p-4 flex flex-col gap-3 flex-grow">
+                <button onclick="restartQuiz()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-2 rounded shadow transition-colors text-sm">
+                    <i class="fa-solid fa-rotate-right mr-2"></i>清空作答進度
+                </button>
+                
+                <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 text-center mt-2">
+                    <div class="text-xs text-slate-500 font-bold mb-1">作答進度</div>
+                    <div class="text-xl font-bold text-slate-800" id="stat-progress">0 / 0</div>
+                </div>
+
+                <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 text-center cursor-pointer hover:bg-red-50 transition-colors" onclick="nextFlag()" title="點擊尋找下一個標記">
+                    <div class="text-xs text-slate-500 font-bold mb-1">標記題數</div>
+                    <div class="text-xl font-bold text-red-600" id="stat-flagged">0</div>
+                </div>
+
+                <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 text-center">
+                    <div class="text-xs text-slate-500 font-bold mb-1">答對題數</div>
+                    <div class="text-xl font-bold text-green-600" id="stat-correct">0</div>
+                </div>
+
+                <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 text-center">
+                    <div class="text-xs text-slate-500 font-bold mb-1">正確率</div>
+                    <div class="text-xl font-bold text-blue-600" id="stat-accuracy">0%</div>
+                </div>
+            </div>
+
+            <!-- 快捷鍵說明 -->
+            <div class="bg-amber-50 p-4 text-xs text-amber-800 border-t border-amber-200 leading-relaxed">
+                <div class="font-bold mb-2 text-sm"><i class="fa-solid fa-keyboard mr-1"></i> 快捷鍵說明</div>
+                <div class="mb-1"><kbd>1</kbd> ~ <kbd>6</kbd> 選擇選項 A~F</div>
+                <div class="mb-1"><kbd>←</kbd> / <kbd>→</kbd> 上 / 下一題</div>
+                <div class="mb-1"><kbd>Enter</kbd> 提交 / 下一題</div>
+                <div class="mb-1"><kbd>M</kbd> 標記 / 取消標記本題</div>
+                <div><kbd>N</kbd> 清除本題進度</div>
+            </div>
+        </aside>
+
+        <!-- 右側面板：作答區 -->
+        <div class="w-full lg:max-w-4xl flex flex-col relative z-10 min-w-0 shadow-xl rounded-2xl overflow-hidden bg-white">
+            
+            <!-- 題目快捷控制列 -->
+            <div class="bg-slate-50 border-b border-slate-200 p-3 flex justify-between items-center flex-wrap gap-2">
+                <div class="text-sm font-bold text-slate-600 flex items-center gap-2">
+                    <span id="q-id-display" class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs">第 1 題 (ID: Q1)</span>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="clearCurrentQuestion()" class="bg-slate-500 hover:bg-slate-600 text-white px-3 py-1.5 rounded text-sm transition-colors shadow-sm flex items-center gap-1" title="清除本題 [N]">
+                        <i class="fa-solid fa-eraser"></i> <span class="hidden sm:inline">清除本題</span>
+                    </button>
+                    <button onclick="toggleFlag()" id="btn-flag" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded text-sm transition-colors shadow-sm flex items-center gap-1" title="標記本題 [M]">
+                        <i class="fa-solid fa-flag"></i> <span class="hidden sm:inline">標記本題</span>
+                    </button>
+                    <button onclick="prevFlag()" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1.5 rounded text-sm transition-colors shadow-sm flex items-center gap-1">
+                        <i class="fa-solid fa-caret-left"></i> <span class="hidden sm:inline">尋找標記</span>
+                    </button>
+                    <button onclick="nextFlag()" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1.5 rounded text-sm transition-colors shadow-sm flex items-center gap-1">
+                        <span class="hidden sm:inline">尋找標記</span> <i class="fa-solid fa-caret-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="w-full bg-slate-200 h-1.5">
+                <div id="progress-bar" class="bg-blue-600 h-1.5 transition-all duration-300" style="width: 0%"></div>
+            </div>
+
+            <!-- Content Area -->
+            <div id="quiz-content" class="p-6 md:p-8 flex-grow flex flex-col text-left">
+                <!-- Content injected via JS -->
+            </div>
+
+            <!-- Footer Controls -->
+            <div id="footer-controls" class="bg-slate-50 border-t border-slate-200 p-4 md:p-6 flex justify-between items-center">
+                <button id="prev-btn" onclick="prevQuestion()" class="px-5 py-2 rounded-lg border border-slate-300 text-slate-600 hover:bg-white hover:text-slate-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                    <i class="fa-solid fa-arrow-left mr-2"></i> <span class="hidden sm:inline">Previous</span>
+                </button>
+
+                <div class="flex gap-3">
+                    <button id="submit-btn" onclick="submitAnswer()" class="px-6 py-2 rounded-lg bg-blue-600 text-white font-bold hover:bg-blue-700 shadow-md transition-transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed">
+                        Submit Answer <span class="ml-2 text-blue-200 text-xs font-normal border border-blue-400 rounded px-1 hidden sm:inline">Enter</span>
+                    </button>
+                    <button id="next-btn" onclick="nextQuestion()" class="px-6 py-2 rounded-lg bg-slate-800 text-white hover:bg-slate-900 transition-colors hidden">
+                        <span class="hidden sm:inline">Next</span> <i class="fa-solid fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Palette Modal (Sidebar) -->
+    <div id="palette-modal" class="fixed inset-0 z-[60] hidden">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity opacity-0" id="palette-backdrop" onclick="togglePalette()"></div>
+        
+        <!-- Panel -->
+        <div class="absolute right-0 top-0 h-full w-80 bg-white shadow-2xl transform transition-transform duration-300 translate-x-full flex flex-col" id="palette-panel">
+            <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
+                <h3 class="font-bold text-slate-800 flex items-center gap-2"><i class="fa-solid fa-list-ol text-blue-600"></i> Navigation</h3>
+                <button onclick="togglePalette()" class="text-slate-400 hover:text-slate-600 transition-colors w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-200">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+            
+            <div class="flex-grow overflow-y-auto p-4 custom-scrollbar">
+                <div id="palette-grid" class="grid grid-cols-5 gap-2">
+                    <!-- Numbers injected here -->
+                </div>
+            </div>
+            
+            <div class="p-4 border-t border-slate-200 bg-slate-50 text-xs text-slate-500 grid grid-cols-2 gap-2">
+                <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-blue-100 border border-blue-500"></div> Current</div>
+                <div class="flex items-center gap-2"><div class="w-3 h-3 rounded bg-white border border-slate-300"></div> Unanswered</div>
+                <div class="flex items-center gap-2"><div class="w-3 h-3 rounded bg-green-100 border border-green-500"></div> Correct</div>
+                <div class="flex items-center gap-2"><div class="w-3 h-3 rounded bg-red-100 border border-red-500"></div> Incorrect</div>
+                <div class="flex items-center gap-2 col-span-2 mt-1"><i class="fa-solid fa-flag text-red-500"></i> Flagged / Marked</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // 【請在此處貼上您原本完整的 128 題 questionsData 陣列】
+        // 為了避免 Token 限制，此處僅放第一題作為格式示意，請將其完整覆蓋。
+        // ==========================================
+const questionsData = [
+  {
+    "id": 1,
+    "q_en": "What are two requirements for an IP fabric? (Choose two.)",
+    "options": [
+      "A. a single connection between each leaf",
+      "B. a single connection between each spine and leaf",
+      "C. a Layer 2 switching protocol",
+      "D. a Layer 3 routing protocol"
+    ],
+    "answer": "B, D",
+    "explanation": "<div class=\"en-head\"><span class=\"en-badge\">ENGLISH<\/span><\/div><div class=\"explanation-body\"><p>An IP fabric is a Layer 3 spine-and-leaf (Clos) topology. Two structural rules define it.<\/p><ul><li><strong>Full spine-to-leaf meshing (B):<\/strong> every leaf connects to every spine with a single link. Leaves never connect to other leaves, and spines never connect to other spines.<\/li><li><strong>A Layer 3 routing protocol (D):<\/strong> EBGP or OSPF provides reachability, ECMP load sharing and loop prevention. There is no Spanning Tree in an IP fabric.<\/li><\/ul><p>Option A is wrong because leaf-to-leaf links break the equidistant multipath property. Option C is wrong because the fabric is routed, not switched.<\/p><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文解析<\/span><\/div><div class=\"zh-body\"><p>IP fabric 是 Layer 3 的 spine-and-leaf（Clos）拓撲，由兩條結構性規則定義。<\/p><ul><li><strong>Spine 對 Leaf 全互連（B）：<\/strong>每台 leaf 以單一連結連到每一台 spine。leaf 之間不相連，spine 之間也不相連。<\/li><li><strong>Layer 3 路由協定（D）：<\/strong>由 EBGP 或 OSPF 提供可達性、ECMP 負載分擔與迴圈預防。IP fabric 中<strong>沒有<\/strong> Spanning Tree。<\/li><\/ul><p>選項 A 錯誤，因為 leaf 之間相連會破壞「等距多路徑」的特性；選項 C 錯誤，因為 fabric 是路由式而非交換式。<\/p><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 2,
+    "q_en": "Which statement is correct about building an IP fabric?",
+    "options": [
+      "A. Each spine device should have a direct physical connection to every leaf device.",
+      "B. Each spine device should have a direct physical connection to every other spine device.",
+      "C. Each spine device must have two or more physical connections to each connected server.",
+      "D. Each spine device must have two or more physical connections to each leaf device."
+    ],
+    "answer": "A",
+    "explanation": "<div class=\"en-head\"><span class=\"en-badge\">ENGLISH<\/span><\/div><div class=\"explanation-body\"><p>The defining rule of a Clos fabric is that <strong>every spine connects to every leaf<\/strong>, and nothing else connects horizontally.<\/p><ul><li><strong>Why (A):<\/strong> full spine-to-leaf meshing guarantees that any leaf reaches any other leaf in exactly two hops, and gives the routing protocol N equal-cost paths (one per spine) for ECMP.<\/li><li><strong>Why not (B):<\/strong> spine-to-spine links serve no purpose in a Clos design and create asymmetric paths.<\/li><li><strong>Why not (C):<\/strong> spines never connect to servers — that is the leaf layer's job.<\/li><li><strong>Why not (D):<\/strong> a single link per spine-leaf pair is the norm; multiple links are optional for capacity, not a requirement.<\/li><\/ul><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文解析<\/span><\/div><div class=\"zh-body\"><p>Clos fabric 的定義性規則是：<strong>每台 spine 都連到每一台 leaf<\/strong>，除此之外不做任何橫向連接。<\/p><ul><li><strong>為何選 A：<\/strong>spine 對 leaf 全互連可保證任一 leaf 到另一 leaf 恰好兩跳，並讓路由協定取得 N 條等價路徑（每台 spine 一條）供 ECMP 使用。<\/li><li><strong>為何不是 B：<\/strong>spine 之間的連線在 Clos 設計中沒有用途，反而造成路徑不對稱。<\/li><li><strong>為何不是 C：<\/strong>spine 從不直接連伺服器，那是 leaf 層的職責。<\/li><li><strong>為何不是 D：<\/strong>每組 spine-leaf 一條連結是常態；多條連結是為了容量而選用，並非硬性要求。<\/li><\/ul><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 3,
+    "q_en": "Which statement is correct about a three-stage IP fabric underlay?",
+    "options": [
+      "A. Every server that connects to a three-stage IP fabric must be multihomed.",
+      "B. Every leaf device can communicate directly with other leaf devices.",
+      "C. Every ingress interface into the fabric is only two hops away from the egress interface.",
+      "D. Every spine device can communicate directly with other spine devices."
+    ],
+    "answer": "C",
+    "explanation": "<div class=\"en-head\"><span class=\"en-badge\">ENGLISH<\/span><\/div><div class=\"explanation-body\"><p>In a three-stage fabric the path is always <code>ingress leaf &rarr; spine &rarr; egress leaf<\/code> — exactly <strong>two hops<\/strong> between the ingress and egress interfaces.<\/p><ul><li><strong>Predictable latency:<\/strong> because every path has the same hop count, latency between any two endpoints is uniform. This is the key property of a Clos design.<\/li><li><strong>Why not B and D:<\/strong> leaves do not connect to leaves, and spines do not connect to spines. All east-west traffic transits the spine layer.<\/li><li><strong>Why not A:<\/strong> multihoming servers is a design choice for redundancy, not a fabric requirement.<\/li><\/ul><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文解析<\/span><\/div><div class=\"zh-body\"><p>在三階 fabric 中，路徑永遠是 <code>入口 leaf &rarr; spine &rarr; 出口 leaf<\/code> —— 入口與出口介面之間恰好 <strong>兩跳<\/strong>。<\/p><ul><li><strong>可預測的延遲：<\/strong>由於每條路徑的跳數都相同，任兩端點之間的延遲一致。這正是 Clos 設計的關鍵特性。<\/li><li><strong>為何不是 B 與 D：<\/strong>leaf 之間不相連，spine 之間也不相連，所有東西向流量都必須經過 spine 層。<\/li><li><strong>為何不是 A：<\/strong>伺服器多重連接是為了備援的設計選擇，並非 fabric 的必要條件。<\/li><\/ul><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 4,
+    "q_en": "When using spine and leaf fabric architectures, what is the role of each device? (Choose two.)",
+    "options": [
+      "A. Leaf nodes are used for traffic to other leafs.",
+      "B. Spine nodes are used for transit to other leaf nodes.",
+      "C. Leaf nodes are used for host connectivity.",
+      "D. Spine nodes are used for host connectivity."
+    ],
+    "answer": "B, C",
+    "explanation": "<div class=\"en-head\"><span class=\"en-badge\">ENGLISH<\/span><\/div><div class=\"explanation-body\"><p>The two tiers have strictly separated roles.<\/p><ul><li><strong>Spine = transit (B):<\/strong> spines are a high-speed backbone whose only job is to carry traffic between leaves. They do not attach hosts.<\/li><li><strong>Leaf = access (C):<\/strong> leaves provide the physical ports for servers, storage, firewalls and load balancers.<\/li><\/ul><p>Option D reverses the roles. Option A is misleading: leaves do carry traffic destined for other leaves, but they must send it <em>via a spine<\/em> — a leaf is not a transit device for other leaves.<\/p><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文解析<\/span><\/div><div class=\"zh-body\"><p>兩個層級的角色嚴格分離。<\/p><ul><li><strong>Spine = 轉送（B）：<\/strong>spine 是高速骨幹，唯一職責是在各 leaf 之間承載流量，不接主機。<\/li><li><strong>Leaf = 存取（C）：<\/strong>leaf 為伺服器、儲存設備、防火牆與負載平衡器提供實體連接埠。<\/li><\/ul><p>選項 D 把角色顛倒了。選項 A 有誤導性：leaf 確實會處理要送往其他 leaf 的流量，但必須<em>經由 spine<\/em> 轉送 —— leaf 本身並不是其他 leaf 的轉送裝置。<\/p><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 5,
+    "q_en": "In a legacy data center architecture, what is the order of devices that data passes through when traveling from a host to the Internet?",
+    "options": [
+      "A. access -> core -> aggregation -> WAN edge",
+      "B. core -> access -> aggregation -> WAN edge",
+      "C. access -> aggregation -> core -> WAN edge",
+      "D. core-> aggregation -> access -> WAN edge"
+    ],
+    "answer": "C",
+    "explanation": "<div class=\"en-head\"><span class=\"en-badge\">ENGLISH<\/span><\/div><div class=\"explanation-body\"><p>The classic three-tier data center is hierarchical, and traffic flows outward from the host through each tier in turn.<\/p><ul><li><strong>Access:<\/strong> where the server plugs in.<\/li><li><strong>Aggregation (Distribution):<\/strong> collects traffic from many access switches and applies policy, inter-VLAN routing and QoS.<\/li><li><strong>Core:<\/strong> the high-speed backbone interconnecting aggregation blocks.<\/li><li><strong>WAN edge:<\/strong> the exit point toward the Internet or WAN.<\/li><\/ul><p>This north-south path is exactly what leaf-spine designs replaced once east-west (server-to-server) traffic came to dominate.<\/p><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文解析<\/span><\/div><div class=\"zh-body\"><p>經典的三層資料中心是階層式的，流量從主機依序往外經過每一層。<\/p><ul><li><strong>Access（存取層）：<\/strong>伺服器接入的地方。<\/li><li><strong>Aggregation／Distribution（匯聚／分佈層）：<\/strong>匯集多台存取層交換器的流量，並套用政策、VLAN 間路由與 QoS。<\/li><li><strong>Core（核心層）：<\/strong>互連各匯聚區塊的高速骨幹。<\/li><li><strong>WAN edge：<\/strong>通往網際網路或 WAN 的出口。<\/li><\/ul><p>這條南北向路徑，正是當東西向（伺服器對伺服器）流量成為主流後，被 leaf-spine 設計所取代的對象。<\/p><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 6,
+    "q_en": "Which signaling protocol is used for EVPN?",
+    "options": [
+      "A. BGP",
+      "B. IS-IS",
+      "C. OSPF",
+      "D. PIM"
+    ],
+    "answer": "A",
+    "explanation": "<div class=\"en-head\"><span class=\"en-badge\">ENGLISH<\/span><\/div><div class=\"explanation-body\"><p>EVPN uses <strong>MP-BGP<\/strong> as its control plane (signaling) protocol.<\/p><ul><li><strong>What it carries:<\/strong> BGP is extended with the EVPN address family (AFI 25 / SAFI 70) to advertise MAC addresses, MAC-IP bindings, Ethernet segment information and IP prefixes between VTEPs.<\/li><li><strong>Why it matters:<\/strong> a BGP control plane replaces VXLAN's legacy flood-and-learn behaviour, so MAC learning becomes a routing-protocol function rather than data-plane flooding — which is what makes EVPN-VXLAN scale.<\/li><\/ul><p>OSPF and IS-IS are underlay IGPs; PIM is for multicast. None of them signal EVPN routes.<\/p><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文解析<\/span><\/div><div class=\"zh-body\"><p>EVPN 使用 <strong>MP-BGP<\/strong> 作為其控制平面（訊號）協定。<\/p><ul><li><strong>承載什麼：<\/strong>BGP 透過 EVPN 位址族（AFI 25／SAFI 70）擴充，在各 VTEP 之間通告 MAC 位址、MAC-IP 綁定、Ethernet Segment 資訊與 IP 前綴。<\/li><li><strong>為何重要：<\/strong>BGP 控制平面取代了 VXLAN 傳統的 flood-and-learn 行為，使 MAC 學習從資料平面的洪泛變成路由協定的功能 —— 這正是 EVPN-VXLAN 得以擴充的關鍵。<\/li><\/ul><p>OSPF 與 IS-IS 是 underlay 的 IGP；PIM 用於多播。三者都不負責 EVPN 路由的訊號傳遞。<\/p><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 7,
+    "q_en": "How many stages are shown in the exhibit?",
+    "options": [
+      "A. 5",
+      "B. 2",
+      "C. 6",
+      "D. 3"
+    ],
+    "answer": "D",
+    "explanation": "<div class=\"en-head\"><span class=\"en-badge\">ENGLISH<\/span><\/div><div class=\"explanation-body\"><p>The exhibit shows a <strong>folded<\/strong> IP Clos architecture — two physical tiers (spine on top, leaf below), which is logically a <strong>three-stage<\/strong> fabric.<\/p><ul><li><strong>Counting stages:<\/strong> stages are counted along the data path, not by counting rows of switches. A packet crosses <code>ingress leaf (1) &rarr; spine (2) &rarr; egress leaf (3)<\/code>.<\/li><li><strong>Why \"folded\":<\/strong> in the classic unfolded Clos drawing the ingress and egress leaf layers are drawn separately, giving three visible rows. Folding merges them into one row, so you see two tiers but still traverse three stages.<\/li><\/ul><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文解析<\/span><\/div><div class=\"zh-body\"><p>圖中呈現的是<strong>折疊式（folded）<\/strong> IP Clos 架構 —— 實體上兩層（上方 spine、下方 leaf），邏輯上則是<strong>三階<\/strong> fabric。<\/p><ul><li><strong>如何數階數：<\/strong>階數是沿著<strong>資料路徑<\/strong>計算，而非數交換器的排數。封包會經過 <code>入口 leaf（1）&rarr; spine（2）&rarr; 出口 leaf（3）<\/code>。<\/li><li><strong>為何叫「折疊」：<\/strong>傳統未折疊的 Clos 圖會把入口與出口 leaf 層分開畫，形成三排。折疊後把兩者合併成一排，因此你只看到兩層，但仍然要走過三個階段。<\/li><\/ul><\/div><\/div>",
+    "images": [
+      "q7.jpg"
+    ]
+  },
+  {
+    "id": 8,
+    "q_en": "Which two statement are correct about trunk ports? (Choose two.)",
+    "options": [
+      "A. Trunk ports typically connect to end users and servers.",
+      "B. By default, trunk ports can transmit and receive untagged traffic.",
+      "C. Trunk ports typically connect to other switches and routers.",
+      "D. By default, trunk ports can transmit and receive VLAN tagged traffic."
+    ],
+    "answer": "C, D",
+    "explanation": "<div class=\"en-head\"><span class=\"en-badge\">ENGLISH<\/span><\/div><div class=\"explanation-body\"><p>A trunk port is an infrastructure link that carries several VLANs over one physical wire.<\/p><ul><li><strong>Connects infrastructure (C):<\/strong> trunks are used switch-to-switch, switch-to-router, or to a hypervisor/server that understands VLAN tags. End users normally sit on access ports.<\/li><li><strong>Carries tagged traffic (D):<\/strong> by default a trunk transmits and receives 802.1Q-tagged frames so the far end can tell which VLAN each frame belongs to.<\/li><\/ul><p>Option B is only true once you explicitly add a <code>native-vlan-id<\/code>; untagged traffic is not accepted by default.<\/p><pre class=\"errata-cli\">set interfaces ge-0/0/1 unit 0 family ethernet-switching interface-mode trunk\nset interfaces ge-0/0/1 unit 0 family ethernet-switching vlan members [ v11 v22 ]<\/pre><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文解析<\/span><\/div><div class=\"zh-body\"><p>Trunk port 是承載多個 VLAN 通過單一實體線路的基礎設施連結。<\/p><ul><li><strong>連接基礎設施（C）：<\/strong>trunk 用於交換器對交換器、交換器對路由器，或連到看得懂 VLAN tag 的 hypervisor／伺服器。終端使用者通常接在 access port 上。<\/li><li><strong>承載已標記流量（D）：<\/strong>trunk 預設收送 802.1Q 標記的訊框，好讓對端知道每個訊框屬於哪個 VLAN。<\/li><\/ul><p>選項 B 只有在你明確設定 <code>native-vlan-id<\/code> 之後才成立；未標記流量<strong>預設不被接受<\/strong>。<\/p><pre class=\"errata-cli\">set interfaces ge-0/0/1 unit 0 family ethernet-switching interface-mode trunk\nset interfaces ge-0/0/1 unit 0 family ethernet-switching vlan members [ v11 v22 ]<\/pre><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 9,
+    "q_en": "What information in the Ethernet header is used to populate the bridging table?",
+    "options": [
+      "A. type",
+      "B. protocol",
+      "C. destination address",
+      "D. source address"
+    ],
+    "answer": "D",
+    "explanation": "<div class=\"en-head\"><span class=\"en-badge\">ENGLISH<\/span><\/div><div class=\"explanation-body\"><p>A switch learns from the <strong>source MAC address<\/strong> of every frame it receives.<\/p><ul><li><strong>Learning:<\/strong> when a frame arrives on a port, the switch records <em>source MAC &rarr; ingress port &rarr; VLAN<\/em> in the bridging (Ethernet-switching) table. This tells it where that device lives.<\/li><li><strong>Forwarding:<\/strong> the <em>destination<\/em> MAC is then used to look up the egress port. Learning and forwarding use opposite fields — this is the distinction the question tests.<\/li><\/ul><pre class=\"errata-cli\">user@switch&gt; show ethernet-switching table<\/pre><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文解析<\/span><\/div><div class=\"zh-body\"><p>交換器是從每個收到的訊框的<strong>來源 MAC 位址<\/strong>來學習。<\/p><ul><li><strong>學習：<\/strong>當訊框抵達某個 port，交換器把「<em>來源 MAC &rarr; 進入的 port &rarr; VLAN<\/em>」記錄到橋接表（Ethernet-switching 表）中，藉此得知該裝置的位置。<\/li><li><strong>轉送：<\/strong>接著用<em>目的<\/em> MAC 去查出口 port。<strong>學習與轉送使用的是相反的欄位<\/strong> —— 這正是本題要考的區別。<\/li><\/ul><pre class=\"errata-cli\">user@switch&gt; show ethernet-switching table<\/pre><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 10,
+    "q_en": "What is the definition of a trunk interface on a switch?",
+    "options": [
+      "A. An interface that carries multiple VLANs.",
+      "B. An interface that carries high bandwidth.",
+      "C. An interface that connects directly to powerful servers.",
+      "D. An interface that carries excess traffic."
+    ],
+    "answer": "A",
+    "explanation": "<div class=\"en-head\"><span class=\"en-badge\">ENGLISH<\/span><\/div><div class=\"explanation-body\"><p>A trunk interface is defined purely by <strong>how many VLANs it carries<\/strong>, not by its speed or what is plugged into it.<\/p><ul><li><strong>Multiple VLANs (A):<\/strong> the trunk tags each frame with an 802.1Q VLAN ID so a single physical link can carry traffic for many broadcast domains while keeping them separate.<\/li><li><strong>Contrast with access:<\/strong> an access interface belongs to exactly one VLAN and carries untagged frames.<\/li><\/ul><p>Options B, C and D describe bandwidth or cabling choices, which have nothing to do with the trunk/access distinction.<\/p><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文解析<\/span><\/div><div class=\"zh-body\"><p>Trunk 介面的定義完全取決於它<strong>承載多少個 VLAN<\/strong>，與速率或接了什麼裝置無關。<\/p><ul><li><strong>多個 VLAN（A）：<\/strong>trunk 為每個訊框加上 802.1Q VLAN ID，使單一實體連結能承載多個廣播網域的流量，同時保持彼此隔離。<\/li><li><strong>與 access 對照：<\/strong>access 介面只屬於單一 VLAN，承載的是未標記訊框。<\/li><\/ul><p>選項 B、C、D 描述的是頻寬或佈線選擇，與 trunk／access 的區別毫無關係。<\/p><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 11,
+    "q_en": "What is the default Junos behavior of access ports?",
+    "options": [
+      "A. Allow only untagged traffic",
+      "B. Allow a maximum of 80 percent untagged traffic",
+      "C. Allow only tagged traffic",
+      "D. Allow both tagged and untagged traffic"
+    ],
+    "answer": "A",
+    "explanation": "<div class=\"en-head\"><span class=\"en-badge\">ENGLISH<\/span><\/div><div class=\"explanation-body\"><p>An access port is meant for end devices that know nothing about VLANs, so by default it handles <strong>untagged traffic only<\/strong>.<\/p><ul><li><strong>Ingress:<\/strong> an untagged frame arriving on an access port is internally associated with that port's configured VLAN.<\/li><li><strong>Egress:<\/strong> the switch strips the tag before sending the frame to the host.<\/li><li><strong>Tagged frames:<\/strong> a tagged frame arriving on a standard access port is dropped. (Accepting one requires explicitly configuring a tagged-access or trunk mode.)<\/li><\/ul><pre class=\"errata-cli\">set interfaces ge-0/0/5 unit 0 family ethernet-switching interface-mode access\nset interfaces ge-0/0/5 unit 0 family ethernet-switching vlan members v11<\/pre><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文解析<\/span><\/div><div class=\"zh-body\"><p>Access port 是為了連接完全不懂 VLAN 的終端裝置而設計，因此預設<strong>只處理未標記（untagged）流量<\/strong>。<\/p><ul><li><strong>進入方向：<\/strong>抵達 access port 的未標記訊框，會在內部被關聯到該 port 所設定的 VLAN。<\/li><li><strong>送出方向：<\/strong>交換器在把訊框送給主機之前會移除 tag。<\/li><li><strong>已標記訊框：<\/strong>標準 access port 收到已標記訊框時會直接<strong>丟棄<\/strong>。（若要接受，必須明確設定 tagged-access 或 trunk 模式。）<\/li><\/ul><pre class=\"errata-cli\">set interfaces ge-0/0/5 unit 0 family ethernet-switching interface-mode access\nset interfaces ge-0/0/5 unit 0 family ethernet-switching vlan members v11<\/pre><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 12,
+    "q_en": "Which statement is true about a native VLAN?",
+    "options": [
+      "A. The native VLAN is a global VLAN from which all interfaces are always a part.",
+      "B. All interfaces are placed into the native VLAN by default.",
+      "C. If an access interface receives an untagged frame, it assumes that the frame is part of the native VLAN that is configured on the interface.",
+      "D. If a trunk interface receives an untagged frame, it assumes that the frame is part of the native VLAN that is configured on the interface."
+    ],
+    "answer": "D",
+    "explanation": "<div class=\"en-head\"><span class=\"en-badge\">ENGLISH<\/span><\/div><div class=\"explanation-body\"><p>The native VLAN exists specifically to give a <strong>trunk<\/strong> port somewhere to put untagged frames.<\/p><ul><li><strong>The problem it solves:<\/strong> a trunk normally expects every frame to carry an 802.1Q tag. If an untagged frame arrives, the switch has no VLAN ID to work with and would otherwise drop it.<\/li><li><strong>The behaviour (D):<\/strong> configuring <code>native-vlan-id<\/code> on the trunk tells the switch to treat any untagged frame as belonging to that VLAN.<\/li><\/ul><p>Option C is wrong because an access port already has exactly one VLAN — the term \"native VLAN\" does not apply to it.<\/p><pre class=\"errata-cli\">set interfaces ge-0/0/1 unit 0 family ethernet-switching interface-mode trunk\nset interfaces ge-0/0/1 native-vlan-id 10<\/pre><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文解析<\/span><\/div><div class=\"zh-body\"><p>Native VLAN 的存在意義，正是為了讓 <strong>trunk<\/strong> port 有地方安置未標記的訊框。<\/p><ul><li><strong>它解決的問題：<\/strong>trunk 預期每個訊框都帶有 802.1Q tag。若收到未標記訊框，交換器沒有 VLAN ID 可用，否則只能丟棄。<\/li><li><strong>實際行為（D）：<\/strong>在 trunk 上設定 <code>native-vlan-id<\/code>，即告訴交換器把任何未標記訊框視為屬於該 VLAN。<\/li><\/ul><p>選項 C 錯誤，因為 access port 本來就只屬於單一 VLAN ——「native VLAN」這個概念對它並不適用。<\/p><pre class=\"errata-cli\">set interfaces ge-0/0/1 unit 0 family ethernet-switching interface-mode trunk\nset interfaces ge-0/0/1 native-vlan-id 10<\/pre><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 13,
+    "q_en": "A switch receives a frame with a MAC address of FF-FF-FF-FF-FF-FF. Which action will the switch take on this frame?",
+    "options": [
+      "A. It will flood it out of all interfaces, except for the next-hop interface.",
+      "B. It will flood it out of all interfaces, except for the directly connected VLAN.",
+      "C. It will flood it out of all interfaces.",
+      "D. It will flood it out of all interfaces, except for the ingress interface."
+    ],
+    "answer": "D",
+    "explanation": "<div class=\"en-head\"><span class=\"en-badge\">ENGLISH<\/span><\/div><div class=\"explanation-body\"><p><code>FF-FF-FF-FF-FF-FF<\/code> is the Ethernet broadcast address, so the frame is flooded — but never back out the port it came in on.<\/p><ul><li><strong>Split horizon (D):<\/strong> sending the frame back out the ingress interface would return it to the sender and could create a loop. The ingress port is always excluded.<\/li><li><strong>Scope:<\/strong> flooding is confined to the ingress frame's VLAN — a broadcast in VLAN 10 never reaches VLAN 20 ports. Option C is wrong for both reasons.<\/li><\/ul><p>Option B has it backwards: the frame is flooded <em>within<\/em> its VLAN, not excluded from it.<\/p><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文解析<\/span><\/div><div class=\"zh-body\"><p><code>FF-FF-FF-FF-FF-FF<\/code> 是乙太網廣播位址，因此訊框會被洪泛 —— 但<strong>絕不會從它進來的那個 port 送回去<\/strong>。<\/p><ul><li><strong>水平分割（D）：<\/strong>把訊框從入口介面送回去，等於退回給發送端，還可能造成迴圈。入口 port 一律被排除。<\/li><li><strong>範圍：<\/strong>洪泛僅限於該訊框所屬的 VLAN —— VLAN 10 的廣播絕不會到達 VLAN 20 的 port。選項 C 在這兩點上都錯了。<\/li><\/ul><p>選項 B 說反了：訊框是在自己的 VLAN <em>之內<\/em>被洪泛，而不是被排除在外。<\/p><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 14,
+    "q_en": "Referring to the exhibit, which statement is correct?",
+    "options": [
+      "A. The ge-0/0/0 interface has been explicitly assigned to a VLAN named default.",
+      "B. The ge-0/0/12 interfaces is an access port.",
+      "C. The default VLAN is a user defined VLAN name.",
+      "D. The asterisk indicates that the interface is active."
+    ],
+    "answer": "D",
+    "explanation": "<div class=\"en-head\"><span class=\"en-badge\">ENGLISH<\/span><\/div><div class=\"explanation-body\"><p>In <code>show vlans<\/code> output, the <strong>asterisk (*)<\/strong> next to an interface means that interface is currently up and actively participating in the VLAN.<\/p><ul><li><strong>Reading the output (D):<\/strong> <code>ge-0/0/1.0<\/code> has no asterisk, so it is administratively down or has no link. Every other listed interface carries one and is active.<\/li><li><strong>Why not A:<\/strong> <code>ge-0/0/0.0<\/code> sits in <code>default<\/code> because that is where unconfigured ports land automatically — not because someone assigned it.<\/li><li><strong>Why not B:<\/strong> <code>ge-0/0/12.0<\/code> appears under <em>both<\/em> GREEN-10 and BLUE-20. Membership in two VLANs means it is a trunk, not an access port.<\/li><li><strong>Why not C:<\/strong> <code>default<\/code> is system-defined, not user-defined.<\/li><\/ul><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文解析<\/span><\/div><div class=\"zh-body\"><p>在 <code>show vlans<\/code> 的輸出中，介面旁的<strong>星號（*）<\/strong>代表該介面目前是 up 的，且正實際參與該 VLAN。<\/p><ul><li><strong>讀懂輸出（D）：<\/strong><code>ge-0/0/1.0<\/code> 沒有星號，代表它在管理上被關閉或沒有實體連線；其餘列出的介面都有星號，皆為 active。<\/li><li><strong>為何不是 A：<\/strong><code>ge-0/0/0.0<\/code> 出現在 <code>default<\/code> 中，是因為未設定的 port 會自動落入該 VLAN，並非有人刻意指派。<\/li><li><strong>為何不是 B：<\/strong><code>ge-0/0/12.0<\/code> 同時出現在 GREEN-10 <em>與<\/em> BLUE-20 底下。同時隸屬兩個 VLAN 代表它是 <strong>trunk<\/strong>，不是 access port。<\/li><li><strong>為何不是 C：<\/strong><code>default<\/code> 是系統定義的，並非使用者自訂。<\/li><\/ul><\/div><\/div>",
+    "images": [
+      "q14.jpg"
+    ]
+  },
+  {
+    "id": 15,
+    "q_en": "A switch receives a frame with a known source MAC address, but an unknown destination MAC address. In this scenario, which action will the switch perform?",
+    "options": [
+      "A. It will add the source MAC to its routing table.",
+      "B. It will use ARP to find the location of the destination host.",
+      "C. It will flood the frame out of all interfaces, except the ingress interface.",
+      "D. It will use multicast so that the frame reaches the correct destination host."
+    ],
+    "answer": "C",
+    "explanation": "<div class=\"en-head\"><span class=\"en-badge\">ENGLISH<\/span><\/div><div class=\"explanation-body\"><p>This is <strong>unknown unicast flooding<\/strong>, the standard Layer 2 fallback.<\/p><ul><li><strong>The lookup fails:<\/strong> the destination MAC is not in the Ethernet-switching table, so the switch does not know which port leads to that host.<\/li><li><strong>The fallback (C):<\/strong> rather than drop the frame, the switch floods it out every active port in the same VLAN except the ingress port. When the destination replies, its source MAC is learned and subsequent frames are unicast normally.<\/li><\/ul><p>Option A confuses the bridging table with the routing table. Option B is wrong because ARP is a host function for resolving IP&rarr;MAC, not something a switch performs on behalf of others.<\/p><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文解析<\/span><\/div><div class=\"zh-body\"><p>這就是<strong>未知單播洪泛（unknown unicast flooding）<\/strong>，Layer 2 的標準後備機制。<\/p><ul><li><strong>查表失敗：<\/strong>目的 MAC 不在 Ethernet-switching 表中，交換器不知道哪個 port 通往該主機。<\/li><li><strong>後備作法（C）：<\/strong>交換器不會丟棄訊框，而是把它洪泛到同一 VLAN 內除入口 port 以外的每一個 active port。當目的端回應時，其來源 MAC 即被學習，後續訊框便以正常單播轉送。<\/li><\/ul><p>選項 A 把橋接表與路由表搞混了。選項 B 錯誤，因為 ARP 是主機用來解析 IP&rarr;MAC 的功能，交換器不會代替他人執行。<\/p><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 16,
+    "q_en": "Referring to the exhibit, which two actions must be taken to enable communication between users within their respective VLAN connected to Switch 1 and users connected to Switch 2? (Choose two.)",
+    "options": [
+      "A. Trunk mode must be enabled on port ge-0/0/1 of Switch 2.",
+      "B. Trunk mode must be enabled on port ge-0/0/1 of Switch 1.",
+      "C. Access mode must be enabled on port ge-0/0/1 of Switch 2.",
+      "D. Access mode must be enabled on port ge-0/0/1 of Switch 1."
+    ],
+    "answer": "A, B",
+    "explanation": "<div class=\"en-head\"><span class=\"en-badge\">ENGLISH<\/span><\/div><div class=\"explanation-body\"><p>The inter-switch link must carry <strong>two<\/strong> VLANs (v11 and v22), so both ends of it have to be trunks.<\/p><ul><li><strong>Reading the exhibit:<\/strong> User 1 (v11) and User 2 (v22) hang off Switch 1; User 4 (v11) and User 3 (v22) hang off Switch 2. The only path between them is the <code>ge-0/0/1<\/code> &harr; <code>ge-0/0/1<\/code> link.<\/li><li><strong>Why both ends (A and B):<\/strong> an access port belongs to a single VLAN and sends untagged frames, so it could carry only one of the two VLANs and the far side would have no way to tell them apart. Configuring trunk mode on both ends lets 802.1Q tags preserve VLAN separation across the link.<\/li><\/ul><p>Note this enables communication <em>within<\/em> each VLAN (v11-to-v11, v22-to-v22). Routing <em>between<\/em> v11 and v22 would additionally require an IRB interface.<\/p><pre class=\"errata-cli\">set interfaces ge-0/0/1 unit 0 family ethernet-switching interface-mode trunk\nset interfaces ge-0/0/1 unit 0 family ethernet-switching vlan members [ v11 v22 ]<\/pre><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文解析<\/span><\/div><div class=\"zh-body\"><p>交換器之間的連結必須承載<strong>兩個<\/strong> VLAN（v11 與 v22），因此兩端都必須設為 trunk。<\/p><ul><li><strong>解讀圖示：<\/strong>User 1（v11）與 User 2（v22）接在 Switch 1；User 4（v11）與 User 3（v22）接在 Switch 2。兩者之間唯一的路徑就是 <code>ge-0/0/1<\/code> &harr; <code>ge-0/0/1<\/code> 這條連結。<\/li><li><strong>為何兩端都要（A 與 B）：<\/strong>access port 只屬於單一 VLAN 且送出未標記訊框，因此只能承載兩個 VLAN 中的一個，對端也無從區分。兩端都設成 trunk 模式，才能靠 802.1Q tag 在連結上維持 VLAN 的隔離。<\/li><\/ul><p>請注意這是讓<em>同一個<\/em> VLAN 內的使用者能互通（v11 對 v11、v22 對 v22）。若要在 v11 與 v22 <em>之間<\/em>路由，還需要額外設定 IRB 介面。<\/p><pre class=\"errata-cli\">set interfaces ge-0/0/1 unit 0 family ethernet-switching interface-mode trunk\nset interfaces ge-0/0/1 unit 0 family ethernet-switching vlan members [ v11 v22 ]<\/pre><\/div><\/div>",
+    "images": [
+      "q16.jpg"
+    ]
+  },
+  {
+    "id": 17,
+    "q_en": "What does the \"qualified-next-hop\" feature do when configuring a static route?",
+    "options": [
+      "A. It instructs the device to verify the next-hop is reachable before activating the route",
+      "B. It allows you to specify an independent route preference value for an additional next hop.",
+      "C. It specifies the IP address of the directly connected device.",
+      "D. It instructs the device to looks up a static route's next-hop that is not directly connected."
+    ],
+    "answer": "B",
+    "explanation": "<div class=\"en-head\"><span class=\"en-badge\">ENGLISH<\/span><\/div><div class=\"explanation-body\"><p><code>qualified-next-hop<\/code> adds a second (or third) next hop to the <em>same<\/em> static route and lets you give it its <strong>own independent preference<\/strong>.<\/p><ul><li><strong>Effect:<\/strong> this creates a floating static route. The router installs the next hop with the lowest preference; if that path goes away, the qualified next hop takes over automatically.<\/li><li><strong>Why not D:<\/strong> resolving a next hop that is not directly connected is what the <code>resolve<\/code> option does.<\/li><li><strong>Why not A:<\/strong> Junos always checks next-hop reachability before activating any static route — that is default behaviour, not something qualified-next-hop adds.<\/li><\/ul><pre class=\"errata-cli\">set routing-options static route 0.0.0.0/0 next-hop 10.0.0.1\nset routing-options static route 0.0.0.0/0 qualified-next-hop 10.0.0.2 preference 10<\/pre><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文解析<\/span><\/div><div class=\"zh-body\"><p><code>qualified-next-hop<\/code> 為<em>同一條<\/em>靜態路由追加第二個（或第三個）next hop，並讓你為它設定<strong>獨立的 preference<\/strong>。<\/p><ul><li><strong>效果：<\/strong>這會形成一條 floating（浮動）靜態路由。路由器安裝 preference 最低的那個 next hop；當該路徑消失時，qualified next hop 自動接手。<\/li><li><strong>為何不是 D：<\/strong>解析非直連的 next hop 是 <code>resolve<\/code> 選項的功能。<\/li><li><strong>為何不是 A：<\/strong>Junos 在啟用任何靜態路由前<strong>本來就會<\/strong>檢查 next-hop 可達性，那是預設行為，並非 qualified-next-hop 額外提供的。<\/li><\/ul><pre class=\"errata-cli\">set routing-options static route 0.0.0.0/0 next-hop 10.0.0.1\nset routing-options static route 0.0.0.0/0 qualified-next-hop 10.0.0.2 preference 10<\/pre><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 18,
+    "q_en": "Referring to the exhibit, which next hop will be preferred in the routing table?",
+    "options": [
+      "A. Neither next hop will be preferred.",
+      "B. Next hop IP address 172.25.20.254 will be preferred.",
+      "C. Next hop IP address 172.25.20.200 will be preferred.",
+      "D. Both next hops will be preferred."
+    ],
+    "answer": "C",
+    "explanation": "<div class=\"en-head\"><span class=\"en-badge\">ENGLISH<\/span><\/div><div class=\"explanation-body\"><p>Work out the preference of each next hop, then pick the <strong>lower<\/strong> one.<\/p><ul><li><strong>172.25.20.254<\/strong> — a plain <code>next-hop<\/code>, so it inherits the <code>defaults { preference 7; }<\/code> block &rarr; <strong>preference 7<\/strong>.<\/li><li><strong>172.25.20.200<\/strong> — a <code>qualified-next-hop<\/code> with an explicit <code>preference 6<\/code>, which overrides the default &rarr; <strong>preference 6<\/strong>.<\/li><\/ul><p>In Junos a lower preference wins, so 6 beats 7 and <strong>172.25.20.200<\/strong> becomes the active next hop. Note the trap: the <code>defaults<\/code> stanza changes the static-route preference from its usual 5 to 7, so you cannot answer this from the default value alone.<\/p><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文解析<\/span><\/div><div class=\"zh-body\"><p>先算出兩個 next hop 各自的 preference，再挑<strong>較低<\/strong>的那個。<\/p><ul><li><strong>172.25.20.254<\/strong> —— 是單純的 <code>next-hop<\/code>，因此繼承 <code>defaults { preference 7; }<\/code> 區塊 &rarr; <strong>preference 7<\/strong>。<\/li><li><strong>172.25.20.200<\/strong> —— 是 <code>qualified-next-hop<\/code> 且明確設定 <code>preference 6<\/code>，覆寫了預設值 &rarr; <strong>preference 6<\/strong>。<\/li><\/ul><p>Junos 中 preference 越低越優先，所以 6 勝過 7，<strong>172.25.20.200<\/strong> 成為 active next hop。請注意這個陷阱：<code>defaults<\/code> 區塊把靜態路由的 preference 從慣常的 5 改成了 7，因此不能只憑預設值作答。<\/p><\/div><\/div>",
+    "images": [
+      "q18.jpg"
+    ]
+  },
+  {
+    "id": 19,
+    "q_en": "What is the default route preference of a static route in the Junos OS?",
+    "options": [
+      "A. 10",
+      "B. 1",
+      "C. 0",
+      "D. 5"
+    ],
+    "answer": "D",
+    "explanation": "<div class=\"en-head\"><span class=\"en-badge\">ENGLISH<\/span><\/div><div class=\"explanation-body\"><p>Static routes default to a route preference of <strong>5<\/strong> in Junos.<\/p><p>Preference works like administrative distance: the lower the value, the more trusted the source. The values you should memorise for JNCIA-DC:<\/p><ul><li><strong>0<\/strong> — Direct / Local<\/li><li><strong>5<\/strong> — Static<\/li><li><strong>10<\/strong> — OSPF internal<\/li><li><strong>130<\/strong> — Aggregate / Generated<\/li><li><strong>150<\/strong> — OSPF AS external<\/li><li><strong>170<\/strong> — BGP (both EBGP and IBGP)<\/li><\/ul><p>So a static route beats OSPF and BGP for the same prefix, but loses to a directly connected route.<\/p><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文解析<\/span><\/div><div class=\"zh-body\"><p>在 Junos 中，靜態路由的預設 route preference 是 <strong>5<\/strong>。<\/p><p>Preference 的作用類似 administrative distance：<strong>數值越低，來源越受信任<\/strong>。JNCIA-DC 應該背下來的數值：<\/p><ul><li><strong>0<\/strong> —— Direct／Local（直連／本機）<\/li><li><strong>5<\/strong> —— Static（靜態）<\/li><li><strong>10<\/strong> —— OSPF internal<\/li><li><strong>130<\/strong> —— Aggregate／Generated<\/li><li><strong>150<\/strong> —— OSPF AS external<\/li><li><strong>170<\/strong> —— BGP（EBGP 與 IBGP <strong>相同<\/strong>）<\/li><\/ul><p>因此對同一個前綴而言，靜態路由勝過 OSPF 與 BGP，但輸給直連路由。<\/p><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 20,
+    "q_en": "Which statement is correct about aggregate routes?",
+    "options": [
+      "A. The default next hop is discard.",
+      "B. The default next hop is readvertise.",
+      "C. The default next hop is resolve.",
+      "D. The default next hop is reject."
+    ],
+    "answer": "D",
+    "explanation": "<div class=\"en-head\"><span class=\"en-badge\">ENGLISH<\/span><\/div><div class=\"explanation-body\"><p>An aggregate route's default next hop is <strong>reject<\/strong>.<\/p><ul><li><strong>What that means:<\/strong> a packet that matches the aggregate but no more-specific contributing route is dropped, and an ICMP Destination Unreachable is returned to the sender.<\/li><li><strong>Why it exists:<\/strong> the aggregate covers a whole block, but only parts of it may actually be reachable. Rejecting the rest prevents a routing loop where traffic bounces back and forth between routers that each think the other owns the address.<\/li><li><strong>The alternative:<\/strong> configure <code>discard<\/code> instead to drop silently, with no ICMP reply.<\/li><\/ul><pre class=\"errata-cli\">set routing-options aggregate route 10.20.0.0/18\nset routing-options aggregate route 10.20.0.0/18 discard<\/pre><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文解析<\/span><\/div><div class=\"zh-body\"><p>彙總路由的預設 next hop 是 <strong>reject<\/strong>。<\/p><ul><li><strong>含義：<\/strong>若封包命中該彙總路由、但找不到更具體的貢獻路由，就會被丟棄，並回送一則 ICMP Destination Unreachable 給發送端。<\/li><li><strong>為何如此設計：<\/strong>彙總路由涵蓋一整個區塊，但實際上可能只有部分位址可達。拒絕其餘部分可預防路由迴圈 —— 否則流量會在兩台各自認為對方擁有該位址的路由器之間來回彈跳。<\/li><li><strong>替代選項：<\/strong>改設定 <code>discard<\/code>，則靜默丟棄、不回送 ICMP。<\/li><\/ul><pre class=\"errata-cli\">set routing-options aggregate route 10.20.0.0/18\nset routing-options aggregate route 10.20.0.0/18 discard<\/pre><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 21,
+    "q_en": "Which two statements are correct about aggregate routes and generated routes? (Choose two.)",
+    "options": [
+      "A. An aggregate route has a forwarding next hop.",
+      "B. An aggregate route does not have a forwarding next hop.",
+      "C. A generated route does not have a forwarding next hop.",
+      "D. A generated route has a forwarding next hop."
+    ],
+    "answer": "B, D",
+    "explanation": "<div class=\"en-head\"><span class=\"en-badge\">ENGLISH<\/span><\/div><div class=\"explanation-body\"><p>Both summarise contributing routes, but they differ in one decisive way: whether the summary itself can forward traffic.<\/p><ul><li><strong>Aggregate (B):<\/strong> has <strong>no<\/strong> forwarding next hop. Its default next hop is <code>reject<\/code>. It exists purely to be advertised; actual forwarding relies on the more-specific contributing routes in the table.<\/li><li><strong>Generated (D):<\/strong> <strong>inherits<\/strong> a real forwarding next hop from its primary contributing route, so the generated route can forward traffic itself.<\/li><\/ul><p>This is why a generated route is the usual choice for a default route pointed at an upstream gateway, while an aggregate is used for advertising a summarised block.<\/p><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文解析<\/span><\/div><div class=\"zh-body\"><p>兩者都會摘要貢獻路由，但有一個決定性差異：<strong>摘要本身能否轉送流量<\/strong>。<\/p><ul><li><strong>Aggregate 彙總路由（B）：<\/strong><strong>沒有<\/strong>轉送 next hop，預設 next hop 為 <code>reject<\/code>。它存在的目的純粹是為了被通告出去，實際轉送靠的是路由表中更具體的貢獻路由。<\/li><li><strong>Generated 產生路由（D）：<\/strong>會從其主要貢獻路由<strong>繼承<\/strong>一個真正的轉送 next hop，因此產生路由本身就能轉送流量。<\/li><\/ul><p>這正是為什麼「指向上游閘道的預設路由」通常用產生路由，而通告摘要區塊則用彙總路由。<\/p><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 22,
+    "q_en": "Which statement is correct about per-flow load balancing?",
+    "options": [
+      "A. Packets associated with the same flow are sent through different egress ports.",
+      "B. The packets are guaranteed to arrive at their destination in the same order in which they were sent.",
+      "C. The packets are guaranteed to arrive at their destination in a different order in which they were sent.",
+      "D. Packets associated with the same flow are sent through the same egress port."
+    ],
+    "answer": "D",
+    "explanation": "<div class=\"en-head\"><span class=\"en-badge\">ENGLISH<\/span><\/div><div class=\"explanation-body\"><p>Per-flow load balancing hashes each flow to one path and keeps it there.<\/p><ul><li><strong>The definition (D):<\/strong> a hash over the 5-tuple (source/destination IP, source/destination port, protocol) selects an egress port, so every packet in that flow leaves through the <em>same<\/em> port.<\/li><li><strong>Why it is the default:<\/strong> keeping a flow on one path preserves packet ordering within the flow. Per-<em>packet<\/em> load balancing sprays packets across links and causes reordering, which badly hurts TCP.<\/li><\/ul><p>Option B states the intended benefit but overstates it — ordering is preserved by this mechanism, not \"guaranteed\" end to end. D is the definitional answer.<\/p><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文解析<\/span><\/div><div class=\"zh-body\"><p>Per-flow（逐流）負載平衡把每個 flow 雜湊到單一路徑，並固定在該路徑上。<\/p><ul><li><strong>定義（D）：<\/strong>依 5-tuple（來源／目的 IP、來源／目的 port、通訊協定）計算雜湊值選出出口 port，因此該 flow 的每個封包都從<em>同一個<\/em> port 送出。<\/li><li><strong>為何是預設值：<\/strong>讓 flow 固定走一條路徑可維持該 flow 內的封包順序。Per-<em>packet<\/em>（逐封包）負載平衡會把封包灑到各條連結上而造成亂序，嚴重傷害 TCP 效能。<\/li><\/ul><p>選項 B 說的是預期效益但講得過頭 —— 順序是靠此機制得以維持，而非端到端「保證」。D 才是定義性的答案。<\/p><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 23,
+    "q_en": "You have configured a load balancing policy. Which statement is correct about applying the policy?",
+    "options": [
+      "A. The policy is applied as an import policy under routing-options forwarding-table.",
+      "B. The policy is applied as an export policy under routing-options forwarding-table.",
+      "C. The policy is applied as an import policy under the routing protocol's hierarchy.",
+      "D. The policy is applied as an export policy under the routing protocol's hierarchy."
+    ],
+    "answer": "B",
+    "explanation": "<div class=\"en-head\"><span class=\"en-badge\">ENGLISH<\/span><\/div><div class=\"explanation-body\"><p>Per-flow load balancing is <strong>not<\/strong> on by default in Junos — by default only one next hop is installed in the forwarding table even when ECMP paths exist. You turn it on with a policy applied in one specific place.<\/p><ul><li><strong>Where (B):<\/strong> as an <strong>export<\/strong> policy under <code>[edit routing-options forwarding-table]<\/code>.<\/li><li><strong>Why there:<\/strong> the policy acts on routes as they move from the RIB (routing table) into the FIB (forwarding table). Exporting to the forwarding table is what tells the PFE to install multiple next hops.<\/li><\/ul><pre class=\"errata-cli\">set policy-options policy-statement LB then load-balance per-packet\nset routing-options forwarding-table export LB<\/pre><p>Note the Junos quirk: the keyword is <code>per-packet<\/code>, but the behaviour it produces is per-<em>flow<\/em> hashing.<\/p><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文解析<\/span><\/div><div class=\"zh-body\"><p>Junos 預設<strong>不啟用<\/strong> per-flow 負載平衡 —— 即使存在 ECMP 路徑，預設也只會在轉送表中安裝一個 next hop。要啟用，必須把政策套用在一個特定位置。<\/p><ul><li><strong>套用位置（B）：<\/strong>以 <strong>export<\/strong> policy 套用在 <code>[edit routing-options forwarding-table]<\/code> 之下。<\/li><li><strong>為何是那裡：<\/strong>該政策作用於路由從 RIB（路由表）搬進 FIB（轉送表）的過程。匯出到轉送表，正是告訴 PFE 要安裝多個 next hop。<\/li><\/ul><pre class=\"errata-cli\">set policy-options policy-statement LB then load-balance per-packet\nset routing-options forwarding-table export LB<\/pre><p>注意 Junos 的一個怪癖：關鍵字寫的是 <code>per-packet<\/code>，但它實際產生的行為是 per-<em>flow<\/em> 的雜湊。<\/p><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 24,
+    "q_en": "You are building an IP fabric using EBGP routing for the underlay network. Which configuration statement is needed under the \"protocols bgp\" hierarchy to ensure that equal cost paths are used in this scenario?",
+    "options": [
+      "A. learn-all",
+      "B. ecmp-paths",
+      "C. load-balance",
+      "D. multipath multiple-as"
+    ],
+    "answer": "D",
+    "explanation": "<div class=\"en-head\"><span class=\"en-badge\">ENGLISH<\/span><\/div><div class=\"explanation-body\"><p>In an EBGP-based IP fabric every switch has its own unique AS number, so the equal-cost paths toward a destination arrive with <strong>different AS paths<\/strong>.<\/p><ul><li><strong>The problem:<\/strong> plain <code>multipath<\/code> only accepts multiple paths when the AS path attributes match. In this fabric they never do — each spine prepends its own AS.<\/li><li><strong>The fix (D):<\/strong> <code>multipath multiple-as<\/code> relaxes that check, allowing BGP to install paths whose AS paths differ but are the same length, giving you ECMP across all spines.<\/li><\/ul><pre class=\"errata-cli\">set protocols bgp group underlay type external\nset protocols bgp group underlay multipath multiple-as<\/pre><p>The other options are not valid Junos BGP statements. Remember this pairs with a forwarding-table export policy (see the load-balancing question) to actually program multiple next hops into the PFE.<\/p><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文解析<\/span><\/div><div class=\"zh-body\"><p>在以 EBGP 為基礎的 IP fabric 中，每台交換器都有自己專屬的 AS 號碼，因此通往同一目的地的等價路徑會帶著<strong>不同的 AS path<\/strong> 抵達。<\/p><ul><li><strong>問題所在：<\/strong>單純的 <code>multipath<\/code> 只有在 AS path 屬性<strong>相同<\/strong>時才接受多條路徑。而在這種 fabric 中永遠不會相同 —— 每台 spine 都會附加自己的 AS。<\/li><li><strong>解法（D）：<\/strong><code>multipath multiple-as<\/code> 放寬該檢查，允許 BGP 安裝「AS path 內容不同但長度相同」的路徑，從而在所有 spine 之間取得 ECMP。<\/li><\/ul><pre class=\"errata-cli\">set protocols bgp group underlay type external\nset protocols bgp group underlay multipath multiple-as<\/pre><p>其餘選項都不是合法的 Junos BGP 敘述。請記得這必須搭配 forwarding-table 的 export policy（見負載平衡那題），才能真正把多個 next hop 寫進 PFE。<\/p><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 25,
+    "q_en": "Within your router, you want to verify that you are learning routes from a remote BGP peer at IP address 10.10.100.1. Which command would satisfy the requirement?",
+    "options": [
+      "A. show route protocol bgp table inet.0 10.10.100.1",
+      "B. show route receive-protocol bgp 10.10.100.1",
+      "C. show route advertise-protocol bgp 10.10.100.1",
+      "D. show route protocol bgp source-gateway 10.10.100.1"
+    ],
+    "answer": "B",
+    "explanation": "<div class=\"en-head\"><span class=\"en-badge\">ENGLISH<\/span><\/div><div class=\"explanation-body\"><p><code>show route receive-protocol bgp &lt;peer&gt;<\/code> lists exactly the routes that peer has <strong>sent to you<\/strong>.<\/p><ul><li><strong>receive vs advertise:<\/strong> <code>receive-protocol<\/code> shows the inbound direction (what you learned); <code>advertise-protocol<\/code> shows the outbound direction (what you are sending to that peer). Option C would answer the opposite question.<\/li><li><strong>Why not A:<\/strong> that syntax filters on a destination prefix, not on which neighbour sent the route.<\/li><li><strong>Why not D:<\/strong> <code>source-gateway<\/code> is not a valid option in this form.<\/li><\/ul><pre class=\"errata-cli\">user@router&gt; show route receive-protocol bgp 10.10.100.1\nuser@router&gt; show route advertise-protocol bgp 10.10.100.1<\/pre><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文解析<\/span><\/div><div class=\"zh-body\"><p><code>show route receive-protocol bgp &lt;peer&gt;<\/code> 正好列出該 peer <strong>送給你<\/strong>的路由。<\/p><ul><li><strong>receive 與 advertise 的分別：<\/strong><code>receive-protocol<\/code> 看的是<strong>進來<\/strong>的方向（你學到了什麼）；<code>advertise-protocol<\/code> 看的是<strong>出去<\/strong>的方向（你送了什麼給該 peer）。選項 C 回答的是相反的問題。<\/li><li><strong>為何不是 A：<\/strong>該語法是依<strong>目的前綴<\/strong>過濾，而非依「哪個鄰居送來的」。<\/li><li><strong>為何不是 D：<\/strong><code>source-gateway<\/code> 在此寫法中不是合法選項。<\/li><\/ul><pre class=\"errata-cli\">user@router&gt; show route receive-protocol bgp 10.10.100.1\nuser@router&gt; show route advertise-protocol bgp 10.10.100.1<\/pre><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 26,
+    "q_en": "Which state in the adjacency process do OSPF routers check the MTU size?",
+    "options": [
+      "A. Init",
+      "B. Done",
+      "C. ExStart",
+      "D. Exchange"
+    ],
+    "answer": "D",
+    "explanation": "<div class=\"en-head\"><span class=\"en-badge\">ENGLISH<\/span><\/div><div class=\"explanation-body\"><p>OSPF checks the interface MTU during the <strong>Exchange<\/strong> state.<\/p><ul><li><strong>Where the value lives:<\/strong> the MTU is carried in the <em>Interface MTU<\/em> field of the Database Description (DBD) packet header.<\/li><li><strong>The sequence:<\/strong> Down &rarr; Init &rarr; 2-Way &rarr; ExStart &rarr; <strong>Exchange<\/strong> &rarr; Loading &rarr; Full. ExStart negotiates master/slave; Exchange is where DBD packets actually carry LSA headers and the MTU is validated.<\/li><li><strong>Symptom of a mismatch:<\/strong> the adjacency stalls and flaps between ExStart and Exchange, never reaching Full.<\/li><\/ul><pre class=\"errata-cli\"># make OSPF ignore an MTU mismatch\nset protocols ospf area 0 interface xe-0/0/4.0 ignore-mtu<\/pre><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文解析<\/span><\/div><div class=\"zh-body\"><p>OSPF 在 <strong>Exchange<\/strong> 狀態檢查介面 MTU。<\/p><ul><li><strong>數值位置：<\/strong>MTU 放在 DBD（Database Description）封包標頭的 <em>Interface MTU<\/em> 欄位中。<\/li><li><strong>狀態順序：<\/strong>Down &rarr; Init &rarr; 2-Way &rarr; ExStart &rarr; <strong>Exchange<\/strong> &rarr; Loading &rarr; Full。ExStart 負責協商主從關係；Exchange 才是 DBD 封包實際帶著 LSA 標頭、並驗證 MTU 的階段。<\/li><li><strong>不一致的症狀：<\/strong>鄰接關係卡住並在 ExStart 與 Exchange 之間反覆跳動，始終無法進到 Full。<\/li><\/ul><pre class=\"errata-cli\"># 讓 OSPF 忽略 MTU 不一致\nset protocols ospf area 0 interface xe-0/0/4.0 ignore-mtu<\/pre><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 27,
+    "q_en": "Which BGP metric or attribute is evaluated before the AS path?",
+    "options": [
+      "A. local preference",
+      "B. MED",
+      "C. cluster list",
+      "D. origin code"
+    ],
+    "answer": "A",
+    "explanation": "<div class=\"en-head\"><span class=\"en-badge\">ENGLISH<\/span><\/div><div class=\"explanation-body\"><p><strong>Local preference<\/strong> is evaluated before AS path length.<\/p><p>The Junos BGP selection order (abbreviated):<\/p><ol><li>Route preference (protocol preference)<\/li><li><strong>Local Preference<\/strong> — highest wins<\/li><li>AS path length — shortest wins<\/li><li>Origin — IGP &lt; EGP &lt; Incomplete<\/li><li>MED — lowest wins<\/li><li>EBGP over IBGP<\/li><li>IGP cost to the next hop<\/li><li>Cluster list length, then router ID / peer address<\/li><\/ol><p>So MED (B), origin (D) and cluster list (C) are all evaluated <em>after<\/em> AS path. Local preference is the only one that comes before it — which is why it is the primary tool for steering outbound traffic out of your AS.<\/p><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文解析<\/span><\/div><div class=\"zh-body\"><p><strong>Local preference<\/strong> 在 AS path 長度<strong>之前<\/strong>被評估。<\/p><p>Junos 的 BGP 選路順序（節錄）：<\/p><ol><li>Route preference（協定 preference）<\/li><li><strong>Local Preference<\/strong> —— 高者勝<\/li><li>AS path 長度 —— 短者勝<\/li><li>Origin —— IGP &lt; EGP &lt; Incomplete<\/li><li>MED —— 低者勝<\/li><li>EBGP 優於 IBGP<\/li><li>到 next hop 的 IGP 成本<\/li><li>Cluster list 長度，再比 router ID／peer 位址<\/li><\/ol><p>因此 MED（B）、origin（D）與 cluster list（C）全都在 AS path <em>之後<\/em>才評估。只有 local preference 排在它前面 —— 這正是它成為「操控本 AS 出向流量」主要工具的原因。<\/p><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 28,
+    "q_en": "Which two statements are correct about rules for EBGP and IBGP? (Choose two.)",
+    "options": [
+      "A. EBGP routes are more preferred than IBGP routes.",
+      "B. EBGP peers have a TTL of 1, while IBGP peers have a TTL of 255.",
+      "C. IBGP routes are more preferred than EBGP routes.",
+      "D. EBGP peers have a TTL of 255, while IBGP peers have a TTL of 1."
+    ],
+    "answer": "A, B",
+    "explanation": "<div class=\"en-head\"><span class=\"en-badge\">ENGLISH<\/span><\/div><div class=\"explanation-body\"><p>Two separate rules are being tested here.<\/p><ul><li><strong>TTL (B):<\/strong> EBGP packets are sent with TTL&nbsp;1, because EBGP peers are expected to be directly connected. IBGP uses TTL&nbsp;255 since IBGP peers are normally several hops apart inside the AS. To peer with a non-adjacent EBGP neighbour you must add <code>multihop<\/code>.<\/li><li><strong>Preference (A):<\/strong> in the BGP best-path algorithm, when everything above is tied, an EBGP-learned route is preferred over an IBGP-learned one.<\/li><\/ul><p>Careful: this is a <em>path-selection step<\/em>, not a route-preference value. In Junos both EBGP and IBGP routes carry route preference <strong>170<\/strong> — they are identical in that respect.<\/p><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文解析<\/span><\/div><div class=\"zh-body\"><p>本題同時考兩條不同的規則。<\/p><ul><li><strong>TTL（B）：<\/strong>EBGP 封包以 TTL&nbsp;1 送出，因為 EBGP peer 預期是直接相連的。IBGP 使用 TTL&nbsp;255，因為 IBGP peer 通常在 AS 內相隔數個 hop。若要與非相鄰的 EBGP 鄰居建立 peering，必須加上 <code>multihop<\/code>。<\/li><li><strong>偏好（A）：<\/strong>在 BGP 最佳路徑演算法中，當前面的條件都相同時，從 EBGP 學到的路由優先於從 IBGP 學到的。<\/li><\/ul><p>請留意：這是<em>選路步驟<\/em>，不是 route preference 的數值。在 Junos 中，EBGP 與 IBGP 路由的 route preference <strong>同為 170<\/strong>，在這一點上完全相同。<\/p><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 29,
+    "q_en": "What are two common reasons for BGP routes to be in the hidden state? (Choose two.)",
+    "options": [
+      "A. The next hop is unresolvable",
+      "B. Routes are being filtered from the inet.2 routing table",
+      "C. The BGP neighbor is in a different autonomous system",
+      "D. Routes are being rejected by a policy"
+    ],
+    "answer": "A, D",
+    "explanation": "<div class=\"en-head\"><span class=\"en-badge\">ENGLISH<\/span><\/div><div class=\"explanation-body\"><p>A hidden route is one Junos has received and kept in memory but considers unusable, so it is never installed in the forwarding table.<\/p><ul><li><strong>Unresolvable next hop (A):<\/strong> the most common cause. If the router has no route to the BGP next-hop address, it cannot forward to it, so the route is hidden. Typical in an IBGP design where the IGP is not advertising loopbacks.<\/li><li><strong>Rejected by policy (D):<\/strong> when an import policy rejects a route, Junos retains it hidden rather than discarding it outright, so it does not have to re-request it from the peer later.<\/li><\/ul><p>Option C is normal EBGP operation, not a fault. Option B is nonsense — <code>inet.2<\/code> is not where BGP unicast routes live.<\/p><pre class=\"errata-cli\">user@router&gt; show route hidden\nuser@router&gt; show route receive-protocol bgp 10.10.100.1 hidden<\/pre><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文解析<\/span><\/div><div class=\"zh-body\"><p>Hidden（隱藏）路由是指 Junos 已收到並保留在記憶體中、但判定為<strong>不可用<\/strong>的路由，因此永遠不會被安裝進轉送表。<\/p><ul><li><strong>Next hop 無法解析（A）：<\/strong>最常見的原因。若路由器沒有路由可抵達該 BGP next-hop 位址，就無法轉送過去，路由因此被隱藏。這在「IGP 未通告 loopback」的 IBGP 設計中很典型。<\/li><li><strong>被政策拒絕（D）：<\/strong>當 import policy 拒絕某條路由時，Junos 會把它保留為 hidden 而非直接丟棄，以免日後還得再向 peer 索取一次。<\/li><\/ul><p>選項 C 描述的是正常的 EBGP 運作，不是故障。選項 B 不成立 —— BGP 單播路由並不存放在 <code>inet.2<\/code>。<\/p><pre class=\"errata-cli\">user@router&gt; show route hidden\nuser@router&gt; show route receive-protocol bgp 10.10.100.1 hidden<\/pre><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 30,
+    "q_en": "Which two statements are correct about BGP? (Choose two.)",
+    "options": [
+      "A. EBGP sessions are typically established between router loopback interfaces.",
+      "B. IBGP sessions are typically established between physical router interfaces.",
+      "C. EBGP uses the AS path to avoid loops.",
+      "D. IBGP peers do not advertise routes learned from IBGP peers to other IBGP peers."
+    ],
+    "answer": "C, D",
+    "explanation": "<div class=\"en-head\"><span class=\"en-badge\">ENGLISH<\/span><\/div><div class=\"explanation-body\"><p>BGP prevents loops differently inside and outside the AS.<\/p><ul><li><strong>Between ASes (C):<\/strong> EBGP relies on the AS path. A router that sees its own AS number in an inbound update discards the route, so a prefix can never loop back into the AS it came from.<\/li><li><strong>Inside the AS (D):<\/strong> there is no AS path change within one AS, so BGP uses the IBGP split-horizon rule instead — a route learned from one IBGP peer is never passed to another IBGP peer. This is exactly why IBGP needs a full mesh, route reflectors or confederations.<\/li><\/ul><p>Options A and B are reversed. IBGP normally peers on loopbacks (stable, survives a link failure); EBGP normally peers on the directly connected physical interfaces.<\/p><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文解析<\/span><\/div><div class=\"zh-body\"><p>BGP 在 AS 內部與外部採用不同的迴圈預防機制。<\/p><ul><li><strong>AS 之間（C）：<\/strong>EBGP 靠 AS path。路由器若在收到的 update 中看到<strong>自己的 AS 號碼<\/strong>，就會丟棄該路由，因此前綴絕不會繞回它的來源 AS。<\/li><li><strong>AS 內部（D）：<\/strong>同一個 AS 內 AS path 不會改變，因此 BGP 改用 IBGP split-horizon 規則 —— 從某個 IBGP peer 學到的路由，絕不會再傳給另一個 IBGP peer。這正是 IBGP 需要 full mesh、route reflector 或 confederation 的原因。<\/li><\/ul><p>選項 A 與 B 說反了。IBGP 通常在 <strong>loopback<\/strong> 上建立 peering（穩定，連結故障時仍存活）；EBGP 通常在<strong>直連的實體介面<\/strong>上建立 peering。<\/p><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 31,
+    "q_en": "By default, which two statements are correct about BGP advertisements? (Choose two.)",
+    "options": [
+      "A. BGP peers advertise routes from IBGP peers to EBGP peers using its own address as the next hop.",
+      "B. BGP peers advertise routes received from IBGP peers to other IBGP peers.",
+      "C. BGP peers advertise routes received from EBGP peers to other IBGP peers.",
+      "D. BGP peers advertise routes from EBGP peers to other IBGP peers using its own address as the next hop."
+    ],
+    "answer": "A, C",
+    "explanation": "<div class=\"en-head\"><span class=\"en-badge\">ENGLISH<\/span><\/div><div class=\"explanation-body\"><p>Three default rules decide what gets advertised and with which next hop.<\/p><ul><li><strong>EBGP routes go to IBGP peers (C):<\/strong> external routes must be distributed inside the AS, so a router does pass EBGP-learned routes to its IBGP peers.<\/li><li><strong>Next hop is rewritten toward EBGP (A):<\/strong> when advertising to an <em>EBGP<\/em> peer, the router replaces the next hop with its own address.<\/li><li><strong>Next hop is preserved toward IBGP:<\/strong> when advertising to an <em>IBGP<\/em> peer the original next hop is kept unchanged — which is why option D is wrong, and why <code>next-hop self<\/code> is so commonly configured on border routers.<\/li><\/ul><p>Option B violates IBGP split horizon.<\/p><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文解析<\/span><\/div><div class=\"zh-body\"><p>三條預設規則決定了「什麼會被通告」以及「用什麼 next hop」。<\/p><ul><li><strong>EBGP 路由會傳給 IBGP peer（C）：<\/strong>外部路由必須散佈到 AS 內部，因此路由器確實會把 EBGP 學到的路由傳給自己的 IBGP peer。<\/li><li><strong>往 EBGP 方向會改寫 next hop（A）：<\/strong>通告給 <em>EBGP<\/em> peer 時，路由器會把 next hop 換成自己的位址。<\/li><li><strong>往 IBGP 方向則保留 next hop：<\/strong>通告給 <em>IBGP<\/em> peer 時，原本的 next hop <strong>維持不變<\/strong> —— 這就是選項 D 錯誤的原因，也是邊界路由器上如此常見地設定 <code>next-hop self<\/code> 的理由。<\/li><\/ul><p>選項 B 違反了 IBGP 的 split horizon 規則。<\/p><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 32,
+    "q_en": "Referring to the exhibit, which statement is correct?",
+    "options": [
+      "A. The configuration will commit successfully and BGP group 1 will operate as EBGP.",
+      "B. BGP group 1 requires a type external parameter.",
+      "C. BGP group 1 requires a type internal parameter.",
+      "D. The configuration will commit successfully and BGP group 1 will operate as IBGP."
+    ],
+    "answer": "A",
+    "explanation": "<div class=\"en-head\"><span class=\"en-badge\">ENGLISH<\/span><\/div><div class=\"explanation-body\"><p>Junos infers the session type by comparing the effective local AS with the peer AS — you do not have to state it.<\/p><ul><li><strong>Reading the config:<\/strong> <code>routing-options<\/code> sets a global <code>autonomous-system 65000<\/code>, but group 1 overrides it with <code>local-as 65101<\/code>. The neighbour is configured with <code>peer-as 65201<\/code>.<\/li><li><strong>The comparison:<\/strong> 65101 &ne; 65201, so the session is <strong>EBGP<\/strong>.<\/li><li><strong>Commit:<\/strong> everything required is present — a peer address and a peer AS — so the configuration commits cleanly. <code>type external<\/code> would be redundant.<\/li><\/ul><p>Junos only requires an explicit <code>type<\/code> in unusual designs; normally the AS comparison is enough.<\/p><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文解析<\/span><\/div><div class=\"zh-body\"><p>Junos 會比較「有效的 local AS」與「peer AS」來推斷 session 類型 —— 你不必明確指定。<\/p><ul><li><strong>解讀設定：<\/strong><code>routing-options<\/code> 設定了全域的 <code>autonomous-system 65000<\/code>，但 group 1 用 <code>local-as 65101<\/code> 覆寫了它；neighbor 則設定 <code>peer-as 65201<\/code>。<\/li><li><strong>比較結果：<\/strong>65101 &ne; 65201，因此該 session 為 <strong>EBGP<\/strong>。<\/li><li><strong>能否 commit：<\/strong>必要元素都齊全 —— peer 位址與 peer AS —— 因此設定可順利 commit。加上 <code>type external<\/code> 只是多餘。<\/li><\/ul><p>Junos 只有在特殊設計中才需要明確的 <code>type<\/code>；一般情況下光靠 AS 比較就足夠了。<\/p><\/div><\/div>",
+    "images": [
+      "q32.jpg"
+    ]
+  },
+  {
+    "id": 33,
+    "q_en": "You are creating an IP fabric underlay and want to use OSPF as your routing protocol. In this scenario, which statement is correct?",
+    "options": [
+      "A. All spine devices must use the same router ID.",
+      "B. All leaf devices must be configured in separate OSPF areas.",
+      "C. Interface speeds should be the same throughout the fabric to ensure that all links are utilized.",
+      "D. All leaf and spine devices must be the same model to ensure the proper load-balancing behavior."
+    ],
+    "answer": "C",
+    "explanation": "<div class=\"en-head\"><span class=\"en-badge\">ENGLISH<\/span><\/div><div class=\"explanation-body\"><p>OSPF derives its cost from bandwidth, so mixed interface speeds quietly break ECMP across the fabric.<\/p><ul><li><strong>The mechanism:<\/strong> <code>cost = reference-bandwidth / interface-bandwidth<\/code>. A 40G uplink gets a lower cost than a 10G uplink.<\/li><li><strong>The consequence (C):<\/strong> ECMP only installs paths whose total cost is <em>equal<\/em>. If some spine uplinks are faster than others, OSPF prefers only the cheapest ones and the remaining links sit idle. Keeping speeds uniform keeps all costs equal and all links in use.<\/li><\/ul><p>Option A is actively wrong — router IDs must be <strong>unique<\/strong>. Option B is wrong: an IP fabric underlay is normally a single area (area 0). Option D is a hardware myth; it is the link speeds that matter, not the model.<\/p><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文解析<\/span><\/div><div class=\"zh-body\"><p>OSPF 的成本由頻寬推導而來，因此介面速率不一致會悄悄破壞整個 fabric 的 ECMP。<\/p><ul><li><strong>運作機制：<\/strong><code>cost = reference-bandwidth ÷ interface-bandwidth<\/code>。40G 上行連結的成本會低於 10G。<\/li><li><strong>後果（C）：<\/strong>ECMP 只會安裝<strong>總成本相等<\/strong>的路徑。若部分 spine 上行連結速率較高，OSPF 只會偏好最便宜的那幾條，其餘連結則閒置。維持速率一致，才能讓成本一致、所有連結都被使用。<\/li><\/ul><p>選項 A 根本是錯的 —— router ID 必須<strong>唯一<\/strong>。選項 B 錯誤：IP fabric underlay 通常是<strong>單一 area<\/strong>（area 0）。選項 D 是硬體迷思，關鍵在連結速率而非機型。<\/p><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 34,
+    "q_en": "R2 received an OSPF update from R1, and it received the same update from R3. Referring to the exhibit, what will R2 do?",
+    "options": [
+      "A. R2 ignores the update from R3.",
+      "B. R2 ignores the update from R1.",
+      "C. R2 acknowledges R3 and discards it.",
+      "D. R2 does nothing with R3's update."
+    ],
+    "answer": "A",
+    "explanation": "<div class=\"en-head\"><span class=\"en-badge\">ENGLISH<\/span><\/div><div class=\"explanation-body\"><p>OSPF floods LSAs around the ring, so R2 receives the same LSA twice — once directly from R1 and once the long way round via R3. It keeps the first and ignores the duplicate.<\/p><ul><li><strong>Duplicate detection:<\/strong> on receiving an LSA, a router compares it against its LSDB using the LSA's sequence number, checksum and age. An identical instance it already holds is discarded rather than reprocessed.<\/li><li><strong>Why R3's copy loses (A):<\/strong> following the arrows in the exhibit, the update reaches R2 directly from R1 first; the copy travelling R1&rarr;R3&rarr;R2 arrives later and is already in the LSDB.<\/li><li><strong>Why it matters:<\/strong> suppressing duplicates prevents pointless SPF recalculation and stops LSAs circulating forever.<\/li><\/ul><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文解析<\/span><\/div><div class=\"zh-body\"><p>OSPF 會沿著環狀拓撲洪泛 LSA，因此 R2 會收到同一則 LSA 兩次 —— 一次直接來自 R1，一次繞遠路經由 R3。它會保留先到的那份，忽略重複的。<\/p><ul><li><strong>重複偵測：<\/strong>收到 LSA 時，路由器會用該 LSA 的序號、checksum 與 age 與自己的 LSDB 比對。若已持有相同的實例，就直接丟棄而不重新處理。<\/li><li><strong>為何是 R3 的那份被忽略（A）：<\/strong>依圖中箭頭方向，更新先由 R1 直接抵達 R2；而走 R1&rarr;R3&rarr;R2 的那份較晚到達時，LSDB 中已經有了。<\/li><li><strong>意義何在：<\/strong>抑制重複可避免無謂的 SPF 重新計算，並阻止 LSA 永無止境地繞圈。<\/li><\/ul><\/div><\/div>",
+    "images": [
+      "q34.jpg"
+    ]
+  },
+  {
+    "id": 35,
+    "q_en": "Which two statements are correct about using LACP on a Junos device? (Choose two.)",
+    "options": [
+      "A. Both sides of the LACP session must be in active mode to exchange LACP packets on a Junos device.",
+      "B. One side of the LACP session must be in active mode to exchange LACP packets on a Junos device.",
+      "C. LACP is used to monitor the status of an aggregated Ethernet bundle's member interfaces on a Junos device.",
+      "D. LACP is used to automatically add and delete interfaces from aggregated Ethernet bundles on a Junos device."
+    ],
+    "answer": "B, C",
+    "explanation": "<div class=\"en-head\"><span class=\"en-badge\">ENGLISH<\/span><\/div><div class=\"explanation-body\"><p>LACP negotiates and then continuously supervises a link bundle.<\/p><ul><li><strong>At least one active end (B):<\/strong> an active-mode end initiates by sending LACPDUs; a passive end only replies. So active/active and active/passive both work, but <strong>passive/passive never forms<\/strong> because nobody starts the conversation.<\/li><li><strong>Continuous monitoring (C):<\/strong> LACPDUs keep flowing over every member link as a health check. If a link stops receiving them it is removed from the bundle — which catches failures that a simple \"link up\" check would miss, such as a one-way fibre fault.<\/li><\/ul><p>Option D overstates it: LACP does not add interfaces to a bundle on its own. Membership is configured manually with <code>802.3ad<\/code>; LACP only decides which configured members are eligible to forward.<\/p><pre class=\"errata-cli\">set interfaces ae0 aggregated-ether-options lacp active\nset interfaces ge-0/0/6 ether-options 802.3ad ae0<\/pre><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文解析<\/span><\/div><div class=\"zh-body\"><p>LACP 負責協商，並在之後持續監管整個連結捆綁。<\/p><ul><li><strong>至少一端為 active（B）：<\/strong>active 模式的一端主動送出 LACPDU，passive 端只負責回應。因此 active/active 與 active/passive 都可行，但 <strong>passive/passive 永遠無法成形<\/strong>，因為沒有人先開口。<\/li><li><strong>持續監控（C）：<\/strong>LACPDU 會持續在每條成員連結上流動，作為健康檢查。某條連結若不再收到，就會被移出捆綁 —— 這能抓到單純看「link up」抓不到的故障，例如單向光纖異常。<\/li><\/ul><p>選項 D 說得太過：LACP <strong>不會<\/strong>自行把介面加進捆綁。成員身分是用 <code>802.3ad<\/code> 手動設定的，LACP 只決定已設定的成員中哪些有資格轉送。<\/p><pre class=\"errata-cli\">set interfaces ae0 aggregated-ether-options lacp active\nset interfaces ge-0/0/6 ether-options 802.3ad ae0<\/pre><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 36,
+    "q_en": "Which two statements about graceful restart (GR) are correct? (Choose two.)",
+    "options": [
+      "A. Graceful restart only works with IGP protocols.",
+      "B. Graceful restart default timeout values vary by protocol.",
+      "C. Graceful restart is enabled by default on restarting routers.",
+      "D. Graceful restart requires helper routers."
+    ],
+    "answer": "B, D",
+    "explanation": "<div class=\"en-head\"><span class=\"en-badge\">ENGLISH<\/span><\/div><div class=\"explanation-body\"><p>GR lets the forwarding plane keep running while the control plane (<code>rpd<\/code>) restarts — but only with the neighbours' cooperation.<\/p><ul><li><strong>Helpers are mandatory (D):<\/strong> the neighbours must support helper mode. A helper holds the adjacency open and marks the restarting router's routes as stale instead of tearing the session down and withdrawing them. Without a helper, GR provides no benefit.<\/li><li><strong>Per-protocol timers (B):<\/strong> each protocol has its own restart/stale timers — OSPF, BGP and IS-IS do not share one global value.<\/li><\/ul><p>Option A is wrong: BGP supports GR too. Option C is wrong: GR is <strong>disabled by default<\/strong> in Junos and must be enabled explicitly.<\/p><pre class=\"errata-cli\">set routing-options graceful-restart<\/pre><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文解析<\/span><\/div><div class=\"zh-body\"><p>GR 讓轉送平面在控制平面（<code>rpd<\/code>）重啟期間持續運作 —— 但必須有鄰居配合才行。<\/p><ul><li><strong>Helper 是必要條件（D）：<\/strong>鄰居必須支援 helper 模式。helper 會維持鄰接關係開啟，並把重啟端的路由標記為 stale，而非拆除 session 並撤回路由。<strong>沒有 helper，GR 毫無效果<\/strong>。<\/li><li><strong>計時器因協定而異（B）：<\/strong>每個協定有各自的 restart／stale 計時器 —— OSPF、BGP 與 IS-IS 並不共用同一組全域值。<\/li><\/ul><p>選項 A 錯誤：BGP 同樣支援 GR。選項 C 錯誤：Junos 中 GR <strong>預設為停用<\/strong>，必須明確啟用。<\/p><pre class=\"errata-cli\">set routing-options graceful-restart<\/pre><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 37,
+    "q_en": "You recently configured ae1 as a new aggregated Ethernet bundle. You applied the configuration shown in the exhibit. However, the ae1 interface is not working. Referring to the exhibit, what will solve this problem?",
+    "options": [
+      "A. You must configure \"unit 1\" on the ae1 bundle instead of \"unit 0\".",
+      "B. You must reboot the device to enable additional aggregated Ethernet interfaces.",
+      "C. You must remove the second defined member interface from the bundle.",
+      "D. You must Increase the device count by 1 under the [edit chassis] hierarchy."
+    ],
+    "answer": "D",
+    "explanation": "<div class=\"en-head\"><span class=\"en-badge\">ENGLISH<\/span><\/div><div class=\"explanation-body\"><p>The chassis is only allowed to create <strong>one<\/strong> aggregated Ethernet interface, so ae1 can never come up.<\/p><ul><li><strong>The evidence:<\/strong> <code>show chassis<\/code> shows <code>device-count 1<\/code>. That allocates exactly one AE device — ae0. In the <code>show interfaces terse<\/code> output ae0 and ae0.0 are present and up, but <strong>ae1 does not appear at all<\/strong>, even though ge-0/0/8.0 and ge-0/0/9.0 are already pointed at ae1.0.<\/li><li><strong>The fix (D):<\/strong> raise the count to 2 so the second bundle can be created. The change takes effect on commit — no reboot is needed, which rules out option B.<\/li><\/ul><pre class=\"errata-cli\">set chassis aggregated-devices ethernet device-count 2<\/pre><p>Options A and C are red herrings: <code>unit 0<\/code> is correct, and two member interfaces is exactly what a LAG is for.<\/p><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文解析<\/span><\/div><div class=\"zh-body\"><p>機箱只被允許建立<strong>一個<\/strong> aggregated Ethernet 介面，因此 ae1 永遠起不來。<\/p><ul><li><strong>證據：<\/strong><code>show chassis<\/code> 顯示 <code>device-count 1<\/code>，這只配置了一個 AE 裝置 —— 也就是 ae0。在 <code>show interfaces terse<\/code> 的輸出中，ae0 與 ae0.0 存在且為 up，但 <strong>ae1 根本沒有出現<\/strong>，儘管 ge-0/0/8.0 與 ge-0/0/9.0 早已指向 ae1.0。<\/li><li><strong>解法（D）：<\/strong>把數量提高到 2，第二個捆綁才能被建立。此變更在 commit 後即生效，<strong>不需要重開機<\/strong>，因此可排除選項 B。<\/li><\/ul><pre class=\"errata-cli\">set chassis aggregated-devices ethernet device-count 2<\/pre><p>選項 A 與 C 是誘答：<code>unit 0<\/code> 本來就正確，而兩個成員介面正是 LAG 存在的目的。<\/p><\/div><\/div>",
+    "images": [
+      "q37.jpg"
+    ]
+  },
+  {
+    "id": 38,
+    "q_en": "When considering bidirectional forwarding detection, which two statements are correct? (Choose two.)",
+    "options": [
+      "A. The BFD default minimum interval is 3.",
+      "B. The BFD default multiplier is 5.",
+      "C. The BFD operation consists of minimum intervals and multipliers.",
+      "D. You can configure BFD per interface within the protocol stanza."
+    ],
+    "answer": "C, D",
+    "explanation": "<div class=\"en-head\"><span class=\"en-badge\">ENGLISH<\/span><\/div><div class=\"explanation-body\"><p>BFD detection time is always built from two values, and it is configured inside the routing protocol.<\/p><ul><li><strong>Interval &times; multiplier (C):<\/strong> <code>detection time = minimum-interval &times; multiplier<\/code>. The interval sets how often control packets are sent; the multiplier sets how many may be missed before the session is declared down.<\/li><li><strong>Per-interface, inside the protocol (D):<\/strong> BFD is configured under the protocol stanza on a specific interface, so you can tune each link independently.<\/li><\/ul><p>Option B is wrong — the default multiplier is <strong>3<\/strong>, not 5. Option A is wrong because there is no meaningful \"default minimum interval of 3\"; the interval must be set explicitly (in milliseconds) when you enable BFD.<\/p><pre class=\"errata-cli\">set protocols ospf area 0 interface xe-0/0/4.0 bfd-liveness-detection minimum-interval 400\nset protocols ospf area 0 interface xe-0/0/4.0 bfd-liveness-detection multiplier 5<\/pre><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文解析<\/span><\/div><div class=\"zh-body\"><p>BFD 的偵測時間永遠由兩個數值構成，而且是設定在路由協定內部。<\/p><ul><li><strong>間隔 &times; 乘數（C）：<\/strong><code>偵測時間 = minimum-interval &times; multiplier<\/code>。間隔決定控制封包多久送一次；乘數決定可容許遺失幾個後才判定 session 中斷。<\/li><li><strong>逐介面、設在協定內（D）：<\/strong>BFD 設定在協定區段下的特定介面上，因此可以獨立調校每一條連結。<\/li><\/ul><p>選項 B 錯誤 —— 預設 multiplier 是 <strong>3<\/strong>，不是 5。選項 A 錯誤，因為並不存在有意義的「預設 minimum interval 為 3」；啟用 BFD 時必須明確指定間隔（單位為毫秒）。<\/p><pre class=\"errata-cli\">set protocols ospf area 0 interface xe-0/0/4.0 bfd-liveness-detection minimum-interval 400\nset protocols ospf area 0 interface xe-0/0/4.0 bfd-liveness-detection multiplier 5<\/pre><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 39,
+    "q_en": "Referring to the exhibit, at which interval will the interface be considered down if no hello packets are received?",
+    "options": [
+      "A. 2000 seconds",
+      "B. 400 milliseconds",
+      "C. 2000 milliseconds",
+      "D. 400 seconds"
+    ],
+    "answer": "C",
+    "explanation": "<div class=\"en-head\"><span class=\"en-badge\">ENGLISH<\/span><\/div><div class=\"explanation-body\"><p>Multiply the two BFD values shown in the configuration.<\/p><ul><li><strong>The values:<\/strong> <code>minimum-interval 400<\/code> and <code>multiplier 5<\/code>.<\/li><li><strong>The calculation:<\/strong> 400 ms &times; 5 = <strong>2000 ms<\/strong> (2 seconds).<\/li><li><strong>What happens then:<\/strong> if no BFD control packet arrives for 2000 ms, BFD declares the session down and notifies OSPF, which immediately tears down the adjacency and reruns SPF — far faster than waiting for the 40-second OSPF dead interval.<\/li><\/ul><p>Watch the units: <code>minimum-interval<\/code> is expressed in <strong>milliseconds<\/strong>, so answers A and D are off by a factor of 1000.<\/p><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文解析<\/span><\/div><div class=\"zh-body\"><p>把設定中顯示的兩個 BFD 數值相乘即可。<\/p><ul><li><strong>數值：<\/strong><code>minimum-interval 400<\/code> 與 <code>multiplier 5<\/code>。<\/li><li><strong>計算：<\/strong>400 ms &times; 5 = <strong>2000 ms<\/strong>（2 秒）。<\/li><li><strong>之後會發生什麼：<\/strong>若 2000 ms 內沒有收到任何 BFD 控制封包，BFD 即宣告 session 中斷並通知 OSPF，OSPF 隨即拆除鄰接關係並重跑 SPF —— 遠快於等待 OSPF 預設 40 秒的 dead interval。<\/li><\/ul><p>注意單位：<code>minimum-interval<\/code> 的單位是<strong>毫秒<\/strong>，因此選項 A 與 D 差了 1000 倍。<\/p><\/div><\/div>",
+    "images": [
+      "q39.jpg"
+    ]
+  },
+  {
+    "id": 40,
+    "q_en": "Which two statements are correct about aggregated Ethernet bundles? (Choose two.)",
+    "options": [
+      "A. LAG increases link bandwidth.",
+      "B. LAG provides a physical layer of redundancy.",
+      "C. LAG must be configured using half-duplex.",
+      "D. LAG must be configured with contiguous ports."
+    ],
+    "answer": "A, B",
+    "explanation": "<div class=\"en-head\"><span class=\"en-badge\">ENGLISH<\/span><\/div><div class=\"explanation-body\"><p>A LAG bonds several physical links into one logical interface, which buys you two things at once.<\/p><ul><li><strong>More bandwidth (A):<\/strong> the bundle's capacity is the sum of its members — four 10G links present a single 40G logical interface, with traffic hashed across the members per flow.<\/li><li><strong>Link redundancy (B):<\/strong> if one member fails, the remaining members keep forwarding. The logical interface stays up and routing protocols never see a topology change, so there is no reconvergence.<\/li><\/ul><p>Option C is wrong — members must be <strong>full<\/strong>-duplex and all the same speed. Option D is wrong: member ports do not have to be contiguous, and on a Virtual Chassis or MC-LAG they can even live on different chassis.<\/p><pre class=\"errata-cli\">set chassis aggregated-devices ethernet device-count 2\nset interfaces ge-0/0/6 ether-options 802.3ad ae0\nset interfaces ge-0/0/7 ether-options 802.3ad ae0<\/pre><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文解析<\/span><\/div><div class=\"zh-body\"><p>LAG 把多條實體連結綁成單一邏輯介面，一次帶來兩項好處。<\/p><ul><li><strong>更大的頻寬（A）：<\/strong>捆綁的容量是各成員的總和 —— 四條 10G 連結呈現為單一的 40G 邏輯介面，流量以 per-flow 雜湊分散到各成員上。<\/li><li><strong>連結備援（B）：<\/strong>若某個成員故障，其餘成員繼續轉送。邏輯介面維持 up，路由協定完全看不到拓撲變化，因此<strong>不會發生重新收斂<\/strong>。<\/li><\/ul><p>選項 C 錯誤 —— 成員必須是<strong>全<\/strong>雙工且速率一致。選項 D 錯誤：成員 port 不必連號，在 Virtual Chassis 或 MC-LAG 上甚至可以分屬不同機箱。<\/p><pre class=\"errata-cli\">set chassis aggregated-devices ethernet device-count 2\nset interfaces ge-0/0/6 ether-options 802.3ad ae0\nset interfaces ge-0/0/7 ether-options 802.3ad ae0<\/pre><\/div><\/div>",
+    "images": []
+  }
+];        // ==========================================
+
+        // Core Logic
+        let currentIndex = 0;
+        let selectedAnswers = []; 
+        let isAnswered = false;
+        let quizResults = {}; 
+        let flaggedQuestions = new Set(); // 儲存被標記的題目 ID
+        let isReversed = false;
+        let isFirstLoad = true; // 新增：用於判斷是否為剛載入網頁
+
+        // LOCALSTORAGE KEY
+        // LOCALSTORAGE KEY — 每份題庫各自獨立，避免互相覆蓋
+        const STORAGE_KEY = 'jncia_dc_official_practice';
+
+        // 產生目前的展示順序
+        function buildDisplayOrder() {
+            const arr = questionsData.map((_, i) => i);
+            return isReversed ? arr.reverse() : arr;
+        }
+        let displayOrder = buildDisplayOrder();
+
+        // 強制移除焦點，避免按鈕視覺卡住
+        function blurFocus() {
+            if (document.activeElement instanceof HTMLElement) {
+                document.activeElement.blur();
+            }
+        }
+
+        // 儲存進度到 LocalStorage
+        function saveProgress() {
+            const progressObj = {
+                currentIndex: currentIndex,
+                quizResults: quizResults,
+                flaggedQuestions: Array.from(flaggedQuestions), // Set 轉 Array
+                selectedAnswers: selectedAnswers,
+                isAnswered: isAnswered,
+                isReversed: isReversed,
+                questionCount: questionsData.length
+            };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(progressObj));
+        }
+
+        // 讀取進度從 LocalStorage
+        function loadProgress() {
+            const savedData = localStorage.getItem(STORAGE_KEY);
+            if (savedData) {
+                try {
+                    const progressObj = JSON.parse(savedData);
+                    // 防呆：題數不符代表這份進度屬於其他題庫，直接丟棄
+                    if (progressObj.questionCount !== undefined &&
+                        progressObj.questionCount !== questionsData.length) {
+                        localStorage.removeItem(STORAGE_KEY);
+                        return;
+                    }
+                    currentIndex = progressObj.currentIndex !== undefined ? progressObj.currentIndex : 0;
+                    if (!(currentIndex >= 0 && currentIndex < questionsData.length)) currentIndex = 0;
+                    quizResults = progressObj.quizResults || {};
+                    if (progressObj.flaggedQuestions) {
+                        flaggedQuestions = new Set(progressObj.flaggedQuestions);
+                    }
+                    selectedAnswers = progressObj.selectedAnswers || [];
+                    isAnswered = progressObj.isAnswered || false;
+                    isReversed = progressObj.isReversed || false;
+                    displayOrder = buildDisplayOrder();
+                } catch (error) {
+                    console.error("載入進度失敗：", error);
+                }
+            }
+        }
+
+        const quizContent = document.getElementById('quiz-content');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const submitBtn = document.getElementById('submit-btn');
+        const progressBar = document.getElementById('progress-bar');
+        const currentProgress = document.getElementById('current-progress');
+        const totalCount = document.getElementById('total-count');
+        const footerControls = document.getElementById('footer-controls');
+
+        // Palette Logic
+        const paletteModal = document.getElementById('palette-modal');
+        const paletteBackdrop = document.getElementById('palette-backdrop');
+        const palettePanel = document.getElementById('palette-panel');
+        const paletteGrid = document.getElementById('palette-grid');
+
+        // ==== 鍵盤事件監聽 (快捷鍵實作) ====
+        document.addEventListener('keydown', (e) => {
+            // 避免在輸入框中觸發
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+            // 1-6 數字鍵選擇選項 A-F
+            const keyMap = {'1': 'A', '2': 'B', '3': 'C', '4': 'D', '5': 'E', '6': 'F'};
+            if (keyMap[e.key] && !isAnswered) {
+                const optionIndex = e.key.charCodeAt(0) - 49; 
+                const cards = document.querySelectorAll('.option-card');
+                if (cards[optionIndex]) {
+                    const currentQ = questionsData[displayOrder[currentIndex]];
+                    const isMultiple = currentQ.answer.includes(',');
+                    toggleOption(keyMap[e.key], isMultiple, cards[optionIndex]);
+                }
+            }
+
+            // 左方向鍵: 上一題
+            if (e.key === 'ArrowLeft') {
+                prevQuestion();
+            }
+            
+            // 右方向鍵: 下一題
+            if (e.key === 'ArrowRight') {
+                nextQuestion();
+            }
+
+            // Enter 鍵: 提交或下一題
+            if (e.key === 'Enter') {
+                // 若已經答完且在看結果頁面，阻止觸發
+                if (document.getElementById('result-banner') && !document.getElementById('result-banner').classList.contains('hidden') && currentIndex === questionsData.length) return; 
+
+                if (!isAnswered && !submitBtn.disabled) {
+                    submitAnswer();
+                } else if (isAnswered) {
+                    nextQuestion();
+                }
+            }
+
+            // M 鍵: 標記/取消標記本題
+            if (e.key.toLowerCase() === 'm') {
+                toggleFlag();
+            }
+
+            // N 鍵: 清除本題進度
+            if (e.key.toLowerCase() === 'n') {
+                clearCurrentQuestion();
+            }
+        });
+
+        // Init
+        document.addEventListener("DOMContentLoaded", () => {
+            totalCount.innerText = questionsData.length + " Questions";
+            loadProgress(); // 優先讀取進度
+            
+            // 根據讀取的 isReversed 更新 UI 排序按鈕狀態
+            const btn = document.getElementById('order-btn');
+            if (btn) {
+                btn.innerHTML = isReversed
+                    ? '<i class="fa-solid fa-arrow-up"></i> <span class="hidden sm:inline">逆序</span>'
+                    : '<i class="fa-solid fa-arrow-down"></i> <span class="hidden sm:inline">正序</span>';
+                btn.className = (isReversed
+                    ? 'bg-pink-600 hover:bg-pink-700'
+                    : 'bg-purple-600 hover:bg-purple-700') + ' text-white px-3 py-1.5 rounded-lg text-sm transition-colors flex items-center gap-2 shadow-sm font-medium';
+            }
+
+            updateStats();
+            renderQuestion(currentIndex);
+        });
+
+        // 切換正序/逆序
+        function toggleOrder() {
+            blurFocus();
+            isReversed = !isReversed;
+            displayOrder = buildDisplayOrder();
+            currentIndex = 0;
+            const btn = document.getElementById('order-btn');
+            if (btn) {
+                btn.innerHTML = isReversed
+                    ? '<i class="fa-solid fa-arrow-up"></i> <span class="hidden sm:inline">逆序</span>'
+                    : '<i class="fa-solid fa-arrow-down"></i> <span class="hidden sm:inline">正序</span>';
+                btn.className = (isReversed
+                    ? 'bg-pink-600 hover:bg-pink-700'
+                    : 'bg-purple-600 hover:bg-purple-700') + ' text-white px-3 py-1.5 rounded-lg text-sm transition-colors flex items-center gap-2 shadow-sm font-medium';
+            }
+            saveProgress();
+            renderQuestion(currentIndex);
+        }
+
+        // 跳轉題號
+        function promptJump() {
+            blurFocus();
+            const ans = prompt('跳到第幾題? (1-' + questionsData.length + ')', '1');
+            if (ans === null) return;
+            const n = parseInt(ans, 10);
+            if (isNaN(n) || n < 1 || n > questionsData.length) {
+                alert('題號必須介於 1 到 ' + questionsData.length);
+                return;
+            }
+            const dataIdx = questionsData.findIndex(q => q.id === n);
+            if (dataIdx < 0) {
+                alert('找不到 Q' + n);
+                return;
+            }
+            currentIndex = displayOrder.indexOf(dataIdx);
+            saveProgress();
+            renderQuestion(currentIndex);
+        }
+
+        // 標記本題 (Flag)
+        function toggleFlag() {
+            blurFocus();
+            const currentQId = questionsData[displayOrder[currentIndex]].id;
+            const btnFlag = document.getElementById('btn-flag');
+            
+            if (flaggedQuestions.has(currentQId)) {
+                flaggedQuestions.delete(currentQId);
+                btnFlag.classList.replace('bg-red-700', 'bg-red-500');
+                btnFlag.innerHTML = '<i class="fa-regular fa-flag"></i> <span class="hidden sm:inline">標記本題</span>';
+            } else {
+                flaggedQuestions.add(currentQId);
+                btnFlag.classList.replace('bg-red-500', 'bg-red-700');
+                btnFlag.innerHTML = '<i class="fa-solid fa-flag"></i> <span class="hidden sm:inline">取消標記</span>';
+            }
+            
+            updateStats();
+            saveProgress();
+            if (!paletteModal.classList.contains('hidden')) renderPaletteGrid();
+        }
+
+        // 尋找下一個標記
+        function nextFlag() {
+            blurFocus();
+            if (flaggedQuestions.size === 0) { alert('目前沒有任何標記的題目。'); return; }
+            for (let pos = currentIndex + 1; pos < questionsData.length; pos++) {
+                if (flaggedQuestions.has(questionsData[displayOrder[pos]].id)) {
+                    currentIndex = pos;
+                    saveProgress();
+                    renderQuestion(currentIndex);
+                    return;
+                }
+            }
+            // 若後面沒有，循環找最前面的
+            for (let pos = 0; pos <= currentIndex; pos++) {
+                if (flaggedQuestions.has(questionsData[displayOrder[pos]].id)) {
+                    currentIndex = pos;
+                    saveProgress();
+                    renderQuestion(currentIndex);
+                    return;
+                }
+            }
+        }
+
+        // 尋找上一個標記
+        function prevFlag() {
+            blurFocus();
+            if (flaggedQuestions.size === 0) { alert('目前沒有任何標記的題目。'); return; }
+            for (let pos = currentIndex - 1; pos >= 0; pos--) {
+                if (flaggedQuestions.has(questionsData[displayOrder[pos]].id)) {
+                    currentIndex = pos;
+                    saveProgress();
+                    renderQuestion(currentIndex);
+                    return;
+                }
+            }
+            // 若前面沒有，找最後面的
+            for (let pos = questionsData.length - 1; pos >= currentIndex; pos--) {
+                if (flaggedQuestions.has(questionsData[displayOrder[pos]].id)) {
+                    currentIndex = pos;
+                    saveProgress();
+                    renderQuestion(currentIndex);
+                    return;
+                }
+            }
+        }
+
+        // 清除本題進度
+        function clearCurrentQuestion() {
+            blurFocus();
+            const currentQId = questionsData[displayOrder[currentIndex]].id;
+            delete quizResults[currentQId];
+            selectedAnswers = [];
+            isAnswered = false;
+            updateStats();
+            saveProgress();
+            renderQuestion(currentIndex);
+        }
+
+        // 更新左側統計數據
+        function updateStats() {
+            const total = questionsData.length;
+            const answeredCount = Object.keys(quizResults).length;
+            const correctCount = Object.values(quizResults).filter(r => r === true).length;
+            const flaggedCount = flaggedQuestions.size;
+            const percentage = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+
+            document.getElementById('stat-progress').innerText = `${answeredCount} / ${total}`;
+            document.getElementById('stat-flagged').innerText = flaggedCount;
+            document.getElementById('stat-correct').innerText = correctCount;
+            document.getElementById('stat-accuracy').innerText = `${percentage}%`;
+        }
+
+        function escapeHTML(s) { 
+            if (!s) return '';
+            return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); 
+        }
+
+        function renderQuestion(index) {
+            const dataIdx = displayOrder[index];
+            const q = questionsData[dataIdx];
+            
+            // 初始化狀態
+            isAnswered = quizResults.hasOwnProperty(q.id);
+            
+            // 解決「下一題自動帶入上一題答案」的 Bug
+            if (isFirstLoad) {
+                // 如果是網頁剛載入的第一次渲染，保留由 loadProgress 取回的 selectedAnswers
+                isFirstLoad = false;
+            } else {
+                // 只要是切換題目（不論上一題是否已送出），都必須清空選擇狀態，防止答案殘留
+                selectedAnswers = []; 
+            }
+
+            // 更新標記按鈕 UI
+            const btnFlag = document.getElementById('btn-flag');
+            if (flaggedQuestions.has(q.id)) {
+                btnFlag.classList.replace('bg-red-500', 'bg-red-700');
+                btnFlag.innerHTML = '<i class="fa-solid fa-flag"></i> <span class="hidden sm:inline">取消標記</span>';
+            } else {
+                btnFlag.classList.replace('bg-red-700', 'bg-red-500');
+                btnFlag.innerHTML = '<i class="fa-regular fa-flag"></i> <span class="hidden sm:inline">標記本題</span>';
+            }
+
+            document.getElementById('q-id-display').innerText = `第 ${index + 1} 題 (ID: Q${q.id})`;
+            
+            // Image Logic
+            let exhibitHtml = '';
+            if (q.images && q.images.length) {
+                exhibitHtml = '<div class="my-6 flex flex-col items-center justify-center gap-4">';
+                q.images.forEach((img, i) => {
+                    const pid = 'placeholder-' + q.id + '-' + i;
+                    exhibitHtml += `
+                        <img src="png-official/${img}" alt="Exhibit ${i+1} for Q${q.id}" class="max-w-full h-auto rounded-lg border border-slate-300 shadow-sm" style="display:none" onload="this.style.display='block'" onerror="this.style.display='none'; document.getElementById('${pid}').classList.remove('hidden');">
+                        <div id="${pid}" class="hidden w-full bg-slate-50 border-2 border-dashed border-slate-300 rounded-lg h-32 flex flex-col items-center justify-center text-slate-400 p-4 text-center">
+                            <i class="fa-regular fa-image text-3xl mb-2"></i>
+                            <span class="text-xs font-semibold mb-1">Q${q.id} Exhibit ${i+1} (png-official/${img})</span>
+                            <span class="text-[10px]">To view the image, please ensure the file <b>${img}</b> is located in the <b>png-official</b> folder.</span>
+                        </div>`;
+                });
+                exhibitHtml += '</div>';
+            }
+
+            // Options Logic - 動態計算正確答案數量
+            const correctAnswersCount = q.answer.split(',').filter(s => s.trim() !== '' && s.trim() !== '—').length;
+            const isMultiple = correctAnswersCount > 1;
+            
+            const typeText = isMultiple ? 
+                `<span class="text-xs bg-slate-200 text-slate-600 px-2 py-0.5 rounded ml-2">Multiple Choice (需選 ${correctAnswersCount} 項)</span>` : 
+                '<span class="text-xs bg-slate-200 text-slate-600 px-2 py-0.5 rounded ml-2">Single Choice</span>';
+
+            let optionsHtml = q.options.map((opt, i) => {
+                const letter = String.fromCharCode(65 + i); 
+                
+                let cleanOpt = opt.trim();
+                const prefixRegex = new RegExp(`^${letter}[\\.\\)]?\\s*`);
+                if (prefixRegex.test(cleanOpt)) {
+                    cleanOpt = cleanOpt.replace(prefixRegex, '').trim();
+                }
+
+                // 處理 localStorage 還原的選中狀態
+                let isSelected = selectedAnswers.includes(letter);
+                let selectedClass = isSelected ? 'selected' : '';
+                let indicatorHidden = isSelected ? '' : 'hidden';
+
+                return `
+                <div class="option-card border border-slate-200 rounded-lg p-4 mb-3 flex items-center gap-3 w-full ${selectedClass}" 
+                     onclick="toggleOption('${letter}', ${isMultiple}, this)" data-letter="${letter}">
+                    <div class="flex-shrink-0 w-6 h-6 rounded-full border-2 border-slate-300 flex items-center justify-center option-indicator bg-white">
+                        <div class="w-3 h-3 ${isMultiple ? 'rounded-sm' : 'rounded-full'} bg-blue-500 ${indicatorHidden}"></div>
+                    </div>
+                    <div class="text-slate-700 text-sm md:text-base leading-relaxed select-none text-left flex-1 break-words">
+                        <span class="font-bold mr-1 text-slate-500">${letter}.</span> ${escapeHTML(cleanOpt)}
+                    </div>
+                </div>`;
+            }).join('');
+
+            // Render
+            quizContent.innerHTML = `
+                <div class="flex justify-between items-start mb-4 fade-in">
+                    <span class="bg-slate-800 text-white text-sm font-bold px-3 py-1 rounded">第 ${index + 1} 題</span>
+                    ${typeText}
+                </div>
+                
+                <div class="mb-2 fade-in">
+                    <p class="font-bold text-slate-800 text-lg md:text-xl mb-3 leading-snug question-text">${escapeHTML(q.q_en)}</p>
+                </div>
+
+                <div class="fade-in">
+                    ${exhibitHtml}
+                </div>
+
+                <div id="options-container" class="mt-4 mb-6 fade-in w-full">
+                    ${optionsHtml}
+                </div>
+
+                <!-- Explanation Area (Initially Hidden) -->
+                <div id="explanation-area" class="hidden mt-4 bg-green-50 rounded-lg p-6 border border-green-100 fade-in text-left w-full">
+                    <div id="result-banner" class="mb-4 p-3 rounded-lg font-bold text-lg text-center"></div>
+                    <div class="flex items-center gap-2 mb-3 flex-wrap">
+                        <span class="font-bold text-green-700"><i class="fa-solid fa-check-circle mr-1"></i> Correct Answer:</span>
+                        <span class="font-bold text-xl text-green-800">${escapeHTML(q.answer)}</span>
+                        <span class="ml-2 text-sm text-slate-600">| Your answer: <span id="your-answer-display" class="font-semibold">(none)</span></span>
+                    </div>
+                    <div class="text-sm text-slate-700 leading-relaxed explanation-body">${q.explanation}</div>
+                </div>
+            `;
+
+            footerControls.classList.remove('hidden');
+            updateProgress();
+            
+            // 如果這題之前已經答過了，直接顯示結果狀態
+            if (isAnswered) {
+                document.getElementById('explanation-area').classList.remove('hidden');
+                submitBtn.classList.add('hidden');
+                nextBtn.classList.remove('hidden');
+                
+                // 視覺上還原對錯狀態並鎖死
+                const optionCards = document.querySelectorAll('.option-card');
+                const correctAnswersArray = q.answer.split(',').map(s => s.trim());
+                
+                optionCards.forEach((card) => {
+                    card.classList.add('disabled-click');
+                    const letter = card.getAttribute('data-letter');
+                    const indicator = card.querySelector('.option-indicator');
+                    
+                    if (correctAnswersArray.includes(letter)) {
+                        card.classList.add('correct-answer');
+                        indicator.innerHTML = '<i class="fa-solid fa-check text-green-600"></i>';
+                        indicator.classList.remove('border-slate-300');
+                        indicator.classList.add('border-green-500');
+                    } else if (selectedAnswers.includes(letter)) {
+                        card.classList.add('wrong-answer');
+                        indicator.innerHTML = '<i class="fa-solid fa-xmark text-red-600"></i>';
+                        indicator.classList.remove('border-slate-300');
+                        indicator.classList.add('border-red-500');
+                    }
+                });
+
+                // Update Your answer display
+                const yourAns = document.getElementById('your-answer-display');
+                if (yourAns) {
+                    yourAns.textContent = selectedAnswers.length ? selectedAnswers.sort().join(', ') : '(none)';
+                    yourAns.className = 'font-semibold ' + (quizResults[q.id] ? 'text-green-700' : 'text-red-700');
+                }
+
+                // Update Result Banner
+                const banner = document.getElementById('result-banner');
+                if (banner) {
+                    if (quizResults[q.id]) {
+                        banner.innerHTML = '<i class="fa-solid fa-circle-check mr-2"></i> 答對! Correct!';
+                        banner.className = 'mb-4 p-3 rounded-lg font-bold text-lg text-center bg-green-200 text-green-800 border-2 border-green-500';
+                    } else {
+                        banner.innerHTML = '<i class="fa-solid fa-circle-xmark mr-2"></i> 答錯! Incorrect';
+                        banner.className = 'mb-4 p-3 rounded-lg font-bold text-lg text-center bg-red-200 text-red-800 border-2 border-red-500';
+                    }
+                }
+            } else {
+                submitBtn.classList.remove('hidden');
+                submitBtn.disabled = selectedAnswers.length !== correctAnswersCount; 
+                nextBtn.classList.add('hidden');
+            }
+
+            nextBtn.innerHTML = 'Next <i class="fa-solid fa-arrow-right ml-2"></i>';
+            nextBtn.className = "px-6 py-2 rounded-lg bg-slate-800 text-white hover:bg-slate-900 transition-colors hidden";
+            prevBtn.disabled = index === 0;
+            
+            if(!paletteModal.classList.contains('hidden')){
+                renderPaletteGrid();
+            }
+        }
+
+        function toggleOption(letter, isMultiple, cardElement) {
+            if (isAnswered) return;
+
+            const q = questionsData[displayOrder[currentIndex]];
+            const correctAnswersCount = q.answer.split(',').filter(s => s.trim() !== '' && s.trim() !== '—').length;
+            const indicator = cardElement.querySelector('.option-indicator > div');
+            
+            if (isMultiple) {
+                if (selectedAnswers.includes(letter)) {
+                    selectedAnswers = selectedAnswers.filter(a => a !== letter);
+                    cardElement.classList.remove('selected');
+                    indicator.classList.add('hidden');
+                } else {
+                    if (selectedAnswers.length < correctAnswersCount) {
+                        selectedAnswers.push(letter);
+                        cardElement.classList.add('selected');
+                        indicator.classList.remove('hidden');
+                    } else {
+                        return; // 達到上限
+                    }
+                }
+            } else {
+                selectedAnswers = [letter];
+                document.querySelectorAll('.option-card').forEach(el => {
+                    el.classList.remove('selected');
+                    el.querySelector('.option-indicator > div').classList.add('hidden');
+                });
+                cardElement.classList.add('selected');
+                indicator.classList.remove('hidden');
+            }
+            
+            submitBtn.disabled = selectedAnswers.length !== correctAnswersCount;
+            saveProgress(); // 選項改變時儲存狀態
+        }
+
+        function submitAnswer() {
+            blurFocus();
+            isAnswered = true;
+            const q = questionsData[displayOrder[currentIndex]];
+            const correctAnswers = q.answer.split(',').map(s => s.trim());
+
+            const isCorrect = correctAnswers.length === selectedAnswers.length && 
+                              correctAnswers.every(val => selectedAnswers.includes(val));
+            
+            quizResults[q.id] = isCorrect;
+            updateStats();
+            saveProgress();
+
+            const optionCards = document.querySelectorAll('.option-card');
+            optionCards.forEach((card) => {
+                const letter = card.getAttribute('data-letter');
+                const indicator = card.querySelector('.option-indicator');
+                
+                card.classList.add('disabled-click');
+                
+                if (correctAnswers.includes(letter)) {
+                    card.classList.add('correct-answer');
+                    indicator.innerHTML = '<i class="fa-solid fa-check text-green-600"></i>';
+                    indicator.classList.remove('border-slate-300');
+                    indicator.classList.add('border-green-500');
+                } else if (selectedAnswers.includes(letter)) {
+                    card.classList.add('wrong-answer');
+                    indicator.innerHTML = '<i class="fa-solid fa-xmark text-red-600"></i>';
+                    indicator.classList.remove('border-slate-300');
+                    indicator.classList.add('border-red-500');
+                }
+            });
+
+            const yourAns = document.getElementById('your-answer-display');
+            if (yourAns) {
+                yourAns.textContent = selectedAnswers.length ? selectedAnswers.sort().join(', ') : '(none)';
+                yourAns.className = 'font-semibold ' + (isCorrect ? 'text-green-700' : 'text-red-700');
+            }
+
+            const banner = document.getElementById('result-banner');
+            if (banner) {
+                if (isCorrect) {
+                    banner.innerHTML = '<i class="fa-solid fa-circle-check mr-2"></i> 答對! Correct!';
+                    banner.className = 'mb-4 p-3 rounded-lg font-bold text-lg text-center bg-green-200 text-green-800 border-2 border-green-500';
+                } else {
+                    banner.innerHTML = '<i class="fa-solid fa-circle-xmark mr-2"></i> 答錯! Incorrect';
+                    banner.className = 'mb-4 p-3 rounded-lg font-bold text-lg text-center bg-red-200 text-red-800 border-2 border-red-500';
+                }
+            }
+
+            document.getElementById('explanation-area').classList.remove('hidden');
+            submitBtn.classList.add('hidden');
+            nextBtn.classList.remove('hidden');
+            
+            if (currentIndex === questionsData.length - 1) {
+                nextBtn.innerHTML = 'View Results <i class="fa-solid fa-chart-pie ml-2"></i>';
+                nextBtn.classList.remove('bg-slate-800', 'hover:bg-slate-900');
+                nextBtn.classList.add('bg-indigo-600', 'hover:bg-indigo-700');
+            }
+
+            setTimeout(() => {
+                document.getElementById('explanation-area').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
+        }
+
+        function nextQuestion() {
+            blurFocus();
+            if (currentIndex < questionsData.length - 1) {
+                currentIndex++;
+                saveProgress();
+                renderQuestion(currentIndex);
+            } else {
+                showResults();
+            }
+        }
+
+        function prevQuestion() {
+            blurFocus();
+            if (currentIndex > 0) {
+                currentIndex--;
+                saveProgress();
+                renderQuestion(currentIndex);
+            }
+        }
+
+        function showResults() {
+            const total = questionsData.length;
+            const correctCount = Object.values(quizResults).filter(r => r === true).length;
+            const answeredCount = Object.keys(quizResults).length;
+            const percentage = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+            
+            let message = "";
+            let colorClass = "";
+            let icon = "";
+
+            if (percentage === 100) {
+                message = "Perfect! You are ready for the exam!";
+                colorClass = "text-green-600";
+                icon = "fa-trophy";
+            } else if (percentage >= 80) {
+                message = "Great job! Excellent score.";
+                colorClass = "text-blue-600";
+                icon = "fa-thumbs-up";
+            } else if (percentage >= 60) {
+                message = "Not bad, keep it up!";
+                colorClass = "text-yellow-600";
+                icon = "fa-star-half-stroke";
+            } else {
+                message = "Don't be discouraged, keep practicing!";
+                colorClass = "text-red-600";
+                icon = "fa-book-open-reader";
+            }
+
+            quizContent.innerHTML = `
+                <div class="flex flex-col items-center justify-center h-full py-10 fade-in">
+                    <div class="w-24 h-24 rounded-full bg-slate-100 flex items-center justify-center mb-6">
+                        <i class="fa-solid ${icon} text-5xl ${colorClass}"></i>
+                    </div>
+                    
+                    <h2 class="text-3xl font-bold text-slate-800 mb-2">Quiz Completed</h2>
+                    
+                    <div class="grid grid-cols-4 gap-4 w-full max-w-2xl mb-8 mt-6">
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center">
+                            <div class="text-slate-400 text-xs uppercase font-bold tracking-wider mb-1">Total</div>
+                            <div class="text-2xl font-bold text-slate-800">${total}</div>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center">
+                            <div class="text-slate-400 text-xs uppercase font-bold tracking-wider mb-1">Answered</div>
+                            <div class="text-2xl font-bold text-slate-800">${answeredCount}</div>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center">
+                            <div class="text-slate-400 text-xs uppercase font-bold tracking-wider mb-1">Correct</div>
+                            <div class="text-2xl font-bold text-green-600">${correctCount}</div>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center">
+                            <div class="text-slate-400 text-xs uppercase font-bold tracking-wider mb-1">Accuracy</div>
+                            <div class="text-2xl font-bold ${colorClass}">${percentage}%</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-50 border-l-4 border-slate-300 p-4 w-full max-w-lg mb-8 rounded-r text-slate-700 italic text-center">
+                        "${message}"
+                    </div>
+
+                    <button onclick="restartQuiz()" class="px-8 py-3 rounded-full bg-slate-900 text-white font-bold hover:bg-slate-800 hover:scale-105 transition-all shadow-lg">
+                        <i class="fa-solid fa-rotate-right mr-2"></i> Restart Quiz
+                    </button>
+                </div>
+            `;
+
+            footerControls.classList.add('hidden');
+            progressBar.style.width = '100%';
+        }
+
+        function restartQuiz() {
+            blurFocus();
+            currentIndex = 0;
+            quizResults = {};
+            selectedAnswers = [];
+            isAnswered = false;
+            // 這裡不再呼叫 flaggedQuestions.clear()，所以標記會被保留下來
+            progressBar.style.width = '0%';
+            
+            // 清空除標記以外的 LocalStorage 進度並重存
+            saveProgress();
+            
+            updateStats();
+            renderQuestion(currentIndex);
+        }
+
+        function updateProgress() {
+            const pct = ((currentIndex + 1) / questionsData.length) * 100;
+            progressBar.style.width = `${pct}%`;
+            currentProgress.innerText = `Question ${currentIndex + 1}`;
+        }
+
+        // Palette Functions
+        function togglePalette() {
+            blurFocus();
+            const isHidden = paletteModal.classList.contains('hidden');
+            if (isHidden) {
+                paletteModal.classList.remove('hidden');
+                void palettePanel.offsetWidth;
+                paletteBackdrop.classList.remove('opacity-0');
+                palettePanel.classList.remove('translate-x-full');
+                renderPaletteGrid();
+            } else {
+                paletteBackdrop.classList.add('opacity-0');
+                palettePanel.classList.add('translate-x-full');
+                setTimeout(() => {
+                    paletteModal.classList.add('hidden');
+                }, 300);
+            }
+        }
+
+        function renderPaletteGrid() {
+            paletteGrid.innerHTML = '';
+            questionsData.forEach((q, index) => {
+                const el = document.createElement('div');
+                el.className = 'palette-item';
+                el.innerText = q.id;
+                
+                let statusClass = 'neutral';
+                if (index === currentIndex) {
+                    statusClass = 'current';
+                } else if (quizResults.hasOwnProperty(q.id)) {
+                    statusClass = quizResults[q.id] ? 'correct' : 'wrong';
+                }
+
+                el.classList.add(statusClass);
+                
+                if (flaggedQuestions.has(q.id)) el.classList.add('flagged');
+
+                el.onclick = () => {
+                    currentIndex = index;
+                    saveProgress();
+                    renderQuestion(index);
+                    togglePalette();
+                };
+                
+                paletteGrid.appendChild(el);
+            });
+        }
+    </script>
+</body>
+</html>
