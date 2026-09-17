@@ -1,0 +1,419 @@
+<meta charset="utf-8">
+<title>JNCIS-DC 備考地圖</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<style>
+  :root{
+    --ground:#F4F7F4;
+    --surface:#FFFFFF;
+    --surface-2:#EAEFEA;
+    --ink:#151C17;
+    --ink-2:#3B473F;
+    --muted:#667268;
+    --rule:#DBE3DC;
+    --rule-2:#BFCCC1;
+    --accent:#1E6A55;
+    --accent-soft:#E2EFE9;
+    --apstra:#BE5A16;
+    --apstra-soft:#FBEDE0;
+    --warn:#A8372B;
+    --warn-soft:#FAE9E6;
+    --code-bg:#EFF3EF;
+    --shadow:0 1px 2px rgba(21,28,23,.05);
+
+    --f-ui:'Archivo','Noto Sans TC','Microsoft JhengHei',system-ui,sans-serif;
+    --f-mono:'JetBrains Mono','Noto Sans TC',ui-monospace,Consolas,monospace;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --ground:#0E120F;
+      --surface:#161C18;
+      --surface-2:#1D2520;
+      --ink:#E7EDE8;
+      --ink-2:#BCC7BE;
+      --muted:#879489;
+      --rule:#27302A;
+      --rule-2:#3A463D;
+      --accent:#6FC3A6;
+      --accent-soft:#122A23;
+      --apstra:#E89453;
+      --apstra-soft:#2C1B0E;
+      --warn:#EE8C7E;
+      --warn-soft:#2E1714;
+      --code-bg:#111714;
+      --shadow:0 1px 2px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0E120F;
+    --surface:#161C18;
+    --surface-2:#1D2520;
+    --ink:#E7EDE8;
+    --ink-2:#BCC7BE;
+    --muted:#879489;
+    --rule:#27302A;
+    --rule-2:#3A463D;
+    --accent:#6FC3A6;
+    --accent-soft:#122A23;
+    --apstra:#E89453;
+    --apstra-soft:#2C1B0E;
+    --warn:#EE8C7E;
+    --warn-soft:#2E1714;
+    --code-bg:#111714;
+    --shadow:0 1px 2px rgba(0,0,0,.35);
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;background:var(--ground);color:var(--ink);
+    font-family:var(--f-ui);font-size:16px;line-height:1.7;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:840px;margin:0 auto;padding:0 24px 88px;}
+  a{color:var(--accent);text-underline-offset:2px;}
+  a:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:3px;}
+  code{font-family:var(--f-mono);background:var(--code-bg);border-radius:3px;
+    padding:1px 5px;font-size:.86em;}
+
+  /* masthead */
+  .mast{padding:56px 0 26px;border-bottom:2px solid var(--ink);margin-bottom:38px;}
+  .eyebrow{
+    font-size:.71rem;letter-spacing:.15em;text-transform:uppercase;font-weight:600;
+    color:var(--accent);margin:0 0 14px;display:flex;flex-wrap:wrap;gap:9px;align-items:center;
+  }
+  .eyebrow .sep{color:var(--rule-2);}
+  h1{font-size:clamp(2rem,5.2vw,2.95rem);line-height:1.12;margin:0 0 16px;
+    font-weight:700;letter-spacing:-.025em;text-wrap:balance;}
+  .lede{font-size:1.08rem;color:var(--ink-2);margin:0;max-width:58ch;}
+  .lede strong{color:var(--ink);font-weight:600;}
+  .lede .hot{color:var(--apstra);font-weight:600;}
+
+  /* thesis graphic */
+  .thesis{margin:0 0 44px;}
+  .thesis-cap{
+    display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:12px;
+  }
+  .thesis-cap .big{
+    font-family:var(--f-mono);font-size:2.1rem;font-weight:500;color:var(--apstra);
+    line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.02em;
+  }
+  .thesis-cap .txt{font-size:.94rem;color:var(--ink-2);}
+  .bar{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:10px;}
+  .seg{height:42px;border-radius:2px;display:flex;align-items:center;justify-content:center;
+    font-family:var(--f-mono);font-size:.78rem;font-weight:500;}
+  .seg.a{background:var(--apstra);color:var(--surface);}
+  .seg.h{background:var(--apstra-soft);color:var(--apstra);border:1px solid var(--apstra);}
+  .seg.n{background:var(--accent-soft);color:var(--accent);border:1px solid var(--accent);}
+  .legend{display:flex;flex-wrap:wrap;gap:16px;font-size:.8rem;color:var(--muted);}
+  .legend span{display:flex;align-items:center;gap:6px;}
+  .legend i{width:11px;height:11px;border-radius:2px;display:inline-block;}
+  .legend .a{background:var(--apstra);}
+  .legend .h{background:var(--apstra-soft);border:1px solid var(--apstra);}
+  .legend .n{background:var(--accent-soft);border:1px solid var(--accent);}
+
+  /* spec strip */
+  .spec{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));
+    gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:4px;
+    overflow:hidden;margin:0 0 46px;
+  }
+  .spec div{background:var(--surface);padding:13px 16px;}
+  .spec .k{font-size:.72rem;color:var(--muted);letter-spacing:.04em;margin-bottom:3px;}
+  .spec .v{font-family:var(--f-mono);font-size:1rem;font-weight:500;
+    font-variant-numeric:tabular-nums;letter-spacing:-.01em;}
+
+  /* sections */
+  section{margin-bottom:52px;}
+  .sec-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;
+    padding-bottom:10px;margin-bottom:24px;border-bottom:1px solid var(--rule-2);}
+  .sec-head h2{font-size:1.3rem;font-weight:600;margin:0;letter-spacing:-.015em;}
+  .sec-head .note{font-size:.82rem;color:var(--muted);margin-left:auto;}
+
+  /* objectives */
+  .obj{display:flex;flex-direction:column;gap:1px;background:var(--rule);
+    border:1px solid var(--rule);border-radius:4px;overflow:hidden;}
+  .obj-row{background:var(--surface);padding:13px 16px;display:flex;gap:14px;align-items:flex-start;}
+  .obj-row .n{font-family:var(--f-mono);font-size:.82rem;color:var(--muted);
+    flex:0 0 18px;padding-top:2px;font-variant-numeric:tabular-nums;}
+  .obj-row .body{flex:1 1 auto;min-width:0;}
+  .obj-row .t{font-weight:600;font-size:.97rem;display:flex;flex-wrap:wrap;gap:8px;align-items:center;}
+  .obj-row .d{font-size:.87rem;color:var(--muted);margin-top:3px;}
+  .tag{font-size:.66rem;font-weight:700;letter-spacing:.06em;padding:.1rem .42rem;
+    border-radius:2px;text-transform:uppercase;white-space:nowrap;}
+  .tag.a{background:var(--apstra);color:var(--surface);}
+  .tag.h{background:var(--apstra-soft);color:var(--apstra);border:1px solid var(--apstra);}
+  .tag.n{background:var(--accent-soft);color:var(--accent);border:1px solid var(--accent);}
+
+  /* resources */
+  .res{display:flex;flex-direction:column;gap:14px;}
+  .card{
+    background:var(--surface);border:1px solid var(--rule);border-radius:4px;
+    padding:16px 18px;box-shadow:var(--shadow);
+    display:flex;gap:16px;align-items:flex-start;
+  }
+  .card.top{border-color:var(--apstra);border-left-width:3px;}
+  .rank{
+    font-family:var(--f-mono);font-size:1.4rem;font-weight:500;line-height:1;
+    color:var(--rule-2);flex:0 0 auto;padding-top:2px;font-variant-numeric:tabular-nums;
+  }
+  .card.top .rank{color:var(--apstra);}
+  .card .body{flex:1 1 auto;min-width:0;}
+  .card h3{margin:0 0 4px;font-size:1.02rem;font-weight:600;
+    display:flex;flex-wrap:wrap;gap:9px;align-items:center;letter-spacing:-.005em;}
+  .card p{margin:0;font-size:.92rem;color:var(--ink-2);}
+  .card p + p{margin-top:7px;}
+  .badge{font-size:.66rem;font-weight:700;letter-spacing:.06em;padding:.1rem .45rem;
+    border-radius:2px;background:var(--accent-soft);color:var(--accent);
+    border:1px solid var(--accent);white-space:nowrap;}
+  .badge.warn{background:var(--warn-soft);color:var(--warn);border-color:var(--warn);}
+  .card .link{
+    display:inline-block;margin-top:9px;font-family:var(--f-mono);font-size:.78rem;
+    word-break:break-all;
+  }
+
+  /* caveats */
+  .caveat{
+    background:var(--warn-soft);border:1px solid var(--warn);
+    border-left-width:3px;border-radius:0 4px 4px 0;
+    padding:14px 18px;margin-bottom:14px;
+  }
+  .caveat h3{margin:0 0 5px;font-size:.98rem;font-weight:600;color:var(--warn);}
+  .caveat p{margin:0;font-size:.92rem;color:var(--ink-2);}
+  .caveat p + p{margin-top:7px;}
+  .caveat strong{color:var(--ink);}
+
+  /* path */
+  .path{counter-reset:step;display:flex;flex-direction:column;gap:2px;}
+  .path li{
+    list-style:none;background:var(--surface);border:1px solid var(--rule);
+    padding:12px 16px;display:flex;gap:14px;align-items:baseline;
+  }
+  .path li:first-child{border-radius:4px 4px 0 0;}
+  .path li:last-child{border-radius:0 0 4px 4px;}
+  .path li::before{
+    counter-increment:step;content:"STEP " counter(step);
+    font-family:var(--f-mono);font-size:.68rem;color:var(--muted);
+    letter-spacing:.06em;flex:0 0 58px;
+  }
+  .path li span{font-size:.93rem;color:var(--ink-2);}
+  .path li b{color:var(--ink);font-weight:600;}
+
+  footer{border-top:1px solid var(--rule);padding-top:20px;font-size:.81rem;color:var(--muted);}
+  footer p{margin:0 0 6px;}
+
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;}}
+  @media (max-width:560px){
+    .wrap{padding:0 16px 60px;}
+    .mast{padding-top:36px;}
+    .bar{grid-template-columns:repeat(7,1fr);gap:2px;}
+    .seg{height:34px;font-size:.68rem;}
+    .path li{flex-direction:column;gap:4px;}
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="mast">
+    <p class="eyebrow">
+      <span>Juniper 資料中心認證</span><span class="sep">/</span>
+      <span>Data Center, Specialist</span><span class="sep">/</span>
+      <span>JN0-481</span>
+    </p>
+    <h1>JNCIS-DC 備考地圖</h1>
+    <p class="lede">
+      JNCIS-DC <strong>不是 JNCIA-DC 的進階版</strong>。七大考綱主題裡，
+      <span class="hot">五個是 Juniper Apstra</span> —— 這是一張<strong>意圖式網路自動化</strong>的證照，
+      背 CLI 指令幫不上忙。
+    </p>
+  </header>
+
+  <div class="thesis">
+    <div class="thesis-cap">
+      <span class="big">5 / 7</span>
+      <span class="txt">考綱主題屬於 Apstra，另有 1 個為 Apstra 與 EVPN 混合</span>
+    </div>
+    <div class="bar">
+      <div class="seg n">1</div>
+      <div class="seg a">2</div>
+      <div class="seg a">3</div>
+      <div class="seg a">4</div>
+      <div class="seg a">5</div>
+      <div class="seg h">6</div>
+      <div class="seg a">7</div>
+    </div>
+    <div class="legend">
+      <span><i class="a"></i>純 Apstra（5）</span>
+      <span><i class="h"></i>Apstra + EVPN 混合（1）</span>
+      <span><i class="n"></i>延續 JNCIA-DC（1）</span>
+    </div>
+  </div>
+
+  <div class="spec">
+    <div><div class="k">考試代碼</div><div class="v">JN0-481</div></div>
+    <div><div class="k">題數</div><div class="v">65</div></div>
+    <div><div class="k">時間</div><div class="v">90 min</div></div>
+    <div><div class="k">軟體版本</div><div class="v">Apstra 5.1</div></div>
+    <div><div class="k">Junos</div><div class="v">24.4</div></div>
+    <div><div class="k">先決條件</div><div class="v">JNCIA-DC</div></div>
+    <div><div class="k">效期</div><div class="v">3 年</div></div>
+    <div><div class="k">考場</div><div class="v">Pearson VUE</div></div>
+  </div>
+
+  <!-- ===== 考綱 ===== -->
+  <section>
+    <div class="sec-head">
+      <h2>官方考綱</h2>
+      <span class="note">考試照這份出題 —— 命中率最高的文件</span>
+    </div>
+    <div class="obj">
+      <div class="obj-row">
+        <span class="n">1</span>
+        <div class="body">
+          <div class="t">Data Center Architectures <span class="tag n">延續 JNCIA</span></div>
+          <div class="d">IP fabric（spine-leaf、ECMP 負載平衡、underlay/overlay 路由）、EVPN（EVI、bridge domain、Ethernet Segment、route type、ERB）、VXLAN（控制平面選項、VNI 對 VLAN 映射、VTEP 功能）</div>
+        </div>
+      </div>
+      <div class="obj-row">
+        <span class="n">2</span>
+        <div class="body">
+          <div class="t">Juniper Apstra Architecture <span class="tag a">Apstra</span></div>
+          <div class="d">Apstra server 元件、device agent、UI、RBAC、事件記錄、syslog</div>
+        </div>
+      </div>
+      <div class="obj-row">
+        <span class="n">3</span>
+        <div class="body">
+          <div class="t">Apstra Design Phase <span class="tag a">Apstra</span></div>
+          <div class="d">reference design、interface map、device profile、resource、tag、logical device、rack type、template</div>
+        </div>
+      </div>
+      <div class="obj-row">
+        <span class="n">4</span>
+        <div class="body">
+          <div class="t">Apstra Build and Deploy <span class="tag a">Apstra</span></div>
+          <div class="d">fabric 裝置管理、blueprint UI、cable map、device state、部署模式</div>
+        </div>
+      </div>
+      <div class="obj-row">
+        <span class="n">5</span>
+        <div class="body">
+          <div class="t">Blueprint Operations <span class="tag a">Apstra</span></div>
+          <div class="d">dashboard 分析、查詢、tag、變更管理、Time Voyager、property set、configlet、virtual network、組態類型</div>
+        </div>
+      </div>
+      <div class="obj-row">
+        <span class="n">6</span>
+        <div class="body">
+          <div class="t">Data Center Multitenancy <span class="tag h">混合</span></div>
+          <div class="d">connectivity template、VRF、routing policy、virtual network、security policy、Data Center Interconnect</div>
+        </div>
+      </div>
+      <div class="obj-row">
+        <span class="n">7</span>
+        <div class="body">
+          <div class="t">Intent-Based Analytics <span class="tag a">Apstra</span></div>
+          <div class="d">graph explorer、graph query、analytics probe</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 資源 ===== -->
+  <section>
+    <div class="sec-head">
+      <h2>免費資源</h2>
+      <span class="note">依重要性排序</span>
+    </div>
+    <div class="res">
+
+      <article class="card top">
+        <span class="rank">1</span>
+        <div class="body">
+          <h3>Juniper vLabs <span class="badge">免費</span><span class="badge">關鍵</span></h3>
+          <p>線上沙箱，<strong>內含 Apstra 環境</strong>。註冊帳號後可預約使用、24 小時開放。能完整跑一遍：onboard vQFX 裝置 → 定義 rack type 與 template → 建立 blueprint → 部署 fabric → 設定 virtual network → 用 analytics 做 Day 2 監控。</p>
+          <p><strong>考綱第 2～7 項全部能在這裡練到。</strong>Apstra 是 GUI 與 blueprint 導向的產品，沒實際操作過，看再多文件也答不出題。</p>
+          <a class="link" href="https://jlabs.juniper.net/vlabs/">jlabs.juniper.net/vlabs/</a>
+        </div>
+      </article>
+
+      <article class="card">
+        <span class="rank">2</span>
+        <div class="body">
+          <h3>JNCIS-DC 官方練習題 <span class="badge">免費</span></h3>
+          <p>Juniper 自己出的練習考題，題型與難度最貼近實際考試。</p>
+          <p>比 JNCIA-DC 那份好的地方是 —— <strong>作答結束會提供正解與逐題解說</strong>。</p>
+          <a class="link" href="https://learningportal.juniper.net/juniper/user_activity_info.aspx?id=EXAM-JNCIS-DC">learningportal.juniper.net &rarr; EXAM-JNCIS-DC</a>
+        </div>
+      </article>
+
+      <article class="card">
+        <span class="rank">3</span>
+        <div class="body">
+          <h3>官方考綱頁 <span class="badge">免費</span></h3>
+          <p>完整的七大主題與所有細項。考題是照這份藍圖出的，所以它本身就是命中率最高的文件 —— 讀熟它比找任何題庫都有效。</p>
+          <a class="link" href="https://learningportal.juniper.net/juniper/user_activity_info.aspx?id=14350">learningportal.juniper.net &rarr; id=14350</a>
+        </div>
+      </article>
+
+      <article class="card">
+        <span class="rank">4</span>
+        <div class="body">
+          <h3>Apstra Cloudlabs 實驗手冊 <span class="badge">免費</span></h3>
+          <p>Apstra 官方的逐步實驗指南，適合搭配 vLabs 一起做 —— 手冊給步驟，vLabs 給環境。</p>
+          <a class="link" href="https://cloudlabs.apstra.com/labguide/Cloudlabs/6.1.0/lab1-junos/lab1-junos-0_intro.html">cloudlabs.apstra.com/labguide/</a>
+        </div>
+      </article>
+
+      <article class="card">
+        <span class="rank">5</span>
+        <div class="body">
+          <h3>JNCIS-DC 考前總覽 Webinar <span class="badge">免費</span><span class="badge warn">目前無場次</span></h3>
+          <p>90 分鐘的考前說明場次，可現場提問。</p>
+          <p><strong>目前沒有排定日期</strong>，需要定期回去查看。官方建議參加前先修過 Apstra 課程。</p>
+          <a class="link" href="https://learningportal.juniper.net/juniper/user_activity_info.aspx?id=13001">learningportal.juniper.net &rarr; id=13001</a>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- ===== 注意 ===== -->
+  <section>
+    <div class="sec-head">
+      <h2>兩個要留意的地方</h2>
+    </div>
+
+    <div class="caveat">
+      <h3>沒有免費的自學課程</h3>
+      <p>和 JNCIA-DC 不同，JNCIS-DC <strong>沒有</strong> Open Learning 免費自學課程。官方建議的
+      <em>Data Center Automation using Juniper Apstra</em> 是<strong>五天的付費講師課</strong>。</p>
+      <p>所以免費路線只有：<strong>考綱 + vLabs 實作 + Cloudlabs 手冊 + 官方練習題</strong>。這條路可行，但要自己補上課程的結構性。</p>
+    </div>
+
+    <div class="caveat">
+      <h3>別把 JN0-683 當成 JNCIS-DC</h3>
+      <p>網路上（包含不少搜尋結果與題庫網站）把 <code>JN0-683</code> 標成 JNCIS-DC，那其實是
+      <strong>JNCIP-DC，Professional 等級</strong>，比 Specialist 高一階。</p>
+      <p>JNCIS-DC 的正確代碼是 <code>JN0-481</code>。買教材或找資源前先確認代碼，別走冤枉路。</p>
+    </div>
+  </section>
+
+  <!-- ===== 路線 ===== -->
+  <section>
+    <div class="sec-head">
+      <h2>建議路線</h2>
+    </div>
+    <ol class="path">
+      <li><span>先拿到 <b>JNCIA-DC（JN0-281）</b> —— 這是報考 JNCIS-DC 的硬性先決條件。</span></li>
+      <li><span>讀完<b>官方考綱</b>，把七大主題的細項逐條對照，標出自己完全沒碰過的名詞。</span></li>
+      <li><span>註冊 <b>vLabs</b>，在 Apstra 沙箱裡從頭建一座 fabric。<b>這一步花的時間最多，但回報也最高。</b></span></li>
+      <li><span>搭配 <b>Cloudlabs 手冊</b>逐個練習 blueprint 操作、connectivity template、analytics probe。</span></li>
+      <li><span>做<b>官方練習題</b>，用它提供的正解與解說定位弱點，回到 vLabs 補強。</span></li>
+    </ol>
+  </section>
+
+  <footer>
+    <p>資料來源：Juniper Learning Portal 官方認證頁（JN0-481）、Juniper vLabs、Apstra Cloudlabs。整理於 2026-09-15。</p>
+    <p>認證規格與資源連結可能隨時間異動，報考前請以官方頁面為準。</p>
+  </footer>
+
+</div>

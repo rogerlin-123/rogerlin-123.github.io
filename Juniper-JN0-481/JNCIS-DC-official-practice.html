@@ -1,0 +1,1611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JNCIS-DC 官方練習題</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .fade-in { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Custom Checkbox/Radio Styles */
+        .option-card { cursor: pointer; transition: all 0.2s; }
+        .option-card:hover { background-color: #f1f5f9; }
+        .option-card.selected { border-color: #3b82f6; background-color: #eff6ff; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5); }
+        
+        .option-card.correct-answer { border-color: #22c55e; background-color: #f0fdf4; }
+        .option-card.wrong-answer { border-color: #ef4444; background-color: #fef2f2; }
+        
+        .disabled-click { pointer-events: none; opacity: 0.9; }
+
+        /* Palette Styles */
+        .palette-item {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            font-weight: 600;
+            border-radius: 0.5rem;
+            border-width: 2px;
+            transition: all 0.2s;
+            cursor: pointer;
+            position: relative;
+        }
+        .palette-item:hover { transform: scale(1.05); }
+        .palette-item.current { border-color: #3b82f6; background-color: #eff6ff; color: #1d4ed8; }
+        .palette-item.correct { border-color: #22c55e; background-color: #f0fdf4; color: #15803d; }
+        .palette-item.wrong { border-color: #ef4444; background-color: #fef2f2; color: #b91c1c; }
+        .palette-item.neutral { border-color: #e2e8f0; background-color: #f8fafc; color: #64748b; }
+        .palette-item.neutral:hover { border-color: #cbd5e1; }
+        
+        /* 標記 (Flag) 小紅旗樣式 */
+        .palette-item.flagged::after {
+            content: '\f024'; font-family: 'Font Awesome 6 Free'; font-weight: 900;
+            position: absolute; top: -5px; right: -5px; color: #ef4444; font-size: 0.75rem;
+            background: white; border-radius: 50%; padding: 2px; box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+
+        /* 鍵盤提示標籤樣式 */
+        kbd {
+            display: inline-block; padding: 0.1rem 0.4rem; font-size: 0.75rem; 
+            font-weight: 700; background-color: #ffffff; border: 1px solid #cbd5e1; 
+            border-radius: 0.25rem; color: #475569; box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+        }
+
+        .question-text { white-space: pre-wrap; }
+        .option-text { white-space: pre-wrap; }
+        .explanation-body p { margin: 0.4rem 0; }
+        .explanation-body strong { color: #0f172a; }
+        .explanation-body ul { padding-left: 1rem; }
+        .explanation-body li { margin: 0.2rem 0; }
+        .explanation-body code { font-family: 'Courier New', monospace; }
+        
+        /* 避免焦點殘留的藍色框框 */
+        button:focus { outline: none; }
+    
+/* ===== 勘誤註記 (errata) ===== */
+.errata{
+  border-left:4px solid var(--e);
+  background:var(--e-bg);
+  border-radius:0 .375rem .375rem 0;
+  padding:.75rem .9rem;
+  margin:0 0 1rem;
+  font-size:.875rem;
+  line-height:1.65;
+  color:#1e293b;
+}
+.errata-critical{--e:#b91c1c;--e-bg:#fef2f2;}
+.errata-caution {--e:#b45309;--e-bg:#fffbeb;}
+.errata-conflict{--e:#6d28d9;--e-bg:#f5f3ff;}
+.errata-scope   {--e:#0f766e;--e-bg:#f0fdfa;}
+.errata-ok      {--e:#15803d;--e-bg:#f0fdf4;}
+.errata-head{
+  display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-bottom:.4rem;
+}
+.errata-tag{
+  font-size:.7rem;font-weight:700;letter-spacing:.04em;
+  color:#fff;background:var(--e);
+  padding:.1rem .45rem;border-radius:.25rem;
+}
+.errata-src{font-size:.7rem;color:#64748b;}
+.errata p{margin:.35rem 0;}
+.errata p.errata-lead{margin:0 0 .45rem;color:var(--e);font-weight:600;}
+.errata code{
+  background:rgba(15,23,42,.07);border-radius:.2rem;
+  padding:.05rem .28rem;font-family:'Courier New',monospace;font-size:.9em;
+}
+.errata-cli{
+  background:#0f172a;color:#e2e8f0;
+  border-radius:.3rem;padding:.6rem .75rem;margin:.5rem 0;
+  font-family:'Courier New',monospace;font-size:.78rem;line-height:1.6;
+  white-space:pre;overflow-x:auto;
+}
+.errata p.errata-xref{
+  margin-top:.5rem;padding-top:.45rem;
+  border-top:1px dashed rgba(15,23,42,.18);
+  font-size:.82rem;color:#475569;
+}
+/* 題號旁的小警示徽章 */
+.errata-flag{
+  display:inline-flex;align-items:center;gap:.25rem;
+  font-size:.7rem;font-weight:700;
+  padding:.1rem .45rem;border-radius:.25rem;
+  background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;
+  vertical-align:middle;margin-left:.5rem;
+}
+/* 頂部版本提示條 */
+.errata-banner{
+  background:#fffbeb;border-bottom:1px solid #fde68a;
+  color:#92400e;font-size:.8rem;
+  padding:.5rem 1rem;text-align:center;
+}
+.errata-banner b{color:#78350f;}
+
+    
+/* ===== 中英對照解說 ===== */
+.en-head, .zh-head{
+  display:flex; align-items:center; gap:.5rem; margin:.2rem 0 .45rem;
+}
+.en-head::after, .zh-head::after{
+  content:''; flex:1; height:1px; background:#cbd5e1;
+}
+.en-badge, .zh-badge{
+  font-size:.68rem; font-weight:700; letter-spacing:.05em;
+  padding:.1rem .5rem; border-radius:.25rem; white-space:nowrap;
+}
+.en-badge{ background:#e2e8f0; color:#475569; }
+.zh-badge{ background:#1d4ed8; color:#ffffff; }
+.zh-wrap{ margin-top:1rem; padding-top:.65rem; border-top:1px solid #cbd5e1; }
+.zh-body{ font-size:.9rem; line-height:1.85; color:#1e293b; }
+.zh-body p{ margin:.45rem 0; }
+.zh-body ul{ padding-left:1.15rem; margin:.4rem 0; }
+.zh-body ol{ padding-left:1.35rem; margin:.4rem 0; }
+.zh-body li{ margin:.3rem 0; }
+.zh-body strong{ color:#0f172a; font-weight:600; }
+.zh-body em{ color:#475569; }
+.zh-body code{
+  font-family:'Courier New',monospace; background:rgba(15,23,42,.07);
+  border-radius:.2rem; padding:.05rem .3rem; font-size:.9em;
+}
+
+    
+/* ===== 考綱分類標籤（與勘誤框區隔）===== */
+.qcat{
+  display:inline-flex; align-items:center; gap:.35rem;
+  font-size:.7rem; font-weight:600; letter-spacing:.03em;
+  padding:.16rem .6rem; border-radius:999px;
+  border:1px solid #cbd5e1; background:#f8fafc; color:#475569;
+}
+.qcat::before{ content:'考綱'; font-weight:700; opacity:.55; }
+.qcat.is-apstra{ border-color:#c2410c; background:#fff7ed; color:#c2410c; }
+.qcat-wrap{ margin:0 0 .9rem; }
+
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col overflow-x-hidden">
+
+    <!-- Navbar -->
+    <nav class="sticky top-0 z-50 bg-slate-900 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="flex items-center gap-3">
+                    <i class="fa-solid fa-graduation-cap text-red-500 text-2xl"></i>
+                    <h1 class="text-xl font-bold tracking-tight">Juniper <span class="text-slate-400 font-normal hidden sm:inline">JN0-481_JNCIS-DC Official Practice</span></h1>
+                </div>
+                
+                <div class="flex items-center gap-3">
+                     <div class="text-sm font-medium bg-slate-800 px-3 py-1.5 rounded-full border border-slate-700">
+                        <span id="current-progress">Question 1</span> / <span id="total-count">--</span>
+                    </div>
+                    <button onclick="toggleOrder()" id="order-btn" title="切換正序/逆序" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1.5 rounded-lg text-sm transition-colors flex items-center gap-2 shadow-sm font-medium">
+                        <i class="fa-solid fa-arrow-down"></i> <span class="hidden sm:inline">正序</span>
+                    </button>
+                    <button onclick="promptJump()" title="跳到指定題號" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 rounded-lg text-sm transition-colors flex items-center gap-2 shadow-sm font-medium">
+                        <i class="fa-solid fa-arrow-right-to-bracket"></i> <span class="hidden sm:inline">跳題</span>
+                    </button>
+                    <button onclick="togglePalette()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-sm transition-colors flex items-center gap-2 shadow-sm font-medium">
+                        <i class="fa-solid fa-table-cells"></i> <span class="hidden sm:inline">Questions</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <div class="errata-banner">來源：<b>Juniper 官方 JNCIS-DC Practice Exam</b> 截圖，共 <b>40 題</b>。答案與英文解說皆為<b>官方原文</b>，下方另附<b>中文翻譯</b>。</div>
+
+    <!-- Main Content (2-Column Grid Layout) -->
+    <main class="flex-grow w-full max-w-7xl mx-auto flex flex-col lg:flex-row items-start justify-center pt-8 pb-20 px-4 gap-6">
+        
+        <!-- 左側面板：統計與狀態 -->
+        <aside class="w-full lg:w-64 flex-shrink-0 bg-white rounded-2xl shadow-xl border-t-4 border-slate-900 sticky top-24 z-10 flex flex-col overflow-hidden">
+            <div class="p-4 bg-slate-50 border-b border-slate-200 text-center">
+                <h2 class="font-bold text-slate-800 text-lg">JNCIS-DC 官方練習題</h2>
+                <div class="text-xs text-slate-500 mt-1">JN0-481_JNCIS-DC</div>
+                <div class="text-xs text-slate-500 mt-1">Juniper Official Practice Exam &middot; 40 questions</div>
+            </div>
+            
+            <div class="p-4 flex flex-col gap-3 flex-grow">
+                <button onclick="restartQuiz()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-2 rounded shadow transition-colors text-sm">
+                    <i class="fa-solid fa-rotate-right mr-2"></i>清空作答進度
+                </button>
+                
+                <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 text-center mt-2">
+                    <div class="text-xs text-slate-500 font-bold mb-1">作答進度</div>
+                    <div class="text-xl font-bold text-slate-800" id="stat-progress">0 / 0</div>
+                </div>
+
+                <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 text-center cursor-pointer hover:bg-red-50 transition-colors" onclick="nextFlag()" title="點擊尋找下一個標記">
+                    <div class="text-xs text-slate-500 font-bold mb-1">標記題數</div>
+                    <div class="text-xl font-bold text-red-600" id="stat-flagged">0</div>
+                </div>
+
+                <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 text-center">
+                    <div class="text-xs text-slate-500 font-bold mb-1">答對題數</div>
+                    <div class="text-xl font-bold text-green-600" id="stat-correct">0</div>
+                </div>
+
+                <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 text-center">
+                    <div class="text-xs text-slate-500 font-bold mb-1">正確率</div>
+                    <div class="text-xl font-bold text-blue-600" id="stat-accuracy">0%</div>
+                </div>
+            </div>
+
+            <!-- 快捷鍵說明 -->
+            <div class="bg-amber-50 p-4 text-xs text-amber-800 border-t border-amber-200 leading-relaxed">
+                <div class="font-bold mb-2 text-sm"><i class="fa-solid fa-keyboard mr-1"></i> 快捷鍵說明</div>
+                <div class="mb-1"><kbd>1</kbd> ~ <kbd>6</kbd> 選擇選項 A~F</div>
+                <div class="mb-1"><kbd>←</kbd> / <kbd>→</kbd> 上 / 下一題</div>
+                <div class="mb-1"><kbd>Enter</kbd> 提交 / 下一題</div>
+                <div class="mb-1"><kbd>M</kbd> 標記 / 取消標記本題</div>
+                <div><kbd>N</kbd> 清除本題進度</div>
+            </div>
+        </aside>
+
+        <!-- 右側面板：作答區 -->
+        <div class="w-full lg:max-w-4xl flex flex-col relative z-10 min-w-0 shadow-xl rounded-2xl overflow-hidden bg-white">
+            
+            <!-- 題目快捷控制列 -->
+            <div class="bg-slate-50 border-b border-slate-200 p-3 flex justify-between items-center flex-wrap gap-2">
+                <div class="text-sm font-bold text-slate-600 flex items-center gap-2">
+                    <span id="q-id-display" class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs">第 1 題 (ID: Q1)</span>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="clearCurrentQuestion()" class="bg-slate-500 hover:bg-slate-600 text-white px-3 py-1.5 rounded text-sm transition-colors shadow-sm flex items-center gap-1" title="清除本題 [N]">
+                        <i class="fa-solid fa-eraser"></i> <span class="hidden sm:inline">清除本題</span>
+                    </button>
+                    <button onclick="toggleFlag()" id="btn-flag" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded text-sm transition-colors shadow-sm flex items-center gap-1" title="標記本題 [M]">
+                        <i class="fa-solid fa-flag"></i> <span class="hidden sm:inline">標記本題</span>
+                    </button>
+                    <button onclick="prevFlag()" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1.5 rounded text-sm transition-colors shadow-sm flex items-center gap-1">
+                        <i class="fa-solid fa-caret-left"></i> <span class="hidden sm:inline">尋找標記</span>
+                    </button>
+                    <button onclick="nextFlag()" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1.5 rounded text-sm transition-colors shadow-sm flex items-center gap-1">
+                        <span class="hidden sm:inline">尋找標記</span> <i class="fa-solid fa-caret-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="w-full bg-slate-200 h-1.5">
+                <div id="progress-bar" class="bg-blue-600 h-1.5 transition-all duration-300" style="width: 0%"></div>
+            </div>
+
+            <!-- Content Area -->
+            <div id="quiz-content" class="p-6 md:p-8 flex-grow flex flex-col text-left">
+                <!-- Content injected via JS -->
+            </div>
+
+            <!-- Footer Controls -->
+            <div id="footer-controls" class="bg-slate-50 border-t border-slate-200 p-4 md:p-6 flex justify-between items-center">
+                <button id="prev-btn" onclick="prevQuestion()" class="px-5 py-2 rounded-lg border border-slate-300 text-slate-600 hover:bg-white hover:text-slate-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                    <i class="fa-solid fa-arrow-left mr-2"></i> <span class="hidden sm:inline">Previous</span>
+                </button>
+
+                <div class="flex gap-3">
+                    <button id="submit-btn" onclick="submitAnswer()" class="px-6 py-2 rounded-lg bg-blue-600 text-white font-bold hover:bg-blue-700 shadow-md transition-transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed">
+                        Submit Answer <span class="ml-2 text-blue-200 text-xs font-normal border border-blue-400 rounded px-1 hidden sm:inline">Enter</span>
+                    </button>
+                    <button id="next-btn" onclick="nextQuestion()" class="px-6 py-2 rounded-lg bg-slate-800 text-white hover:bg-slate-900 transition-colors hidden">
+                        <span class="hidden sm:inline">Next</span> <i class="fa-solid fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Palette Modal (Sidebar) -->
+    <div id="palette-modal" class="fixed inset-0 z-[60] hidden">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity opacity-0" id="palette-backdrop" onclick="togglePalette()"></div>
+        
+        <!-- Panel -->
+        <div class="absolute right-0 top-0 h-full w-80 bg-white shadow-2xl transform transition-transform duration-300 translate-x-full flex flex-col" id="palette-panel">
+            <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
+                <h3 class="font-bold text-slate-800 flex items-center gap-2"><i class="fa-solid fa-list-ol text-blue-600"></i> Navigation</h3>
+                <button onclick="togglePalette()" class="text-slate-400 hover:text-slate-600 transition-colors w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-200">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+            
+            <div class="flex-grow overflow-y-auto p-4 custom-scrollbar">
+                <div id="palette-grid" class="grid grid-cols-5 gap-2">
+                    <!-- Numbers injected here -->
+                </div>
+            </div>
+            
+            <div class="p-4 border-t border-slate-200 bg-slate-50 text-xs text-slate-500 grid grid-cols-2 gap-2">
+                <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-blue-100 border border-blue-500"></div> Current</div>
+                <div class="flex items-center gap-2"><div class="w-3 h-3 rounded bg-white border border-slate-300"></div> Unanswered</div>
+                <div class="flex items-center gap-2"><div class="w-3 h-3 rounded bg-green-100 border border-green-500"></div> Correct</div>
+                <div class="flex items-center gap-2"><div class="w-3 h-3 rounded bg-red-100 border border-red-500"></div> Incorrect</div>
+                <div class="flex items-center gap-2 col-span-2 mt-1"><i class="fa-solid fa-flag text-red-500"></i> Flagged / Marked</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // 【請在此處貼上您原本完整的 128 題 questionsData 陣列】
+        // 為了避免 Token 限制，此處僅放第一題作為格式示意，請將其完整覆蓋。
+        // ==========================================
+const questionsData = [
+  {
+    "id": 1,
+    "q_en": "The 10.100.0.0/16 route is being advertised into your BGP IP fabric. ECMP load balancing has been properly enabled on all devices. In this scenario, how many routes will the leaf device in AS 65000 receive for the 10.100.0.0/16 prefix?",
+    "options": [
+      "A. 4",
+      "B. 1",
+      "C. 5",
+      "D. 2"
+    ],
+    "answer": "D",
+    "explanation": "<div class=\"errata errata-ok\" style=\"margin-bottom:.9rem\"><div class=\"errata-head\"><span class=\"errata-tag\">官方答案<\/span><span class=\"errata-src\">Juniper 官方練習題 · 含官方解說<\/span><\/div><\/div><div class=\"en-head\"><span class=\"en-badge\">OFFICIAL EXPLANATION<\/span><\/div><div class=\"explanation-body\"><p>Since the leaf device is peering with both spine devices in 65001 and 65003 using EBGP the leaf device in 65000 will receive the 10.100.0.0/16 route from both peers. This means that the leaf device will receive two copies of the route through EBGP.<\/p><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文翻譯<\/span><\/div><div class=\"zh-body\"><p>由於該 leaf 裝置同時與 AS 65001 和 AS 65003 的兩台 spine 裝置建立 EBGP peering，位於 AS 65000 的 leaf 會<b>從兩個 peer 各收到一份<\/b> 10.100.0.0/16 路由。也就是說，這台 leaf 透過 EBGP 會收到該路由的<b>兩個副本<\/b>。<\/p><\/div><\/div>",
+    "images": [
+      "ex01.webp"
+    ]
+  },
+  {
+    "id": 2,
+    "q_en": "You are working to build an ESI-LAG for a multihomed server. The ESI-LAG is not coming up as multihomed. Referring to the exhibit, what are two solutions to this problem? (Choose two.)",
+    "options": [
+      "A. The gateway IP addresses on both devices must be different.",
+      "B. The loopback IP addresses on both devices must be the same.",
+      "C. The LACP system ID on both devices must be the same.",
+      "D. The ESI ID on both devices must be the same."
+    ],
+    "answer": "C, D",
+    "explanation": "<div class=\"errata errata-ok\" style=\"margin-bottom:.9rem\"><div class=\"errata-head\"><span class=\"errata-tag\">官方答案<\/span><span class=\"errata-src\">Juniper 官方練習題 · 含官方解說<\/span><\/div><\/div><div class=\"en-head\"><span class=\"en-badge\">OFFICIAL EXPLANATION<\/span><\/div><div class=\"explanation-body\"><p>In order for the ESI-LAG to be considered multihomed, the ESI ID and LACP must be identical on both devices.<\/p><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文翻譯<\/span><\/div><div class=\"zh-body\"><p>ESI-LAG 要被視為 multihomed（多重連接），兩台裝置上的 <b>ESI ID<\/b> 與 <b>LACP system ID<\/b> 必須<b>完全相同<\/b>。<\/p><\/div><\/div>",
+    "images": [
+      "ex02.webp"
+    ]
+  },
+  {
+    "id": 3,
+    "q_en": "What are three supported methods that are used for a VXLAN control plane? (Choose three.)",
+    "options": [
+      "A. EVPN signaled",
+      "B. LDP signaled",
+      "C. multicast signaled",
+      "D. static configuration",
+      "E. OSPF signaled"
+    ],
+    "answer": "A, C, D",
+    "explanation": "<div class=\"errata errata-ok\" style=\"margin-bottom:.9rem\"><div class=\"errata-head\"><span class=\"errata-tag\">官方答案<\/span><span class=\"errata-src\">Juniper 官方練習題 · 含官方解說<\/span><\/div><\/div><div class=\"en-head\"><span class=\"en-badge\">OFFICIAL EXPLANATION<\/span><\/div><div class=\"explanation-body\"><p>Originally, VXLAN gateways learned about remote destinations through multicast. It also required manual configuration on every gateway to associate locally connected broadcast domains with multicast group addresses. Both of which are still available. To improve performance of the VXLAN control plane, engineers developed EVPN.<\/p><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文翻譯<\/span><\/div><div class=\"zh-body\"><p>VXLAN 閘道最初是透過<b>多播（multicast）<\/b>學習遠端目的地，同時還需要在每台閘道上<b>手動設定<\/b>，把本地連接的廣播網域對應到多播群組位址。這兩種方式至今仍可使用。為了提升 VXLAN 控制平面的效能，工程師後來發展出 <b>EVPN<\/b>。<\/p><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 4,
+    "q_en": "What statement is correct when building a three-stage IP fabric?",
+    "options": [
+      "A. Every spine-leaf link should have the same bandwidth.",
+      "B. Each leaf should have a physical link to at least two other leaf devices.",
+      "C. Leaf devices and spines devices must be the same model.",
+      "D. Each spine should have a physical link to every other spine."
+    ],
+    "answer": "A",
+    "explanation": "<div class=\"errata errata-ok\" style=\"margin-bottom:.9rem\"><div class=\"errata-head\"><span class=\"errata-tag\">官方答案<\/span><span class=\"errata-src\">Juniper 官方練習題 · 含官方解說<\/span><\/div><\/div><div class=\"en-head\"><span class=\"en-badge\">OFFICIAL EXPLANATION<\/span><\/div><div class=\"explanation-body\"><p>In an IP fabric, each leaf device must connect to each spine device. However, there should not be any direct connection between leaf devices. There should not be any direct connections between spine devices either. In addition to facilitate load balancing through out the network all leaf to spine devices should maintain the same link speeds.<\/p><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文翻譯<\/span><\/div><div class=\"zh-body\"><p>在 IP fabric 中，每台 leaf 裝置都必須連到每一台 spine 裝置；但 <b>leaf 之間不可直接相連<\/b>，<b>spine 之間也不可直接相連<\/b>。此外，為了讓整個網路都能做負載平衡，所有 leaf 到 spine 的連結都應維持<b>相同的速率<\/b>。<\/p><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 5,
+    "q_en": "In the Juniper Apstra UI, which two resource types would be created in the \"Resources\" menu? (Choose two.)",
+    "options": [
+      "A. bridge domain identifier (BDI)",
+      "B. IP pools",
+      "C. ASN pools",
+      "D. DHCP pools"
+    ],
+    "answer": "B, C",
+    "explanation": "<div class=\"errata errata-ok\" style=\"margin-bottom:.9rem\"><div class=\"errata-head\"><span class=\"errata-tag\">官方答案<\/span><span class=\"errata-src\">Juniper 官方練習題 · 含官方解說<\/span><\/div><\/div><div class=\"en-head\"><span class=\"en-badge\">OFFICIAL EXPLANATION<\/span><\/div><div class=\"explanation-body\"><p>The available option for Resources are IP pools, ASN pools, VNI pools, and Integer pools.<\/p><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文翻譯<\/span><\/div><div class=\"zh-body\"><p>Resources 選單中可用的選項為：<b>IP pools、ASN pools、VNI pools、Integer pools<\/b>。<\/p><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 6,
+    "q_en": "Which statement about Juniper Apstra role-based access control is correct?",
+    "options": [
+      "A. The user role can create roles.",
+      "B. The administrator role can see all permissions.",
+      "C. The administrator role is the only predefined role.",
+      "D. The viewer role is predefined and can be deleted."
+    ],
+    "answer": "B",
+    "explanation": "<div class=\"errata errata-ok\" style=\"margin-bottom:.9rem\"><div class=\"errata-head\"><span class=\"errata-tag\">官方答案<\/span><span class=\"errata-src\">Juniper 官方練習題 · 含官方解說<\/span><\/div><\/div><div class=\"en-head\"><span class=\"en-badge\">OFFICIAL EXPLANATION<\/span><\/div><div class=\"explanation-body\"><p>The admin user may perform any task within the UI.<\/p><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文翻譯<\/span><\/div><div class=\"zh-body\"><p>admin（管理員）使用者可以在 UI 中執行<b>任何<\/b>操作。<\/p><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 7,
+    "q_en": "What are two system-defined user roles that are available in Juniper Apstra? (Choose two.)",
+    "options": [
+      "A. root",
+      "B. user",
+      "C. authorized",
+      "D. viewer"
+    ],
+    "answer": "B, D",
+    "explanation": "<div class=\"errata errata-ok\" style=\"margin-bottom:.9rem\"><div class=\"errata-head\"><span class=\"errata-tag\">官方答案<\/span><span class=\"errata-src\">Juniper 官方練習題 · 含官方解說<\/span><\/div><\/div><div class=\"en-head\"><span class=\"en-badge\">OFFICIAL EXPLANATION<\/span><\/div><div class=\"explanation-body\"><p>In Apstra, There are five predefined roles that are available — administrator, device_ztp, license_reader, user, and viewer. You cannot delete these roles.<\/p><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文翻譯<\/span><\/div><div class=\"zh-body\"><p>Apstra 中有<b>五個<\/b>預先定義的角色：<b>administrator、device_ztp、license_reader、user、viewer<\/b>。這些角色<b>無法被刪除<\/b>。<\/p><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 8,
+    "q_en": "In the case of IP Clos data center five-stage fabric design, what are two roles of the super spines? (Choose two.)",
+    "options": [
+      "A. Super spines are always connected to an external data center gateway.",
+      "B. Super spines are used to connect leaf nodes within a data center pod.",
+      "C. Super spines are used to interconnect two different data center pods.",
+      "D. Super spines connect to all spine devices within the five-stage architecture."
+    ],
+    "answer": "C, D",
+    "explanation": "<div class=\"errata errata-ok\" style=\"margin-bottom:.9rem\"><div class=\"errata-head\"><span class=\"errata-tag\">官方答案<\/span><span class=\"errata-src\">Juniper 官方練習題 · 含官方解說<\/span><\/div><\/div><div class=\"en-head\"><span class=\"en-badge\">OFFICIAL EXPLANATION<\/span><\/div><div class=\"explanation-body\"><p>Superspine devices provide connectivity between data center three-stage pods. Each superspine connects to every spine in each pod.<\/p><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文翻譯<\/span><\/div><div class=\"zh-body\"><p>Super spine 裝置負責提供各個<b>三階 pod 之間<\/b>的連線。每一台 super spine 都會連到<b>每個 pod 中的每一台 spine<\/b>。<\/p><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 9,
+    "q_en": "You are installing a Juniper Apstra server in your data center. You have multiple users that will be expected to configure, manage, and carry out operational tasks in your data center. You have decided to implement remote user authentication for the role-based access control of your Apstra server. In this scenario, which three methods are supported? (Choose three.)",
+    "options": [
+      "A. SAML",
+      "B. LDAP",
+      "C. Auth0",
+      "D. TACACS+",
+      "E. RADIUS"
+    ],
+    "answer": "B, D, E",
+    "explanation": "<div class=\"errata errata-ok\" style=\"margin-bottom:.9rem\"><div class=\"errata-head\"><span class=\"errata-tag\">官方答案<\/span><span class=\"errata-src\">Juniper 官方練習題 · 含官方解說<\/span><\/div><\/div><div class=\"en-head\"><span class=\"en-badge\">OFFICIAL EXPLANATION<\/span><\/div><div class=\"explanation-body\"><p>You can use the following protocols to authenticate and authorize users: LDAP, Active Directory, TACACS+, and RADIUS.<\/p><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文翻譯<\/span><\/div><div class=\"zh-body\"><p>可用來驗證與授權使用者的通訊協定有：<b>LDAP、Active Directory、TACACS+、RADIUS<\/b>。<\/p><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 10,
+    "q_en": "In the Juniper Apstra design phase, which object dictates port count, port speed, and how the ports would be used?",
+    "options": [
+      "A. interface map",
+      "B. network devices",
+      "C. logical devices",
+      "D. rack type"
+    ],
+    "answer": "C",
+    "explanation": "<div class=\"errata errata-ok\" style=\"margin-bottom:.9rem\"><div class=\"errata-head\"><span class=\"errata-tag\">官方答案<\/span><span class=\"errata-src\">Juniper 官方練習題 · 含官方解說<\/span><\/div><\/div><div class=\"en-head\"><span class=\"en-badge\">OFFICIAL EXPLANATION<\/span><\/div><div class=\"explanation-body\"><p>When you create a logical device, you assign ports of the logical device to port groups. Port groups are assigned speed and a role of what it&#x27;s connected to. The role options for port groups are: Superspine, Spine, Leaf, Access Switch, Peer, Unused, Generic.<\/p><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文翻譯<\/span><\/div><div class=\"zh-body\"><p>建立 logical device 時，你會把它的埠指派到<b>port group<\/b>。每個 port group 都會被賦予<b>速率<\/b>以及一個代表「連接對象」的<b>角色<\/b>。可用的 port group 角色為：<b>Superspine、Spine、Leaf、Access Switch、Peer、Unused、Generic<\/b>。<\/p><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 11,
+    "q_en": "You need to add a new device profile. Which syntax would be used in this scenario?",
+    "options": [
+      "A. QL",
+      "B. JSON",
+      "C. YAML",
+      "D. XML"
+    ],
+    "answer": "B",
+    "explanation": "<div class=\"errata errata-ok\" style=\"margin-bottom:.9rem\"><div class=\"errata-head\"><span class=\"errata-tag\">官方答案<\/span><span class=\"errata-src\">Juniper 官方練習題 · 含官方解說<\/span><\/div><\/div><div class=\"en-head\"><span class=\"en-badge\">OFFICIAL EXPLANATION<\/span><\/div><div class=\"explanation-body\"><p>The &quot;Create Device Profile&quot; option opens the window to enter the fields for Sector, Capabilities, Ports. All this information can be supplied within a JSON formatted file that can be imported by pressing the &quot;Import Device Profile&quot; that only support the JSON format.<\/p><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文翻譯<\/span><\/div><div class=\"zh-body\"><p>「Create Device Profile」選項會開啟視窗，讓你填入 Sector、Capabilities、Ports 等欄位。這些資訊全都可以寫在一個 <b>JSON 格式<\/b>的檔案中，再按下「Import Device Profile」匯入 —— 而該匯入功能<b>只支援 JSON 格式<\/b>。<\/p><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 12,
+    "q_en": "Which statement is correct about making changes to a predefined device profile in Juniper Apstra?",
+    "options": [
+      "A. The processor load on the Apstra server will be negatively impacted when changes are made to a predefined device profile.",
+      "B. Changing the predefined device profile will also affect deployed devices that use the same profile.",
+      "C. You must reboot the Apstra server after changes are made to a predefined device profile before they will become active.",
+      "D. The changes you make to a predefined device profile will be discarded and overwritten when upgrading the Apstra server version."
+    ],
+    "answer": "D",
+    "explanation": "<div class=\"errata errata-ok\" style=\"margin-bottom:.9rem\"><div class=\"errata-head\"><span class=\"errata-tag\">官方答案<\/span><span class=\"errata-src\">Juniper 官方練習題 · 含官方解說<\/span><\/div><\/div><div class=\"en-head\"><span class=\"en-badge\">OFFICIAL EXPLANATION<\/span><\/div><div class=\"explanation-body\"><p>Predefined device profiles can be modified but will be rewritten if there is an upgrade to the Apstra server. Therefore, it is best to clone predefined device profiles instead of modifying them directly.<\/p><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文翻譯<\/span><\/div><div class=\"zh-body\"><p>預先定義的 device profile <b>可以修改<\/b>，但只要 Apstra server 進行升級就會<b>被覆寫<\/b>。因此最佳做法是<b>複製（clone）<\/b>一份預先定義的 device profile 來改，而不要直接修改原本的。<\/p><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 13,
+    "q_en": "Which fabric type should be chosen in a template to create a five-stage Clos?",
+    "options": [
+      "A. collapsed",
+      "B. rack-based",
+      "C. circuit switched",
+      "D. pod-based"
+    ],
+    "answer": "D",
+    "explanation": "<div class=\"errata errata-ok\" style=\"margin-bottom:.9rem\"><div class=\"errata-head\"><span class=\"errata-tag\">官方答案<\/span><span class=\"errata-src\">Juniper 官方練習題 · 含官方解說<\/span><\/div><\/div><div class=\"en-head\"><span class=\"en-badge\">OFFICIAL EXPLANATION<\/span><\/div><div class=\"explanation-body\"><p>A Clos five-stage IP fabric requires a pod-based template. A Clos three-stage IP fabric requires a rack-based template. A collapsed IP fabric requires a collapsed template.<\/p><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文翻譯<\/span><\/div><div class=\"zh-body\"><p>五階（five-stage）Clos IP fabric 需要使用 <b>pod-based<\/b> template；三階（three-stage）Clos IP fabric 需要 <b>rack-based<\/b> template；collapsed IP fabric 則需要 <b>collapsed<\/b> template。<\/p><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 14,
+    "q_en": "In the Juniper Apstra UI, which two rack types would be specified under the Create Rack Type menu? (Choose two.)",
+    "options": [
+      "A. dual stack",
+      "B. border leaf",
+      "C. L3 collapsed",
+      "D. L3 Clos"
+    ],
+    "answer": "C, D",
+    "explanation": "<div class=\"errata errata-ok\" style=\"margin-bottom:.9rem\"><div class=\"errata-head\"><span class=\"errata-tag\">官方答案<\/span><span class=\"errata-src\">Juniper 官方練習題 · 含官方解說<\/span><\/div><\/div><div class=\"en-head\"><span class=\"en-badge\">OFFICIAL EXPLANATION<\/span><\/div><div class=\"explanation-body\"><p>During the design phase, when creating racks, only three-stage IP fabric or a collapsed fabric are the available options.<\/p><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文翻譯<\/span><\/div><div class=\"zh-body\"><p>在設計階段建立 rack 時，可選的只有<b>三階 IP fabric<\/b> 或 <b>collapsed fabric<\/b> 兩種。<\/p><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 15,
+    "q_en": "What is the purpose of a Juniper Apstra rack?",
+    "options": [
+      "A. It stores information on how leaf nodes connect to generic devices.",
+      "B. It stores IP address and ASN pool information.",
+      "C. It stores device port data rates and vendor information.",
+      "D. It stores information on how pods connect to super spines."
+    ],
+    "answer": "A",
+    "explanation": "<div class=\"errata errata-ok\" style=\"margin-bottom:.9rem\"><div class=\"errata-head\"><span class=\"errata-tag\">官方答案<\/span><span class=\"errata-src\">Juniper 官方練習題 · 含官方解說<\/span><\/div><\/div><div class=\"en-head\"><span class=\"en-badge\">OFFICIAL EXPLANATION<\/span><\/div><div class=\"explanation-body\"><p>A rack design incorporates the details of number of top of rack (switch) leafs, redundancy protocol (MLAG/vPC/ESI), combinations of generic systems, along with number of NICs and speed.<\/p><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文翻譯<\/span><\/div><div class=\"zh-body\"><p>rack 設計涵蓋以下細節：<b>ToR（top of rack）leaf 交換器的數量<\/b>、<b>備援協定<\/b>（MLAG／vPC／ESI）、<b>generic system 的組合<\/b>，以及<b>網卡數量與速率<\/b>。<\/p><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 16,
+    "q_en": "You are using Juniper Apstra to design a data center fabric. In this scenario, which object type associates a specific vendor model to a logical device?",
+    "options": [
+      "A. agent profiles",
+      "B. device profiles",
+      "C. templates",
+      "D. interface map"
+    ],
+    "answer": "D",
+    "explanation": "<div class=\"errata errata-ok\" style=\"margin-bottom:.9rem\"><div class=\"errata-head\"><span class=\"errata-tag\">官方答案<\/span><span class=\"errata-src\">Juniper 官方練習題 · 含官方解說<\/span><\/div><\/div><div class=\"en-head\"><span class=\"en-badge\">OFFICIAL EXPLANATION<\/span><\/div><div class=\"explanation-body\"><p>Interface maps are the glue that brings together device profiles, logical devices, and real vendor equipment so that Juniper Apstra understands how you intend for each physical device&#x27;s interfaces to operate.<\/p><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文翻譯<\/span><\/div><div class=\"zh-body\"><p>Interface map 是把 <b>device profile<\/b>、<b>logical device<\/b> 與<b>實體廠商設備<\/b>三者黏合起來的關鍵，讓 Juniper Apstra 知道你希望每一台實體裝置的介面如何運作。<\/p><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 17,
+    "q_en": "In Juniper Apstra, you are viewing the Assign Systems screen for a blueprint and see a device showing the deploy mode as Ready. Which statement is correct in this scenario?",
+    "options": [
+      "A. The device is actively participating in underlay and overlay routing.",
+      "B. The device is ready to be gracefully removed from the blueprint.",
+      "C. The device is assigned to the blueprint but not actively participating in routing.",
+      "D. The device actively participates in routing, but routing policies direct traffic away from itself."
+    ],
+    "answer": "C",
+    "explanation": "<div class=\"errata errata-ok\" style=\"margin-bottom:.9rem\"><div class=\"errata-head\"><span class=\"errata-tag\">官方答案<\/span><span class=\"errata-src\">Juniper 官方練習題 · 含官方解說<\/span><\/div><\/div><div class=\"en-head\"><span class=\"en-badge\">OFFICIAL EXPLANATION<\/span><\/div><div class=\"explanation-body\"><p>It&#x27;s common to have a committed blueprint without any deployed devices. You can deploy devices as required, in batches, one by one, or all in one go. If you want to assign devices without deploying them, set the deploy mode to Ready, which puts devices in the In Service Ready state.<\/p><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文翻譯<\/span><\/div><div class=\"zh-body\"><p>blueprint 已 commit 但尚未部署任何裝置，是很常見的情況。你可以依需求部署裝置 —— 分批、逐台、或一次全部。若你想<b>指派裝置但先不部署<\/b>，就把 deploy mode 設為 <b>Ready<\/b>，這會讓裝置進入 <b>In Service Ready<\/b> 狀態。<\/p><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 18,
+    "q_en": "You are adding a new switch to Juniper Apstra software. The Managed Devices page shows the \"OOS-Quarantined\" status. What is the proper next step to make the device ready for use in a blueprint?",
+    "options": [
+      "A. Take the device out of drain state.",
+      "B. Acknowledge the device.",
+      "C. Install the agent for the device.",
+      "D. Take the device out of maintenance mode."
+    ],
+    "answer": "B",
+    "explanation": "<div class=\"errata errata-ok\" style=\"margin-bottom:.9rem\"><div class=\"errata-head\"><span class=\"errata-tag\">官方答案<\/span><span class=\"errata-src\">Juniper 官方練習題 · 含官方解說<\/span><\/div><\/div><div class=\"en-head\"><span class=\"en-badge\">OFFICIAL EXPLANATION<\/span><\/div><div class=\"explanation-body\"><p>When you install an on-box agent on a device (or an off-box agent on the server) the device connects and registers with Apstra in the Quarantined state. When you acknowledge a device, you&#x27;re putting it in the Ready state. This acknowledgment signals your intent to have Apstra manage.<\/p><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文翻譯<\/span><\/div><div class=\"zh-body\"><p>當你在裝置上安裝 on-box agent（或在伺服器上安裝 off-box agent）後，裝置會連上並向 Apstra 註冊，此時處於 <b>Quarantined（隔離）<\/b>狀態。當你<b>acknowledge（確認）<\/b>該裝置，就是把它推進 <b>Ready<\/b> 狀態 —— 這個確認動作代表你有意讓 Apstra 納管這台裝置。<\/p><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 19,
+    "q_en": "Referring to the exhibit, which deploy mode should be selected to gracefully take Spine2 out of service?",
+    "options": [
+      "A. Drain",
+      "B. Undeploy",
+      "C. Ready",
+      "D. Deploy"
+    ],
+    "answer": "A",
+    "explanation": "<div class=\"errata errata-ok\" style=\"margin-bottom:.9rem\"><div class=\"errata-head\"><span class=\"errata-tag\">官方答案<\/span><span class=\"errata-src\">Juniper 官方練習題 · 含官方解說<\/span><\/div><\/div><div class=\"en-head\"><span class=\"en-badge\">OFFICIAL EXPLANATION<\/span><\/div><div class=\"explanation-body\"><p>Both Undeploy and Drain will take Spine2 out of service, but when Committed the Undeploy option immediately drops the device. There is no &quot;grace&quot; to it. Drain uses the features of BGP to graceful take the protocols offline, so the device can then be removed.<\/p><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文翻譯<\/span><\/div><div class=\"zh-body\"><p><b>Undeploy<\/b> 與 <b>Drain<\/b> 都會讓 Spine2 停止服務，但 Undeploy 在 commit 時會<b>立即切掉<\/b>該裝置，完全沒有「緩衝」。<b>Drain<\/b> 則是利用 BGP 的機制<b>優雅地讓協定下線<\/b>，之後才把裝置移除。<\/p><\/div><\/div>",
+    "images": [
+      "ex19.webp"
+    ]
+  },
+  {
+    "id": 20,
+    "q_en": "You have designed your fabric in Juniper Apstra prior to deploying the network devices. Which Apstra element in the Staged tab would be used to assist the team that is installing the devices and cabling?",
+    "options": [
+      "A. Connectivity Templates",
+      "B. Virtual Networks table",
+      "C. Managed Devices list",
+      "D. Links table"
+    ],
+    "answer": "D",
+    "explanation": "<div class=\"errata errata-ok\" style=\"margin-bottom:.9rem\"><div class=\"errata-head\"><span class=\"errata-tag\">官方答案<\/span><span class=\"errata-src\">Juniper 官方練習題 · 含官方解說<\/span><\/div><\/div><div class=\"en-head\"><span class=\"en-badge\">OFFICIAL EXPLANATION<\/span><\/div><div class=\"explanation-body\"><p>Data center technicians may find a printed cabling map useful when wiring in switches, or remote network operators may find it useful for viewing IP assignments. The links table can be found at Staged &gt; Physical &gt; Links.<\/p><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文翻譯<\/span><\/div><div class=\"zh-body\"><p>資料中心的技術人員在接線時，可能會需要一份列印出來的佈線圖；遠端的網路維運人員也可能需要它來查看 IP 指派狀況。這張 links table 位於 <code>Staged &gt; Physical &gt; Links<\/code>。<\/p><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 21,
+    "q_en": "Which two statements are correct regarding a pristine configuration in Juniper Apstra? (Choose two.)",
+    "options": [
+      "A. It is the device's previously active configuration.",
+      "B. It is the configuration file placed on the device when decommissioning the device.",
+      "C. It is the configuration file on a device before acknowledgment in Apstra.",
+      "D. It is the device's currently active configuration."
+    ],
+    "answer": "B, C",
+    "explanation": "<div class=\"errata errata-ok\" style=\"margin-bottom:.9rem\"><div class=\"errata-head\"><span class=\"errata-tag\">官方答案<\/span><span class=\"errata-src\">Juniper 官方練習題 · 含官方解說<\/span><\/div><\/div><div class=\"en-head\"><span class=\"en-badge\">OFFICIAL EXPLANATION<\/span><\/div><div class=\"explanation-body\"><p>A pristine configuration is the configuration that exists on a device just prior and just after agent installation (before acknowledgment). When you decide to decommission a device (remove it from the control of Apstra), by default, Apstra will place the pristine configuration back on the device so that it operates exactly as it did before Apstra ever controlled it.<\/p><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文翻譯<\/span><\/div><div class=\"zh-body\"><p>pristine configuration（原始組態）是指裝置在 <b>agent 安裝前後、acknowledge 之前<\/b>所存在的那份組態。當你決定<b>汰除（decommission）<\/b>一台裝置（把它移出 Apstra 的控制）時，Apstra 預設會把這份 pristine configuration <b>寫回裝置<\/b>，讓它恢復成被 Apstra 接管之前的運作狀態。<\/p><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 22,
+    "q_en": "The cable map in the Juniper Apstra blueprint does not match your existing cabling. In this scenario, how would you correct the cabling map?",
+    "options": [
+      "A. Import a custom cabling map in CSV format.",
+      "B. Use the \"Fetch discovered LLDP data\" feature.",
+      "C. Add a custom template for your existing cabling.",
+      "D. Specify your own cabling map under Manage Interface Maps."
+    ],
+    "answer": "B",
+    "explanation": "<div class=\"errata errata-ok\" style=\"margin-bottom:.9rem\"><div class=\"errata-head\"><span class=\"errata-tag\">官方答案<\/span><span class=\"errata-src\">Juniper 官方練習題 · 含官方解說<\/span><\/div><\/div><div class=\"en-head\"><span class=\"en-badge\">OFFICIAL EXPLANATION<\/span><\/div><div class=\"explanation-body\"><p>From the blueprint, navigate to Staged &gt; Physical &gt; Links and click the Fetch discovered LLDP data button. If staged data is different from LLDP discovery results, the message includes the number of links that are different.<\/p><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文翻譯<\/span><\/div><div class=\"zh-body\"><p>從 blueprint 進入 <code>Staged &gt; Physical &gt; Links<\/code>，按下「<b>Fetch discovered LLDP data<\/b>」按鈕。若 staged 的資料與 LLDP 探索結果不一致，訊息中會顯示<b>有幾條連結不相符<\/b>。<\/p><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 23,
+    "q_en": "You have recently committed a change after creating a new blueprint in Juniper Apstra. In the main dashboard, you see a number of anomalies related to BGP. What is a likely cause of these anomalies?",
+    "options": [
+      "A. The fabric has not converged yet.",
+      "B. You have misconfigured ASNs.",
+      "C. Spine-leaf links are incorrectly set.",
+      "D. A generic system has not been configured."
+    ],
+    "answer": "A",
+    "explanation": "<div class=\"errata errata-ok\" style=\"margin-bottom:.9rem\"><div class=\"errata-head\"><span class=\"errata-tag\">官方答案<\/span><span class=\"errata-src\">Juniper 官方練習題 · 含官方解說<\/span><\/div><\/div><div class=\"en-head\"><span class=\"en-badge\">OFFICIAL EXPLANATION<\/span><\/div><div class=\"explanation-body\"><p>Just after you commit, you will probably see the IP Fabric &gt; BGP gauge turn red for a period until all the agents report that the devices have established their intended BGP sessions.<\/p><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文翻譯<\/span><\/div><div class=\"zh-body\"><p>剛 commit 完之後，你通常會看到 <b>IP Fabric &gt; BGP<\/b> 這個儀表<b>暫時變紅<\/b>，直到所有 agent 回報裝置已建立預期的 BGP session 為止。<\/p><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 24,
+    "q_en": "Which blueprint tab shows the difference between the Active and Staged tabs?",
+    "options": [
+      "A. Analytics",
+      "B. Dashboard",
+      "C. Time Voyager",
+      "D. Uncommitted"
+    ],
+    "answer": "D",
+    "explanation": "<div class=\"errata errata-ok\" style=\"margin-bottom:.9rem\"><div class=\"errata-head\"><span class=\"errata-tag\">官方答案<\/span><span class=\"errata-src\">Juniper 官方練習題 · 含官方解說<\/span><\/div><\/div><div class=\"en-head\"><span class=\"en-badge\">OFFICIAL EXPLANATION<\/span><\/div><div class=\"explanation-body\"><p>The Uncommitted tab shows the difference between the Active tab and the Staged tab.<\/p><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文翻譯<\/span><\/div><div class=\"zh-body\"><p><b>Uncommitted<\/b> 頁籤會顯示 <b>Active<\/b> 頁籤與 <b>Staged<\/b> 頁籤之間的差異。<\/p><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 25,
+    "q_en": "Which two statements are correct about Time Voyager? (Choose two.)",
+    "options": [
+      "A. Time Voyager retains the five most recent blueprint commits.",
+      "B. Time Voyager retains all of the blueprint revisions from the last Juniper Apstra backup.",
+      "C. Time Voyager retains up to twenty-five saved revisions by default.",
+      "D. Time Voyager retains the last ten blueprint commits."
+    ],
+    "answer": "A, C",
+    "explanation": "<div class=\"errata errata-ok\" style=\"margin-bottom:.9rem\"><div class=\"errata-head\"><span class=\"errata-tag\">官方答案<\/span><span class=\"errata-src\">Juniper 官方練習題 · 含官方解說<\/span><\/div><\/div><div class=\"en-head\"><span class=\"en-badge\">OFFICIAL EXPLANATION<\/span><\/div><div class=\"explanation-body\"><p>Time Voyager allows you to quickly restore previous revisions of a blueprint. The 5 most recent blueprint commits are retained, by default. You can retain a particular revision indefinitely by keeping it, or manually saving it. When you keep a revision it is not included in the 5 revisions that cycle out.<\/p><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文翻譯<\/span><\/div><div class=\"zh-body\"><p>Time Voyager 讓你能快速還原 blueprint 的先前版本。預設會保留<b>最近 5 次<\/b>的 blueprint commit。你可以透過「keep」或手動儲存，把某個特定版本<b>無限期保留<\/b>下來 —— 被 keep 的版本<b>不計入<\/b>那 5 個會輪替淘汰的版本之中。<\/p><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 26,
+    "q_en": "In Juniper Apstra, what are three modes available for devices? (Choose three.)",
+    "options": [
+      "A. Stopped",
+      "B. Deploy",
+      "C. Ready",
+      "D. Drain",
+      "E. Active"
+    ],
+    "answer": "B, C, D",
+    "explanation": "<div class=\"errata errata-ok\" style=\"margin-bottom:.9rem\"><div class=\"errata-head\"><span class=\"errata-tag\">官方答案<\/span><span class=\"errata-src\">Juniper 官方練習題 · 含官方解說<\/span><\/div><\/div><div class=\"en-head\"><span class=\"en-badge\">OFFICIAL EXPLANATION<\/span><\/div><div class=\"explanation-body\"><p>Deploy, Drain, and Ready are valid deployment modes that devices can be assigned.<\/p><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文翻譯<\/span><\/div><div class=\"zh-body\"><p><b>Deploy、Drain、Ready<\/b> 是裝置可被指派的有效部署模式。<\/p><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 27,
+    "q_en": "Referring to the exhibit, how many rack types are used in the staged blueprint?",
+    "options": [
+      "A. two",
+      "B. six",
+      "C. three",
+      "D. seven"
+    ],
+    "answer": "A",
+    "explanation": "<div class=\"errata errata-ok\" style=\"margin-bottom:.9rem\"><div class=\"errata-head\"><span class=\"errata-tag\">官方答案<\/span><span class=\"errata-src\">Juniper 官方練習題 · 含官方解說<\/span><\/div><\/div><div class=\"en-head\"><span class=\"en-badge\">OFFICIAL EXPLANATION<\/span><\/div><div class=\"explanation-body\"><p>There are multiple iterations of ServerRack and one instance of Border Leaf rack types.<\/p><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文翻譯<\/span><\/div><div class=\"zh-body\"><p>清單中有<b>多筆 ServerRack<\/b> 以及<b>一筆 Border Leaf<\/b> rack type，因此共使用了 <b>2 種<\/b> rack type。<\/p><\/div><\/div>",
+    "images": [
+      "ex27.webp"
+    ]
+  },
+  {
+    "id": 28,
+    "q_en": "You want to add a configuration that is not supported by Juniper Apstra reference architecture using a configlet. Which two configurations would be applicable in this scenario? (Choose two.)",
+    "options": [
+      "A. static route configuration",
+      "B. NTP configuration",
+      "C. policy configuration",
+      "D. syslog configuration"
+    ],
+    "answer": "B, D",
+    "explanation": "<div class=\"errata errata-ok\" style=\"margin-bottom:.9rem\"><div class=\"errata-head\"><span class=\"errata-tag\">官方答案<\/span><span class=\"errata-src\">Juniper 官方練習題 · 含官方解說<\/span><\/div><\/div><div class=\"en-head\"><span class=\"en-badge\">OFFICIAL EXPLANATION<\/span><\/div><div class=\"explanation-body\"><p>Juniper Apstra does not natively handle Network Time Protocol (NTP), Syslog, and class-of-service (CoS) configuration. Rather than configuring these features directly on the device, you can use configlets to have Juniper Apstra push these chunks of configuration out to your devices. You must configure configlets using the vendor-specific CLI commands.<\/p><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文翻譯<\/span><\/div><div class=\"zh-body\"><p>Juniper Apstra <b>不原生處理<\/b> NTP、Syslog 與 CoS（class-of-service）這幾類組態。與其直接在裝置上設定這些功能，你可以改用 <b>configlet<\/b>，讓 Apstra 把這些組態片段推送到裝置上。撰寫 configlet 時必須使用<b>各廠商專屬的 CLI 指令<\/b>。<\/p><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 29,
+    "q_en": "Referring to the exhibit, how do you display the IPv6 subnets for all of the listed VXLANs?",
+    "options": [
+      "A. IPv6 subnets are shown when each VXLAN is selected individually.",
+      "B. Select Columns, then select IPv6 Subnet.",
+      "C. An IPv6 Subnets column is not shown, indicating that no VXLAN has an assigned IPv6 subnet.",
+      "D. Select all VXLANs, and the IPv6 Subnets column will appear."
+    ],
+    "answer": "B",
+    "explanation": "<div class=\"errata errata-ok\" style=\"margin-bottom:.9rem\"><div class=\"errata-head\"><span class=\"errata-tag\">官方答案<\/span><span class=\"errata-src\">Juniper 官方練習題 · 含官方解說<\/span><\/div><\/div><div class=\"en-head\"><span class=\"en-badge\">OFFICIAL EXPLANATION<\/span><\/div><div class=\"explanation-body\"><p>You are allowed to include additional details in the exhibit columns by adding additional criteria like IPv6 subnets.<\/p><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文翻譯<\/span><\/div><div class=\"zh-body\"><p>你可以透過新增額外的欄位條件（例如 IPv6 subnet），把更多細節加進表格的欄位中顯示。<\/p><\/div><\/div>",
+    "images": [
+      "ex29.webp"
+    ]
+  },
+  {
+    "id": 30,
+    "q_en": "Which statement is correct about the Juniper Apstra Rendered configuration?",
+    "options": [
+      "A. It is rendered from the graph database and stored locally.",
+      "B. It is built at commit time and stored in a MySQL database.",
+      "C. It is dynamically rendered at commit time.",
+      "D. It is stored in a NoSQL database and incrementally updated."
+    ],
+    "answer": "C",
+    "explanation": "<div class=\"errata errata-ok\" style=\"margin-bottom:.9rem\"><div class=\"errata-head\"><span class=\"errata-tag\">官方答案<\/span><span class=\"errata-src\">Juniper 官方練習題 · 含官方解說<\/span><\/div><\/div><div class=\"en-head\"><span class=\"en-badge\">OFFICIAL EXPLANATION<\/span><\/div><div class=\"explanation-body\"><p>The rendered configuration is always dynamically rendered at commit time.<\/p><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文翻譯<\/span><\/div><div class=\"zh-body\"><p>Rendered configuration（算繪組態）<b>一律是在 commit 當下動態產生<\/b>的。<\/p><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 31,
+    "q_en": "In the Juniper Apstra UI, you are creating a VNI pool for virtual networks. In this scenario, which VNI range is acceptable?",
+    "options": [
+      "A. The valid VNI range is 4096 through 16777214.",
+      "B. The valid VNI range is 1 through 10000.",
+      "C. The valid VNI range is 2 through 4096.",
+      "D. Any range is acceptable for the VNI pool."
+    ],
+    "answer": "A",
+    "explanation": "<div class=\"errata errata-ok\" style=\"margin-bottom:.9rem\"><div class=\"errata-head\"><span class=\"errata-tag\">官方答案<\/span><span class=\"errata-src\">Juniper 官方練習題 · 含官方解說<\/span><\/div><\/div><div class=\"en-head\"><span class=\"en-badge\">OFFICIAL EXPLANATION<\/span><\/div><div class=\"explanation-body\"><p>The range allowable for VNIs on Arista devices is 4096 to 16777214. Juniper Apstra supports multiple vendors including Arista which means it needs to accommodate the most restrictive range defined (4096 to 16777214) by these vendors.<\/p><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文翻譯<\/span><\/div><div class=\"zh-body\"><p>Arista 裝置允許的 VNI 範圍是 <b>4096 到 16777214<\/b>。由於 Juniper Apstra 支援多家廠商（含 Arista），它必須遷就這些廠商中<b>限制最嚴格<\/b>的範圍，也就是 4096 到 16777214。<\/p><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 32,
+    "q_en": "Using the Juniper Apstra multitenancy capabilities, which approach will allow a tenant to interconnect two different routing zones?",
+    "options": [
+      "A. Interconnection is the default behavior.",
+      "B. Interconnection cannot be enabled.",
+      "C. Use interconnection through an external gateway.",
+      "D. Use interconnection through the fabric spine nodes."
+    ],
+    "answer": "C",
+    "explanation": "<div class=\"errata errata-ok\" style=\"margin-bottom:.9rem\"><div class=\"errata-head\"><span class=\"errata-tag\">官方答案<\/span><span class=\"errata-src\">Juniper 官方練習題 · 含官方解說<\/span><\/div><\/div><div class=\"en-head\"><span class=\"en-badge\">OFFICIAL EXPLANATION<\/span><\/div><div class=\"explanation-body\"><p>By default, routing zones are isolated from one another, unless there is an external routing device between them.<\/p><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文翻譯<\/span><\/div><div class=\"zh-body\"><p>預設情況下，各個 routing zone 之間是<b>互相隔離<\/b>的 —— 除非兩者之間存在一台<b>外部路由裝置<\/b>。<\/p><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 33,
+    "q_en": "What are three components that make up the Juniper Apstra multitenancy capability? (Choose three.)",
+    "options": [
+      "A. resource pools",
+      "B. virtual networks",
+      "C. routing zones",
+      "D. connectivity templates",
+      "E. probes"
+    ],
+    "answer": "B, C, D",
+    "explanation": "<div class=\"errata errata-ok\" style=\"margin-bottom:.9rem\"><div class=\"errata-head\"><span class=\"errata-tag\">官方答案<\/span><span class=\"errata-src\">Juniper 官方練習題 · 含官方解說<\/span><\/div><\/div><div class=\"en-head\"><span class=\"en-badge\">OFFICIAL EXPLANATION<\/span><\/div><div class=\"explanation-body\"><p>Routing zones, virtual networks, and connectivity templates are all components that make up Juniper Apstra&#x27;s multitenancy capabilities.<\/p><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文翻譯<\/span><\/div><div class=\"zh-body\"><p><b>Routing zone、virtual network、connectivity template<\/b> 這三者共同構成了 Juniper Apstra 的多租戶（multitenancy）能力。<\/p><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 34,
+    "q_en": "You want to keep virtual networks isolated from each other within the Juniper Apstra system. In this scenario, what are three ways to accomplish this task? (Choose three.)",
+    "options": [
+      "A. Disable Route Target exports when creating the Routing Zones.",
+      "B. Disable IPv4 connectivity when creating the virtual network within the same Routing Zone.",
+      "C. Put each network in different Routing Zones.",
+      "D. Enable Security Policy for virtual networks in the same Routing Zone.",
+      "E. Use Connectivity Templates to block access within the same Routing Zone."
+    ],
+    "answer": "B, C, D",
+    "explanation": "<div class=\"errata errata-ok\" style=\"margin-bottom:.9rem\"><div class=\"errata-head\"><span class=\"errata-tag\">官方答案<\/span><span class=\"errata-src\">Juniper 官方練習題 · 含官方解說<\/span><\/div><\/div><div class=\"en-head\"><span class=\"en-badge\">OFFICIAL EXPLANATION<\/span><\/div><div class=\"explanation-body\"><p>Disabling IPv4 connectivity removes the ability for virtual networks to route traffic between routing zones. Using security policy allows filters to be applied to prevent network to network communication, and networks in different routing zones can not talk to each other unless explicitly allowed.<\/p><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文翻譯<\/span><\/div><div class=\"zh-body\"><p><b>停用 IPv4 connectivity<\/b> 會移除 virtual network 在各 routing zone 之間路由流量的能力。使用 <b>security policy<\/b> 則可套用過濾規則，阻止網路之間互通。而位於<b>不同 routing zone<\/b> 的網路，除非明確允許，否則本來就無法互相通訊。<\/p><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 35,
+    "q_en": "You use Juniper Apstra to enable a new VXLAN virtual network. Which two components will be assigned from resource pools, in this situation? (Choose two.)",
+    "options": [
+      "A. VXLAN VNI",
+      "B. IP subnet",
+      "C. Route Zone",
+      "D. VLAN-ID"
+    ],
+    "answer": "A, B",
+    "explanation": "<div class=\"errata errata-ok\" style=\"margin-bottom:.9rem\"><div class=\"errata-head\"><span class=\"errata-tag\">官方答案<\/span><span class=\"errata-src\">Juniper 官方練習題 · 含官方解說<\/span><\/div><\/div><div class=\"en-head\"><span class=\"en-badge\">OFFICIAL EXPLANATION<\/span><\/div><div class=\"explanation-body\"><p>VXLAN network Identifiers (VNIs) pools and IP subnet pools are defined under resources in the design phase and are both used when enabling VXLAN virtual networks.<\/p><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文翻譯<\/span><\/div><div class=\"zh-body\"><p><b>VNI（VXLAN Network Identifier）pool<\/b> 與 <b>IP subnet pool<\/b> 是在設計階段的 resources 中定義的，兩者在啟用 VXLAN virtual network 時都會被用到。<\/p><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 36,
+    "q_en": "You have a virtual network that needs controlled access to other virtual networks in the same routing zone. Using the Juniper Apstra UI, which feature would be used to accomplish this task?",
+    "options": [
+      "A. security policy",
+      "B. interface policy",
+      "C. anti-affinity policy",
+      "D. routing policy"
+    ],
+    "answer": "A",
+    "explanation": "<div class=\"errata errata-ok\" style=\"margin-bottom:.9rem\"><div class=\"errata-head\"><span class=\"errata-tag\">官方答案<\/span><span class=\"errata-src\">Juniper 官方練習題 · 含官方解說<\/span><\/div><\/div><div class=\"en-head\"><span class=\"en-badge\">OFFICIAL EXPLANATION<\/span><\/div><div class=\"explanation-body\"><p>A security policy should be used to control traffic between VNs in the same routing zone.<\/p><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文翻譯<\/span><\/div><div class=\"zh-body\"><p>要控制<b>同一個 routing zone 內<\/b>各 virtual network 之間的流量，應使用 <b>security policy<\/b>。<\/p><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 37,
+    "q_en": "Which two statements are correct about the graph query output shown in the exhibit? (Choose two.)",
+    "options": [
+      "A. The output shows a LAG connection.",
+      "B. The switch in the output is a Juniper device.",
+      "C. The interface has tags assigned to it.",
+      "D. The interface has an IP address assigned to it."
+    ],
+    "answer": "A, B",
+    "explanation": "<div class=\"errata errata-ok\" style=\"margin-bottom:.9rem\"><div class=\"errata-head\"><span class=\"errata-tag\">官方答案<\/span><span class=\"errata-src\">Juniper 官方練習題 · 含官方解說<\/span><\/div><\/div><div class=\"en-head\"><span class=\"en-badge\">OFFICIAL EXPLANATION<\/span><\/div><div class=\"explanation-body\"><p>In the exhibit you should note the AE2 designation for the interface. This is Juniper&#x27;s notation for Aggregated Ethernet, AKA a LAG.<\/p><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文翻譯<\/span><\/div><div class=\"zh-body\"><p>請留意圖中該介面的 <b>AE2<\/b> 標示 —— 這是 Juniper 對 <b>Aggregated Ethernet<\/b>（也就是 LAG）的命名方式。<\/p><\/div><\/div>",
+    "images": [
+      "ex37.webp"
+    ]
+  },
+  {
+    "id": 38,
+    "q_en": "Referring to the exhibit, which two statements are correct? (Choose two.)",
+    "options": [
+      "A. The anomaly represents a connection to a multihomed, generic system.",
+      "B. The anomaly is triggered when a greater than 20% difference exists between the compared links in the ESI.",
+      "C. Other links contain the anomaly.",
+      "D. A duplicate ESI exists in the fabric."
+    ],
+    "answer": "A, B",
+    "explanation": "<div class=\"errata errata-ok\" style=\"margin-bottom:.9rem\"><div class=\"errata-head\"><span class=\"errata-tag\">官方答案<\/span><span class=\"errata-src\">Juniper 官方練習題 · 含官方解說<\/span><\/div><\/div><div class=\"en-head\"><span class=\"en-badge\">OFFICIAL EXPLANATION<\/span><\/div><div class=\"explanation-body\"><p>The exhibit shows that the ESI ID is a non-zero value which means that it represents a multihomed connection. It also shows that the current difference in usage between the two links is currently 40%. Since the anomalous value for the probe is set to greater than or equal to 21%, an anomaly has correctly been raised by Apstra.<\/p><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文翻譯<\/span><\/div><div class=\"zh-body\"><p>圖中顯示 ESI ID 是一個<b>非零值<\/b>，代表它是一條 multihomed（多重連接）的連線。同時也顯示兩條連結目前的使用率差異為 <b>40%<\/b>。由於該 probe 設定的異常門檻為<b>大於或等於 21%<\/b>，因此 Apstra 正確地發出了 anomaly（異常）。<\/p><\/div><\/div>",
+    "images": [
+      "ex38.webp"
+    ]
+  },
+  {
+    "id": 39,
+    "q_en": "IBA probes analyze telemetry data from specified devices within a blueprint. Which component identifies devices that supply data for a specific probe?",
+    "options": [
+      "A. processor",
+      "B. data selector",
+      "C. search engine",
+      "D. graph query"
+    ],
+    "answer": "D",
+    "explanation": "<div class=\"errata errata-ok\" style=\"margin-bottom:.9rem\"><div class=\"errata-head\"><span class=\"errata-tag\">官方答案<\/span><span class=\"errata-src\">Juniper 官方練習題 · 含官方解說<\/span><\/div><\/div><div class=\"en-head\"><span class=\"en-badge\">OFFICIAL EXPLANATION<\/span><\/div><div class=\"explanation-body\"><p>The graph datastore contains device context about all of the devices in the DC fabric - in order to get information about devices, one can do a graph query - and that graph query can then be used to provide the individual probes with that device context.<\/p><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文翻譯<\/span><\/div><div class=\"zh-body\"><p>graph datastore 儲存了 DC fabric 中所有裝置的<b>裝置情境（device context）<\/b>。要取得裝置相關資訊，可以執行 <b>graph query<\/b>；而這個 graph query 便能用來為個別 probe 提供所需的裝置情境。<\/p><\/div><\/div>",
+    "images": []
+  },
+  {
+    "id": 40,
+    "q_en": "Which three statements describe intent-based analytics? (Choose three.)",
+    "options": [
+      "A. It is used to establish network performance baselines.",
+      "B. It is a real-time information processing pipeline.",
+      "C. It collects information from vendor websites.",
+      "D. It alerts the network operator when network performance moves away from the baseline.",
+      "E. It indicates when device operating versions require updating."
+    ],
+    "answer": "A, B, D",
+    "explanation": "<div class=\"errata errata-ok\" style=\"margin-bottom:.9rem\"><div class=\"errata-head\"><span class=\"errata-tag\">官方答案<\/span><span class=\"errata-src\">Juniper 官方練習題 · 含官方解說<\/span><\/div><\/div><div class=\"en-head\"><span class=\"en-badge\">OFFICIAL EXPLANATION<\/span><\/div><div class=\"explanation-body\"><p>Intent based analytics takes telemetry information from the devices and processes it to glean real-time information about the network - there are predefined probes, and operators can create their own probes. These probes can alert the operator about various performance impacting issues in the network compared to a baseline.<\/p><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文翻譯<\/span><\/div><div class=\"zh-body\"><p>Intent-based analytics 會取得裝置的<b>遙測（telemetry）<\/b>資訊並加以處理，藉此即時掌握網路狀態。系統內建有預設的 probe，維運人員也可以自行建立 probe。這些 probe 能在網路出現各種影響效能的問題時，<b>對照基準線（baseline）<\/b>向維運人員發出告警。<\/p><\/div><\/div>",
+    "images": []
+  }
+];        // ==========================================
+
+        // Core Logic
+        let currentIndex = 0;
+        let selectedAnswers = []; 
+        let isAnswered = false;
+        let quizResults = {}; 
+        let flaggedQuestions = new Set(); // 儲存被標記的題目 ID
+        let isReversed = false;
+        let isFirstLoad = true; // 新增：用於判斷是否為剛載入網頁
+
+        // LOCALSTORAGE KEY — 每份題庫各自獨立，避免互相覆蓋
+        const STORAGE_KEY = 'jncis_dc_official_practice';
+
+        // 產生目前的展示順序
+        function buildDisplayOrder() {
+            const arr = questionsData.map((_, i) => i);
+            return isReversed ? arr.reverse() : arr;
+        }
+        let displayOrder = buildDisplayOrder();
+
+        // 強制移除焦點，避免按鈕視覺卡住
+        function blurFocus() {
+            if (document.activeElement instanceof HTMLElement) {
+                document.activeElement.blur();
+            }
+        }
+
+        // 儲存進度到 LocalStorage
+        function saveProgress() {
+            const progressObj = {
+                currentIndex: currentIndex,
+                quizResults: quizResults,
+                flaggedQuestions: Array.from(flaggedQuestions), // Set 轉 Array
+                selectedAnswers: selectedAnswers,
+                isAnswered: isAnswered,
+                isReversed: isReversed,
+                questionCount: questionsData.length
+            };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(progressObj));
+        }
+
+        // 讀取進度從 LocalStorage
+        function loadProgress() {
+            const savedData = localStorage.getItem(STORAGE_KEY);
+            if (savedData) {
+                try {
+                    const progressObj = JSON.parse(savedData);
+                    // 防呆：題數不符，或紀錄中出現本題庫沒有的題號，
+                    // 都代表這份進度屬於其他題庫 —— 直接丟棄。
+                    const validIds = new Set(questionsData.map(q => q.id));
+                    const foreign = Object.keys(progressObj.quizResults || {})
+                        .map(Number).filter(n => !isNaN(n))
+                        .some(n => !validIds.has(n));
+                    if (foreign ||
+                        (progressObj.questionCount !== undefined &&
+                         progressObj.questionCount !== questionsData.length)) {
+                        localStorage.removeItem(STORAGE_KEY);
+                        return;
+                    }
+                    currentIndex = progressObj.currentIndex !== undefined ? progressObj.currentIndex : 0;
+                    if (!(currentIndex >= 0 && currentIndex < questionsData.length)) currentIndex = 0;
+                    quizResults = progressObj.quizResults || {};
+                    if (progressObj.flaggedQuestions) {
+                        // 只保留本題庫確實存在的題號
+                        flaggedQuestions = new Set(
+                            progressObj.flaggedQuestions.filter(n => validIds.has(n)));
+                    }
+                    selectedAnswers = progressObj.selectedAnswers || [];
+                    isAnswered = progressObj.isAnswered || false;
+                    isReversed = progressObj.isReversed || false;
+                    displayOrder = buildDisplayOrder();
+                } catch (error) {
+                    console.error("載入進度失敗：", error);
+                }
+            }
+        }
+
+        const quizContent = document.getElementById('quiz-content');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const submitBtn = document.getElementById('submit-btn');
+        const progressBar = document.getElementById('progress-bar');
+        const currentProgress = document.getElementById('current-progress');
+        const totalCount = document.getElementById('total-count');
+        const footerControls = document.getElementById('footer-controls');
+
+        // Palette Logic
+        const paletteModal = document.getElementById('palette-modal');
+        const paletteBackdrop = document.getElementById('palette-backdrop');
+        const palettePanel = document.getElementById('palette-panel');
+        const paletteGrid = document.getElementById('palette-grid');
+
+        // ==== 鍵盤事件監聽 (快捷鍵實作) ====
+        document.addEventListener('keydown', (e) => {
+            // 避免在輸入框中觸發
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+            // 1-6 數字鍵選擇選項 A-F
+            const keyMap = {'1': 'A', '2': 'B', '3': 'C', '4': 'D', '5': 'E', '6': 'F'};
+            if (keyMap[e.key] && !isAnswered) {
+                const optionIndex = e.key.charCodeAt(0) - 49; 
+                const cards = document.querySelectorAll('.option-card');
+                if (cards[optionIndex]) {
+                    const currentQ = questionsData[displayOrder[currentIndex]];
+                    const isMultiple = currentQ.answer.includes(',');
+                    toggleOption(keyMap[e.key], isMultiple, cards[optionIndex]);
+                }
+            }
+
+            // 左方向鍵: 上一題
+            if (e.key === 'ArrowLeft') {
+                prevQuestion();
+            }
+            
+            // 右方向鍵: 下一題
+            if (e.key === 'ArrowRight') {
+                nextQuestion();
+            }
+
+            // Enter 鍵: 提交或下一題
+            if (e.key === 'Enter') {
+                // 若已經答完且在看結果頁面，阻止觸發
+                if (document.getElementById('result-banner') && !document.getElementById('result-banner').classList.contains('hidden') && currentIndex === questionsData.length) return; 
+
+                if (!isAnswered && !submitBtn.disabled) {
+                    submitAnswer();
+                } else if (isAnswered) {
+                    nextQuestion();
+                }
+            }
+
+            // M 鍵: 標記/取消標記本題
+            if (e.key.toLowerCase() === 'm') {
+                toggleFlag();
+            }
+
+            // N 鍵: 清除本題進度
+            if (e.key.toLowerCase() === 'n') {
+                clearCurrentQuestion();
+            }
+        });
+
+        // Init
+        document.addEventListener("DOMContentLoaded", () => {
+            totalCount.innerText = questionsData.length + " Questions";
+            loadProgress(); // 優先讀取進度
+            
+            // 根據讀取的 isReversed 更新 UI 排序按鈕狀態
+            const btn = document.getElementById('order-btn');
+            if (btn) {
+                btn.innerHTML = isReversed
+                    ? '<i class="fa-solid fa-arrow-up"></i> <span class="hidden sm:inline">逆序</span>'
+                    : '<i class="fa-solid fa-arrow-down"></i> <span class="hidden sm:inline">正序</span>';
+                btn.className = (isReversed
+                    ? 'bg-pink-600 hover:bg-pink-700'
+                    : 'bg-purple-600 hover:bg-purple-700') + ' text-white px-3 py-1.5 rounded-lg text-sm transition-colors flex items-center gap-2 shadow-sm font-medium';
+            }
+
+            updateStats();
+            renderQuestion(currentIndex);
+        });
+
+        // 切換正序/逆序
+        function toggleOrder() {
+            blurFocus();
+            isReversed = !isReversed;
+            displayOrder = buildDisplayOrder();
+            currentIndex = 0;
+            const btn = document.getElementById('order-btn');
+            if (btn) {
+                btn.innerHTML = isReversed
+                    ? '<i class="fa-solid fa-arrow-up"></i> <span class="hidden sm:inline">逆序</span>'
+                    : '<i class="fa-solid fa-arrow-down"></i> <span class="hidden sm:inline">正序</span>';
+                btn.className = (isReversed
+                    ? 'bg-pink-600 hover:bg-pink-700'
+                    : 'bg-purple-600 hover:bg-purple-700') + ' text-white px-3 py-1.5 rounded-lg text-sm transition-colors flex items-center gap-2 shadow-sm font-medium';
+            }
+            saveProgress();
+            renderQuestion(currentIndex);
+        }
+
+        // 跳轉題號
+        function promptJump() {
+            blurFocus();
+            const ans = prompt('跳到第幾題? (1-' + questionsData.length + ')', '1');
+            if (ans === null) return;
+            const n = parseInt(ans, 10);
+            if (isNaN(n) || n < 1 || n > questionsData.length) {
+                alert('題號必須介於 1 到 ' + questionsData.length);
+                return;
+            }
+            const dataIdx = questionsData.findIndex(q => q.id === n);
+            if (dataIdx < 0) {
+                alert('找不到 Q' + n);
+                return;
+            }
+            currentIndex = displayOrder.indexOf(dataIdx);
+            saveProgress();
+            renderQuestion(currentIndex);
+        }
+
+        // 標記本題 (Flag)
+        function toggleFlag() {
+            blurFocus();
+            const currentQId = questionsData[displayOrder[currentIndex]].id;
+            const btnFlag = document.getElementById('btn-flag');
+            
+            if (flaggedQuestions.has(currentQId)) {
+                flaggedQuestions.delete(currentQId);
+                btnFlag.classList.replace('bg-red-700', 'bg-red-500');
+                btnFlag.innerHTML = '<i class="fa-regular fa-flag"></i> <span class="hidden sm:inline">標記本題</span>';
+            } else {
+                flaggedQuestions.add(currentQId);
+                btnFlag.classList.replace('bg-red-500', 'bg-red-700');
+                btnFlag.innerHTML = '<i class="fa-solid fa-flag"></i> <span class="hidden sm:inline">取消標記</span>';
+            }
+            
+            updateStats();
+            saveProgress();
+            if (!paletteModal.classList.contains('hidden')) renderPaletteGrid();
+        }
+
+        // 尋找下一個標記
+        function nextFlag() {
+            blurFocus();
+            if (flaggedQuestions.size === 0) { alert('目前沒有任何標記的題目。'); return; }
+            for (let pos = currentIndex + 1; pos < questionsData.length; pos++) {
+                if (flaggedQuestions.has(questionsData[displayOrder[pos]].id)) {
+                    currentIndex = pos;
+                    saveProgress();
+                    renderQuestion(currentIndex);
+                    return;
+                }
+            }
+            // 若後面沒有，循環找最前面的
+            for (let pos = 0; pos <= currentIndex; pos++) {
+                if (flaggedQuestions.has(questionsData[displayOrder[pos]].id)) {
+                    currentIndex = pos;
+                    saveProgress();
+                    renderQuestion(currentIndex);
+                    return;
+                }
+            }
+        }
+
+        // 尋找上一個標記
+        function prevFlag() {
+            blurFocus();
+            if (flaggedQuestions.size === 0) { alert('目前沒有任何標記的題目。'); return; }
+            for (let pos = currentIndex - 1; pos >= 0; pos--) {
+                if (flaggedQuestions.has(questionsData[displayOrder[pos]].id)) {
+                    currentIndex = pos;
+                    saveProgress();
+                    renderQuestion(currentIndex);
+                    return;
+                }
+            }
+            // 若前面沒有，找最後面的
+            for (let pos = questionsData.length - 1; pos >= currentIndex; pos--) {
+                if (flaggedQuestions.has(questionsData[displayOrder[pos]].id)) {
+                    currentIndex = pos;
+                    saveProgress();
+                    renderQuestion(currentIndex);
+                    return;
+                }
+            }
+        }
+
+        // 清除本題進度
+        function clearCurrentQuestion() {
+            blurFocus();
+            const currentQId = questionsData[displayOrder[currentIndex]].id;
+            delete quizResults[currentQId];
+            selectedAnswers = [];
+            isAnswered = false;
+            updateStats();
+            saveProgress();
+            renderQuestion(currentIndex);
+        }
+
+        // 更新左側統計數據
+        function updateStats() {
+            const total = questionsData.length;
+            const answeredCount = Object.keys(quizResults).length;
+            const correctCount = Object.values(quizResults).filter(r => r === true).length;
+            const flaggedCount = flaggedQuestions.size;
+            const percentage = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+
+            document.getElementById('stat-progress').innerText = `${answeredCount} / ${total}`;
+            document.getElementById('stat-flagged').innerText = flaggedCount;
+            document.getElementById('stat-correct').innerText = correctCount;
+            document.getElementById('stat-accuracy').innerText = `${percentage}%`;
+        }
+
+        function escapeHTML(s) { 
+            if (!s) return '';
+            return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); 
+        }
+
+        function renderQuestion(index) {
+            const dataIdx = displayOrder[index];
+            const q = questionsData[dataIdx];
+            
+            // 初始化狀態
+            isAnswered = quizResults.hasOwnProperty(q.id);
+            
+            // 解決「下一題自動帶入上一題答案」的 Bug
+            if (isFirstLoad) {
+                // 如果是網頁剛載入的第一次渲染，保留由 loadProgress 取回的 selectedAnswers
+                isFirstLoad = false;
+            } else {
+                // 只要是切換題目（不論上一題是否已送出），都必須清空選擇狀態，防止答案殘留
+                selectedAnswers = []; 
+            }
+
+            // 更新標記按鈕 UI
+            const btnFlag = document.getElementById('btn-flag');
+            if (flaggedQuestions.has(q.id)) {
+                btnFlag.classList.replace('bg-red-500', 'bg-red-700');
+                btnFlag.innerHTML = '<i class="fa-solid fa-flag"></i> <span class="hidden sm:inline">取消標記</span>';
+            } else {
+                btnFlag.classList.replace('bg-red-700', 'bg-red-500');
+                btnFlag.innerHTML = '<i class="fa-regular fa-flag"></i> <span class="hidden sm:inline">標記本題</span>';
+            }
+
+            document.getElementById('q-id-display').innerText = `第 ${index + 1} 題 (ID: Q${q.id})`;
+            
+            // Image Logic
+            let exhibitHtml = '';
+            if (q.images && q.images.length) {
+                exhibitHtml = '<div class="my-6 flex flex-col items-center justify-center gap-4">';
+                q.images.forEach((img, i) => {
+                    const pid = 'placeholder-' + q.id + '-' + i;
+                    exhibitHtml += `
+                        <a href="png-official/${img}" target="_blank" rel="noopener" title="點擊開新分頁檢視原圖"><img src="png-official/${img}" alt="Exhibit ${i+1} for Q${q.id}" class="max-w-full h-auto rounded-lg border border-slate-300 shadow-sm" style="display:none;cursor:zoom-in" onload="this.style.display='block'" onerror="this.style.display='none'; document.getElementById('${pid}').classList.remove('hidden');"></a>
+                        <div id="${pid}" class="hidden w-full bg-slate-50 border-2 border-dashed border-slate-300 rounded-lg h-32 flex flex-col items-center justify-center text-slate-400 p-4 text-center">
+                            <i class="fa-regular fa-image text-3xl mb-2"></i>
+                            <span class="text-xs font-semibold mb-1">Q${q.id} Exhibit ${i+1} (png-official/${img})</span>
+                            <span class="text-[10px]">To view the image, please ensure the file <b>${img}</b> is located in the <b>png-official</b> folder.</span>
+                        </div>`;
+                });
+                exhibitHtml += '</div>';
+            }
+
+            // Options Logic - 動態計算正確答案數量
+            const correctAnswersCount = q.answer.split(',').filter(s => s.trim() !== '' && s.trim() !== '—').length;
+            const isMultiple = correctAnswersCount > 1;
+            
+            const typeText = isMultiple ? 
+                `<span class="text-xs bg-slate-200 text-slate-600 px-2 py-0.5 rounded ml-2">Multiple Choice (需選 ${correctAnswersCount} 項)</span>` : 
+                '<span class="text-xs bg-slate-200 text-slate-600 px-2 py-0.5 rounded ml-2">Single Choice</span>';
+
+            let optionsHtml = q.options.map((opt, i) => {
+                const letter = String.fromCharCode(65 + i); 
+                
+                let cleanOpt = opt.trim();
+                const prefixRegex = new RegExp(`^${letter}[\\.\\)]?\\s*`);
+                if (prefixRegex.test(cleanOpt)) {
+                    cleanOpt = cleanOpt.replace(prefixRegex, '').trim();
+                }
+
+                // 處理 localStorage 還原的選中狀態
+                let isSelected = selectedAnswers.includes(letter);
+                let selectedClass = isSelected ? 'selected' : '';
+                let indicatorHidden = isSelected ? '' : 'hidden';
+
+                return `
+                <div class="option-card border border-slate-200 rounded-lg p-4 mb-3 flex items-center gap-3 w-full ${selectedClass}" 
+                     onclick="toggleOption('${letter}', ${isMultiple}, this)" data-letter="${letter}">
+                    <div class="flex-shrink-0 w-6 h-6 rounded-full border-2 border-slate-300 flex items-center justify-center option-indicator bg-white">
+                        <div class="w-3 h-3 ${isMultiple ? 'rounded-sm' : 'rounded-full'} bg-blue-500 ${indicatorHidden}"></div>
+                    </div>
+                    <div class="text-slate-700 text-sm md:text-base leading-relaxed select-none text-left flex-1 break-words">
+                        <span class="font-bold mr-1 text-slate-500">${letter}.</span> ${escapeHTML(cleanOpt)}
+                    </div>
+                </div>`;
+            }).join('');
+
+            // Render
+            quizContent.innerHTML = `
+                <div class="flex justify-between items-start mb-4 fade-in">
+                    <span class="bg-slate-800 text-white text-sm font-bold px-3 py-1 rounded">第 ${index + 1} 題</span>
+                    ${typeText}
+                </div>
+                
+                <div class="mb-2 fade-in">
+                    <p class="font-bold text-slate-800 text-lg md:text-xl mb-3 leading-snug question-text">${escapeHTML(q.q_en)}</p>
+                </div>
+
+                <div class="fade-in">
+                    ${exhibitHtml}
+                </div>
+
+                <div id="options-container" class="mt-4 mb-6 fade-in w-full">
+                    ${optionsHtml}
+                </div>
+
+                <!-- Explanation Area (Initially Hidden) -->
+                <div id="explanation-area" class="hidden mt-4 bg-green-50 rounded-lg p-6 border border-green-100 fade-in text-left w-full">
+                    <div id="result-banner" class="mb-4 p-3 rounded-lg font-bold text-lg text-center"></div>
+                    <div class="flex items-center gap-2 mb-3 flex-wrap">
+                        <span class="font-bold text-green-700"><i class="fa-solid fa-check-circle mr-1"></i> Correct Answer:</span>
+                        <span class="font-bold text-xl text-green-800">${escapeHTML(q.answer)}</span>
+                        <span class="ml-2 text-sm text-slate-600">| Your answer: <span id="your-answer-display" class="font-semibold">(none)</span></span>
+                    </div>
+                    <div class="text-sm text-slate-700 leading-relaxed explanation-body">${q.explanation}</div>
+                </div>
+            `;
+
+            footerControls.classList.remove('hidden');
+            updateProgress();
+            
+            // 如果這題之前已經答過了，直接顯示結果狀態
+            if (isAnswered) {
+                document.getElementById('explanation-area').classList.remove('hidden');
+                submitBtn.classList.add('hidden');
+                nextBtn.classList.remove('hidden');
+                
+                // 視覺上還原對錯狀態並鎖死
+                const optionCards = document.querySelectorAll('.option-card');
+                const correctAnswersArray = q.answer.split(',').map(s => s.trim());
+                
+                optionCards.forEach((card) => {
+                    card.classList.add('disabled-click');
+                    const letter = card.getAttribute('data-letter');
+                    const indicator = card.querySelector('.option-indicator');
+                    
+                    if (correctAnswersArray.includes(letter)) {
+                        card.classList.add('correct-answer');
+                        indicator.innerHTML = '<i class="fa-solid fa-check text-green-600"></i>';
+                        indicator.classList.remove('border-slate-300');
+                        indicator.classList.add('border-green-500');
+                    } else if (selectedAnswers.includes(letter)) {
+                        card.classList.add('wrong-answer');
+                        indicator.innerHTML = '<i class="fa-solid fa-xmark text-red-600"></i>';
+                        indicator.classList.remove('border-slate-300');
+                        indicator.classList.add('border-red-500');
+                    }
+                });
+
+                // Update Your answer display
+                const yourAns = document.getElementById('your-answer-display');
+                if (yourAns) {
+                    yourAns.textContent = selectedAnswers.length ? selectedAnswers.sort().join(', ') : '(none)';
+                    yourAns.className = 'font-semibold ' + (quizResults[q.id] ? 'text-green-700' : 'text-red-700');
+                }
+
+                // Update Result Banner
+                const banner = document.getElementById('result-banner');
+                if (banner) {
+                    if (quizResults[q.id]) {
+                        banner.innerHTML = '<i class="fa-solid fa-circle-check mr-2"></i> 答對! Correct!';
+                        banner.className = 'mb-4 p-3 rounded-lg font-bold text-lg text-center bg-green-200 text-green-800 border-2 border-green-500';
+                    } else {
+                        banner.innerHTML = '<i class="fa-solid fa-circle-xmark mr-2"></i> 答錯! Incorrect';
+                        banner.className = 'mb-4 p-3 rounded-lg font-bold text-lg text-center bg-red-200 text-red-800 border-2 border-red-500';
+                    }
+                }
+            } else {
+                submitBtn.classList.remove('hidden');
+                submitBtn.disabled = selectedAnswers.length !== correctAnswersCount; 
+                nextBtn.classList.add('hidden');
+            }
+
+            nextBtn.innerHTML = 'Next <i class="fa-solid fa-arrow-right ml-2"></i>';
+            nextBtn.className = "px-6 py-2 rounded-lg bg-slate-800 text-white hover:bg-slate-900 transition-colors hidden";
+            prevBtn.disabled = index === 0;
+            
+            if(!paletteModal.classList.contains('hidden')){
+                renderPaletteGrid();
+            }
+        }
+
+        function toggleOption(letter, isMultiple, cardElement) {
+            if (isAnswered) return;
+
+            const q = questionsData[displayOrder[currentIndex]];
+            const correctAnswersCount = q.answer.split(',').filter(s => s.trim() !== '' && s.trim() !== '—').length;
+            const indicator = cardElement.querySelector('.option-indicator > div');
+            
+            if (isMultiple) {
+                if (selectedAnswers.includes(letter)) {
+                    selectedAnswers = selectedAnswers.filter(a => a !== letter);
+                    cardElement.classList.remove('selected');
+                    indicator.classList.add('hidden');
+                } else {
+                    if (selectedAnswers.length < correctAnswersCount) {
+                        selectedAnswers.push(letter);
+                        cardElement.classList.add('selected');
+                        indicator.classList.remove('hidden');
+                    } else {
+                        return; // 達到上限
+                    }
+                }
+            } else {
+                selectedAnswers = [letter];
+                document.querySelectorAll('.option-card').forEach(el => {
+                    el.classList.remove('selected');
+                    el.querySelector('.option-indicator > div').classList.add('hidden');
+                });
+                cardElement.classList.add('selected');
+                indicator.classList.remove('hidden');
+            }
+            
+            submitBtn.disabled = selectedAnswers.length !== correctAnswersCount;
+            saveProgress(); // 選項改變時儲存狀態
+        }
+
+        function submitAnswer() {
+            blurFocus();
+            isAnswered = true;
+            const q = questionsData[displayOrder[currentIndex]];
+            const correctAnswers = q.answer.split(',').map(s => s.trim());
+
+            const isCorrect = correctAnswers.length === selectedAnswers.length && 
+                              correctAnswers.every(val => selectedAnswers.includes(val));
+            
+            quizResults[q.id] = isCorrect;
+            updateStats();
+            saveProgress();
+
+            const optionCards = document.querySelectorAll('.option-card');
+            optionCards.forEach((card) => {
+                const letter = card.getAttribute('data-letter');
+                const indicator = card.querySelector('.option-indicator');
+                
+                card.classList.add('disabled-click');
+                
+                if (correctAnswers.includes(letter)) {
+                    card.classList.add('correct-answer');
+                    indicator.innerHTML = '<i class="fa-solid fa-check text-green-600"></i>';
+                    indicator.classList.remove('border-slate-300');
+                    indicator.classList.add('border-green-500');
+                } else if (selectedAnswers.includes(letter)) {
+                    card.classList.add('wrong-answer');
+                    indicator.innerHTML = '<i class="fa-solid fa-xmark text-red-600"></i>';
+                    indicator.classList.remove('border-slate-300');
+                    indicator.classList.add('border-red-500');
+                }
+            });
+
+            const yourAns = document.getElementById('your-answer-display');
+            if (yourAns) {
+                yourAns.textContent = selectedAnswers.length ? selectedAnswers.sort().join(', ') : '(none)';
+                yourAns.className = 'font-semibold ' + (isCorrect ? 'text-green-700' : 'text-red-700');
+            }
+
+            const banner = document.getElementById('result-banner');
+            if (banner) {
+                if (isCorrect) {
+                    banner.innerHTML = '<i class="fa-solid fa-circle-check mr-2"></i> 答對! Correct!';
+                    banner.className = 'mb-4 p-3 rounded-lg font-bold text-lg text-center bg-green-200 text-green-800 border-2 border-green-500';
+                } else {
+                    banner.innerHTML = '<i class="fa-solid fa-circle-xmark mr-2"></i> 答錯! Incorrect';
+                    banner.className = 'mb-4 p-3 rounded-lg font-bold text-lg text-center bg-red-200 text-red-800 border-2 border-red-500';
+                }
+            }
+
+            document.getElementById('explanation-area').classList.remove('hidden');
+            submitBtn.classList.add('hidden');
+            nextBtn.classList.remove('hidden');
+            
+            if (currentIndex === questionsData.length - 1) {
+                nextBtn.innerHTML = 'View Results <i class="fa-solid fa-chart-pie ml-2"></i>';
+                nextBtn.classList.remove('bg-slate-800', 'hover:bg-slate-900');
+                nextBtn.classList.add('bg-indigo-600', 'hover:bg-indigo-700');
+            }
+
+            setTimeout(() => {
+                document.getElementById('explanation-area').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
+        }
+
+        function nextQuestion() {
+            blurFocus();
+            if (currentIndex < questionsData.length - 1) {
+                currentIndex++;
+                saveProgress();
+                renderQuestion(currentIndex);
+            } else {
+                showResults();
+            }
+        }
+
+        function prevQuestion() {
+            blurFocus();
+            if (currentIndex > 0) {
+                currentIndex--;
+                saveProgress();
+                renderQuestion(currentIndex);
+            }
+        }
+
+        function showResults() {
+            const total = questionsData.length;
+            const correctCount = Object.values(quizResults).filter(r => r === true).length;
+            const answeredCount = Object.keys(quizResults).length;
+            const percentage = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+            
+            let message = "";
+            let colorClass = "";
+            let icon = "";
+
+            if (percentage === 100) {
+                message = "Perfect! You are ready for the exam!";
+                colorClass = "text-green-600";
+                icon = "fa-trophy";
+            } else if (percentage >= 80) {
+                message = "Great job! Excellent score.";
+                colorClass = "text-blue-600";
+                icon = "fa-thumbs-up";
+            } else if (percentage >= 60) {
+                message = "Not bad, keep it up!";
+                colorClass = "text-yellow-600";
+                icon = "fa-star-half-stroke";
+            } else {
+                message = "Don't be discouraged, keep practicing!";
+                colorClass = "text-red-600";
+                icon = "fa-book-open-reader";
+            }
+
+            quizContent.innerHTML = `
+                <div class="flex flex-col items-center justify-center h-full py-10 fade-in">
+                    <div class="w-24 h-24 rounded-full bg-slate-100 flex items-center justify-center mb-6">
+                        <i class="fa-solid ${icon} text-5xl ${colorClass}"></i>
+                    </div>
+                    
+                    <h2 class="text-3xl font-bold text-slate-800 mb-2">Quiz Completed</h2>
+                    
+                    <div class="grid grid-cols-4 gap-4 w-full max-w-2xl mb-8 mt-6">
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center">
+                            <div class="text-slate-400 text-xs uppercase font-bold tracking-wider mb-1">Total</div>
+                            <div class="text-2xl font-bold text-slate-800">${total}</div>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center">
+                            <div class="text-slate-400 text-xs uppercase font-bold tracking-wider mb-1">Answered</div>
+                            <div class="text-2xl font-bold text-slate-800">${answeredCount}</div>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center">
+                            <div class="text-slate-400 text-xs uppercase font-bold tracking-wider mb-1">Correct</div>
+                            <div class="text-2xl font-bold text-green-600">${correctCount}</div>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center">
+                            <div class="text-slate-400 text-xs uppercase font-bold tracking-wider mb-1">Accuracy</div>
+                            <div class="text-2xl font-bold ${colorClass}">${percentage}%</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-50 border-l-4 border-slate-300 p-4 w-full max-w-lg mb-8 rounded-r text-slate-700 italic text-center">
+                        "${message}"
+                    </div>
+
+                    <button onclick="restartQuiz()" class="px-8 py-3 rounded-full bg-slate-900 text-white font-bold hover:bg-slate-800 hover:scale-105 transition-all shadow-lg">
+                        <i class="fa-solid fa-rotate-right mr-2"></i> Restart Quiz
+                    </button>
+                </div>
+            `;
+
+            footerControls.classList.add('hidden');
+            progressBar.style.width = '100%';
+        }
+
+        function restartQuiz() {
+            blurFocus();
+            currentIndex = 0;
+            quizResults = {};
+            selectedAnswers = [];
+            isAnswered = false;
+            // 這裡不再呼叫 flaggedQuestions.clear()，所以標記會被保留下來
+            progressBar.style.width = '0%';
+            
+            // 清空除標記以外的 LocalStorage 進度並重存
+            saveProgress();
+            
+            updateStats();
+            renderQuestion(currentIndex);
+        }
+
+        function updateProgress() {
+            const pct = ((currentIndex + 1) / questionsData.length) * 100;
+            progressBar.style.width = `${pct}%`;
+            currentProgress.innerText = `Question ${currentIndex + 1}`;
+        }
+
+        // Palette Functions
+        function togglePalette() {
+            blurFocus();
+            const isHidden = paletteModal.classList.contains('hidden');
+            if (isHidden) {
+                paletteModal.classList.remove('hidden');
+                void palettePanel.offsetWidth;
+                paletteBackdrop.classList.remove('opacity-0');
+                palettePanel.classList.remove('translate-x-full');
+                renderPaletteGrid();
+            } else {
+                paletteBackdrop.classList.add('opacity-0');
+                palettePanel.classList.add('translate-x-full');
+                setTimeout(() => {
+                    paletteModal.classList.add('hidden');
+                }, 300);
+            }
+        }
+
+        function renderPaletteGrid() {
+            paletteGrid.innerHTML = '';
+            questionsData.forEach((q, index) => {
+                const el = document.createElement('div');
+                el.className = 'palette-item';
+                el.innerText = q.id;
+                
+                let statusClass = 'neutral';
+                if (index === currentIndex) {
+                    statusClass = 'current';
+                } else if (quizResults.hasOwnProperty(q.id)) {
+                    statusClass = quizResults[q.id] ? 'correct' : 'wrong';
+                }
+
+                el.classList.add(statusClass);
+                
+                if (flaggedQuestions.has(q.id)) el.classList.add('flagged');
+
+                el.onclick = () => {
+                    currentIndex = index;
+                    saveProgress();
+                    renderQuestion(index);
+                    togglePalette();
+                };
+                
+                paletteGrid.appendChild(el);
+            });
+        }
+    </script>
+</body>
+</html>
