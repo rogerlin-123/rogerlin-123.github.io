@@ -242,7 +242,7 @@
 
 function addRecentEntry(data) {
     recentEntries.unshift(data);
-    if(recentEntries.length > 5) recentEntries.pop(); // 畫面上只保留最新 5 筆
+    if(recentEntries.length > 10) recentEntries.pop(); // 畫面上只保留最新 10 筆
     
     if(recentEntries.length === 1) recentList.innerHTML = ''; // 清除「尚無紀錄」文字
     
