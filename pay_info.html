@@ -9,7 +9,6 @@
 <body class="bg-slate-50 min-h-screen p-4 md:p-8 font-sans text-slate-800">
     <div class="max-w-5xl mx-auto space-y-6">
         
-        <!-- 頁首 -->
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-6 rounded-xl shadow-sm border border-slate-100">
             <div>
                 <h1 class="text-2xl font-bold text-slate-900">雲端支出記帳本</h1>
@@ -24,7 +23,10 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- 記帳輸入表單 -->
             <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 h-fit lg:col-span-1">
-                <h2 class="text-lg font-bold mb-4 text-slate-800">新增支出</h2>
+                <div class="flex justify-between items-center mb-4">
+                    <h2 id="formTitle" class="text-lg font-bold text-slate-800">新增支出</h2>
+                    <button id="cancelEditBtn" class="hidden text-xs text-slate-500 hover:text-slate-800 underline">取消修改</button>
+                </div>
                 <form id="expenseForm" class="space-y-4">
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">日期</label>
@@ -97,7 +99,7 @@
             </div>
 
             <div class="lg:col-span-2 space-y-6">
-                <!-- 歷史區間查詢 -->
+                <!-- 歷史查詢與編輯區塊 -->
                 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
                         <h2 class="text-lg font-bold text-slate-800">查詢歷史紀錄</h2>
@@ -114,42 +116,20 @@
                         <span id="historyTotal" class="text-xl font-bold text-rose-600">NT$ 0</span>
                     </div>
 
-                    <div class="overflow-x-auto max-h-80 overflow-y-auto">
+                    <div class="overflow-x-auto max-h-96 overflow-y-auto">
                         <table class="w-full text-left text-sm whitespace-nowrap relative">
-                            <thead class="bg-slate-50 text-slate-500 text-xs uppercase border-b sticky top-0">
+                            <thead class="bg-slate-50 text-slate-500 text-xs uppercase border-b sticky top-0 z-10">
                                 <tr>
                                     <th class="py-2 px-3">日期</th>
                                     <th class="py-2 px-3">類別</th>
                                     <th class="py-2 px-3">項目</th>
-                                    <th class="py-2 px-3">付款方式</th>
-                                    <th class="py-2 px-3 text-right">外幣金額</th>
-                                    <th class="py-2 px-3 text-right">台幣總額</th>
+                                    <th class="py-2 px-3 text-right">外幣</th>
+                                    <th class="py-2 px-3 text-right">台幣</th>
+                                    <th class="py-2 px-3 text-center">操作</th>
                                 </tr>
                             </thead>
                             <tbody id="historyList" class="divide-y divide-slate-100">
                                 <tr><td colspan="6" class="text-center py-6 text-slate-400 text-xs">請點擊查詢載入歷史資料</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- 本機暫存明細 (供確認用) -->
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
-                    <h2 class="text-lg font-bold text-slate-800 mb-4">最近輸入紀錄 (僅顯示本次作業)</h2>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-sm whitespace-nowrap">
-                            <thead class="bg-slate-50 text-slate-500 text-xs uppercase border-b">
-                                <tr>
-                                    <th class="py-2 px-3">日期</th>
-                                    <th class="py-2 px-3">類別</th>
-                                    <th class="py-2 px-3">項目</th>
-                                    <th class="py-2 px-3">付款方式</th>
-                                    <th class="py-2 px-3 text-right">外幣金額</th>
-                                    <th class="py-2 px-3 text-right">台幣總額</th>
-                                </tr>
-                            </thead>
-                            <tbody id="recentList" class="divide-y divide-slate-100">
-                                <tr><td colspan="6" class="text-center py-6 text-slate-400 text-xs">尚無新增紀錄</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -162,40 +142,38 @@
         // ==========================================
         // 1. 替換為您的 Apps Script 網址
         // ==========================================
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbywxzHuGomu3OSLTNaIGWiSSZNC6xKBkpMMi0plgZKGurwiah4CHPd0Mep8HmOQR8g/exec'; 
+        const SCRIPT_URL = 'YOUR_GOOGLE_SCRIPT_WEB_APP_URL'; 
 
-        // 初始化日期與 DOM
         const todayStr = new Date().toISOString().split('T')[0];
         document.getElementById('date').value = todayStr;
-        
-        // 預設查詢區間為當月1號到今天
-        const firstDayStr = todayStr.substring(0, 8) + '01';
-        document.getElementById('searchStart').value = firstDayStr;
+        document.getElementById('searchStart').value = todayStr.substring(0, 8) + '01';
         document.getElementById('searchEnd').value = todayStr;
 
         const form = document.getElementById('expenseForm');
+        const formTitle = document.getElementById('formTitle');
+        const cancelEditBtn = document.getElementById('cancelEditBtn');
         const currencySelect = document.getElementById('currency');
         const rateInput = document.getElementById('exchangeRate');
         const amountInput = document.getElementById('amount');
         const twdDisplay = document.getElementById('twdAmountDisplay');
         const statusEl = document.getElementById('status');
         const submitBtn = document.getElementById('submitBtn');
-        const recentList = document.getElementById('recentList');
+        const searchBtn = document.getElementById('searchBtn');
+        const historyList = document.getElementById('historyList');
+        const historyTotalEl = document.getElementById('historyTotal');
         
-        let recentEntries = [];
-
-// 從瀏覽器記憶讀取歷史自訂匯率，若無則建立空物件
         let savedRates = JSON.parse(localStorage.getItem('user_exchange_rates')) || {};
+        window.historyRecords = []; // 儲存下載的資料供編輯對照用
+        let currentEditId = null;   // 追蹤目前正在編輯的 ID
 
+        // 匯率與台幣試算
         currencySelect.addEventListener('change', (e) => {
             const cur = e.target.value;
-            
             if(cur.startsWith('TWD')) {
                 rateInput.value = 1;
                 rateInput.readOnly = true;
                 rateInput.classList.add('bg-slate-100');
             } else {
-                // 若有儲存過該外幣的匯率就自動帶入，否則保持空白讓您手動輸入
                 rateInput.value = savedRates[cur] || ''; 
                 rateInput.readOnly = false;
                 rateInput.classList.remove('bg-slate-100');
@@ -214,36 +192,54 @@
             return twd;
         }
 
-        // 送出表單 (POST)
+        // 取消編輯狀態
+        cancelEditBtn.addEventListener('click', resetFormState);
+
+        function resetFormState() {
+            currentEditId = null;
+            formTitle.textContent = '新增支出';
+            formTitle.className = 'text-lg font-bold text-slate-800';
+            cancelEditBtn.classList.add('hidden');
+            submitBtn.className = 'w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-lg text-sm transition';
+            submitBtn.innerHTML = '<span>送出並同步至雲端</span>';
+            
+            form.reset();
+            document.getElementById('date').value = todayStr;
+            currencySelect.dispatchEvent(new Event('change'));
+            calculateTWD();
+        }
+
+        // 核心：送出表單 (建立或修改)
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
-            if(SCRIPT_URL === 'YOUR_GOOGLE_SCRIPT_WEB_APP_URL') {
-                alert('請先在原始碼中填入您的 Google Apps Script 網址！');
-                return;
-            }
+            if(SCRIPT_URL === 'YOUR_GOOGLE_SCRIPT_WEB_APP_URL') { alert('請填寫 SCRIPT_URL'); return; }
 
+            const actionType = currentEditId ? 'update' : 'create';
             submitBtn.disabled = true;
             submitBtn.innerHTML = '連線同步中...';
             statusEl.textContent = '資料傳送中...';
             statusEl.className = 'text-sm font-bold text-amber-600';
 
-            const twdAmount = calculateTWD();
-            const formData = {
-                date: document.getElementById('date').value,
-                category: document.getElementById('category').value,
-                payment: document.getElementById('payment').value,
-                title: document.getElementById('title').value,
-                currency: currencySelect.value,
-                originalAmount: amountInput.value,
-                exchangeRate: rateInput.value,
-                twdAmount: twdAmount,
-                note: document.getElementById('note').value
+            const payload = {
+                action: actionType,
+                data: {
+                    id: currentEditId || Date.now().toString(), // 產生唯一 ID
+                    date: document.getElementById('date').value,
+                    category: document.getElementById('category').value,
+                    payment: document.getElementById('payment').value,
+                    title: document.getElementById('title').value,
+                    currency: currencySelect.value,
+                    originalAmount: amountInput.value,
+                    exchangeRate: rateInput.value,
+                    twdAmount: calculateTWD(),
+                    note: document.getElementById('note').value
+                }
             };
 
             try {
                 const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
-                    body: JSON.stringify(formData),
+                    body: JSON.stringify(payload),
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' }
                 });
                 const result = await response.json();
@@ -251,96 +247,46 @@
                 if(result.status === 'success') {
                     statusEl.textContent = '同步成功';
                     statusEl.className = 'text-sm font-bold text-emerald-600';
-                    addRecentEntry(formData);
                     
-                    // === 新增這兩行：記憶本次送出的外幣匯率 ===
-                    if (!formData.currency.startsWith('TWD')) {
-                        savedRates[formData.currency] = formData.exchangeRate;
+                    if (!payload.data.currency.startsWith('TWD')) {
+                        savedRates[payload.data.currency] = payload.data.exchangeRate;
                         localStorage.setItem('user_exchange_rates', JSON.stringify(savedRates));
                     }
-                    // ==========================================
-
-                    document.getElementById('title').value = '';
-                    amountInput.value = '';
-                    document.getElementById('note').value = '';
-                    calculateTWD();
-                } else {
-                    throw new Error(result.message);
-                }
+                    
+                    resetFormState();
+                    searchBtn.click(); // 自動重新整理歷史清單
+                } else { throw new Error(result.message); }
             } catch (error) {
-                console.error('Error:', error);
+                console.error(error);
                 statusEl.textContent = '同步失敗';
                 statusEl.className = 'text-sm font-bold text-rose-600';
-                alert('寫入失敗，請確認網址或權限設定。');
+                alert('寫入失敗，請確認網址或重新整理。');
             } finally {
                 submitBtn.disabled = false;
-                submitBtn.innerHTML = '<span>送出並同步至雲端</span>';
             }
         });
 
-        // 渲染最新寫入紀錄 (雙金額欄位)
-        function addRecentEntry(data) {
-            recentEntries.unshift(data);
-            if(recentEntries.length > 5) recentEntries.pop(); 
-            if(recentEntries.length === 1) recentList.innerHTML = '';
-            
-            const currencyCode = data.currency.split(' ')[0];
-            const origAmt = parseFloat(data.originalAmount).toLocaleString();
-            const twdAmt = data.twdAmount.toLocaleString();
-            
-            // 決定外幣欄位顯示內容
-            const displayOrig = currencyCode === 'TWD' ? '-' : `${currencyCode} ${origAmt}`;
-
-            const tr = document.createElement('tr');
-            tr.className = 'hover:bg-slate-50 transition';
-            tr.innerHTML = `
-                <td class="py-2 px-3 text-slate-600 text-xs">${data.date}</td>
-                <td class="py-2 px-3"><span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-xs">${data.category}</span></td>
-                <td class="py-2 px-3 font-medium text-slate-800">${data.title}</td>
-                <td class="py-2 px-3 text-slate-600 text-xs">${data.payment}</td>
-                <td class="py-2 px-3 text-right text-slate-600 text-xs">${displayOrig}</td>
-                <td class="py-2 px-3 text-right font-bold text-slate-900">NT$ ${twdAmt}</td>
-            `;
-            recentList.prepend(tr);
-        }
-
-        // ==========================================
-        // 讀取歷史資料功能 (GET)
-        // ==========================================
-        const searchBtn = document.getElementById('searchBtn');
-        const historyList = document.getElementById('historyList');
-        const historyTotalEl = document.getElementById('historyTotal');
-
+        // 讀取歷史資料
         searchBtn.addEventListener('click', async () => {
-            if(SCRIPT_URL === 'YOUR_GOOGLE_SCRIPT_WEB_APP_URL') {
-                alert('請先設定 SCRIPT_URL'); return;
-            }
+            if(SCRIPT_URL === 'YOUR_GOOGLE_SCRIPT_WEB_APP_URL') return;
 
             const startDate = document.getElementById('searchStart').value;
             const endDate = document.getElementById('searchEnd').value;
-            
             searchBtn.disabled = true;
-            searchBtn.textContent = '載入中...';
-            historyList.innerHTML = '<tr><td colspan="6" class="text-center py-6 text-slate-400 text-xs">正在從雲端讀取資料...</td></tr>';
-            historyTotalEl.textContent = '計算中...';
+            historyList.innerHTML = '<tr><td colspan="6" class="text-center py-6 text-slate-400 text-xs">讀取中...</td></tr>';
 
             try {
-                const response = await fetch(SCRIPT_URL); // GET request
+                const response = await fetch(SCRIPT_URL);
                 const result = await response.json();
-                
                 if(result.status !== 'success') throw new Error(result.message);
 
+                window.historyRecords = result.data.reverse(); 
                 let totalTwd = 0;
                 let htmlStr = '';
 
-                // 反轉陣列讓新日期在上面
-                const records = result.data.reverse();
-
-                records.forEach(row => {
-                    // Google Sheets 回傳的日期可能是 YYYY/MM/DD 或 YYYY-MM-DD
+                window.historyRecords.forEach(row => {
                     const rowDate = (row['日期'] || '').replace(/\//g, '-');
                     
-                    // 區間篩選
                     if(rowDate >= startDate && rowDate <= endDate) {
                         const twdAmtVal = parseFloat((row['折合台幣']||'').replace(/,/g, '')) || 0;
                         totalTwd += twdAmtVal;
@@ -348,36 +294,98 @@
                         const curCode = (row['幣別'] || '').split(' ')[0];
                         const origAmtVal = parseFloat((row['外幣金額']||'').replace(/,/g, '')) || 0;
                         const displayOrig = curCode === 'TWD' ? '-' : `${curCode} ${origAmtVal.toLocaleString()}`;
+                        
+                        // 判斷該列是否有 ID，若無則不顯示按鈕
+                        const recordId = row['ID'];
+                        let actionHtml = '-';
+                        if(recordId) {
+                            actionHtml = `
+                                <button onclick="startEdit('${recordId}')" class="text-blue-500 hover:text-blue-700 mr-2 font-medium">修改</button>
+                                <button onclick="deleteRecord('${recordId}')" class="text-rose-500 hover:text-rose-700 font-medium">刪除</button>
+                            `;
+                        }
 
                         htmlStr += `
                             <tr class="hover:bg-slate-50 transition border-b border-slate-50 last:border-0">
                                 <td class="py-2 px-3 text-slate-600 text-xs">${rowDate}</td>
-                                <td class="py-2 px-3"><span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-xs">${row['類別'] || '-'}</span></td>
-                                <td class="py-2 px-3 font-medium text-slate-800">${row['項目明細'] || '-'}</td>
-                                <td class="py-2 px-3 text-slate-600 text-xs">${row['付款方式'] || '-'}</td>
+                                <td class="py-2 px-3 text-xs"><span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded">${row['類別'] || '-'}</span></td>
+                                <td class="py-2 px-3 text-sm font-medium text-slate-800">${row['項目明細'] || '-'}</td>
                                 <td class="py-2 px-3 text-right text-slate-600 text-xs">${displayOrig}</td>
-                                <td class="py-2 px-3 text-right font-bold text-slate-900">NT$ ${twdAmtVal.toLocaleString()}</td>
+                                <td class="py-2 px-3 text-right text-sm font-bold text-slate-900">NT$ ${twdAmtVal.toLocaleString()}</td>
+                                <td class="py-2 px-3 text-center text-xs">${actionHtml}</td>
                             </tr>
                         `;
                     }
                 });
 
-                if(htmlStr === '') {
-                    historyList.innerHTML = '<tr><td colspan="6" class="text-center py-6 text-slate-400 text-xs">此區間無資料</td></tr>';
-                } else {
-                    historyList.innerHTML = htmlStr;
-                }
-                
+                historyList.innerHTML = htmlStr || '<tr><td colspan="6" class="text-center py-6 text-slate-400 text-xs">此區間無資料</td></tr>';
                 historyTotalEl.textContent = `NT$ ${totalTwd.toLocaleString()}`;
-
             } catch (error) {
-                console.error(error);
-                historyList.innerHTML = '<tr><td colspan="6" class="text-center py-6 text-rose-500 text-xs">讀取失敗，請確認程式碼是否已重新部署。</td></tr>';
-                historyTotalEl.textContent = '錯誤';
+                historyList.innerHTML = '<tr><td colspan="6" class="text-center py-6 text-rose-500 text-xs">讀取失敗</td></tr>';
             } finally {
                 searchBtn.disabled = false;
-                searchBtn.textContent = '查詢';
             }
+        });
+
+        // 進入編輯模式
+        window.startEdit = function(id) {
+            const record = window.historyRecords.find(r => r['ID'] === id);
+            if(!record) return;
+
+            currentEditId = id;
+            formTitle.textContent = '修改此筆紀錄';
+            formTitle.className = 'text-lg font-bold text-amber-600';
+            cancelEditBtn.classList.remove('hidden');
+            
+            submitBtn.className = 'w-full bg-amber-500 hover:bg-amber-600 text-white font-medium py-2.5 rounded-lg text-sm transition shadow-md';
+            submitBtn.innerHTML = '<span>儲存修改並同步</span>';
+
+            // 填入表單
+            document.getElementById('date').value = record['日期'].replace(/\//g, '-');
+            document.getElementById('category').value = record['類別'];
+            document.getElementById('payment').value = record['付款方式'];
+            document.getElementById('title').value = record['項目明細'];
+            document.getElementById('note').value = record['備註'] || '';
+            
+            currencySelect.value = record['幣別'];
+            currencySelect.dispatchEvent(new Event('change'));
+            
+            amountInput.value = parseFloat(record['外幣金額'].replace(/,/g, '')) || '';
+            rateInput.value = parseFloat(record['匯率'].replace(/,/g, '')) || '';
+            calculateTWD();
+
+            window.scrollTo({ top: 0, behavior: 'smooth' }); // 捲動回上方
+        };
+
+        // 執行刪除
+        window.deleteRecord = async function(id) {
+            if(!confirm('確定要永久刪除這筆紀錄嗎？')) return;
+            
+            statusEl.textContent = '刪除中...';
+            statusEl.className = 'text-sm font-bold text-amber-600';
+
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'delete', data: { id: id } }),
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+                });
+                const result = await response.json();
+                
+                if(result.status === 'success') {
+                    statusEl.textContent = '刪除成功';
+                    statusEl.className = 'text-sm font-bold text-emerald-600';
+                    if(currentEditId === id) resetFormState(); // 如果剛好正在編輯這筆，強制取消編輯
+                    searchBtn.click(); // 重新整理清單
+                } else { throw new Error(result.message); }
+            } catch (error) {
+                alert('刪除失敗');
+                statusEl.textContent = '準備就緒';
+            }
+        };
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if (SCRIPT_URL !== 'YOUR_GOOGLE_SCRIPT_WEB_APP_URL') searchBtn.click();
         });
     </script>
 </body>
