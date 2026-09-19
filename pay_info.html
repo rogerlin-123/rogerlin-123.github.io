@@ -73,7 +73,7 @@
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-600 mb-1">匯率</label>
-                            <input type="number" id="exchangeRate" value="1" step="0.0001" min="0.000001" required class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                            <input type="number" id="exchangeRate" value="1" step="any" min="0.000001" required class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
                         </div>
                         <div class="col-span-2">
                             <label class="block text-xs font-semibold text-slate-600 mb-1">外幣/原始金額</label>
@@ -184,21 +184,19 @@
         
         let recentEntries = [];
 
-        const mockRates = {
-            'TWD 台幣': 1,
-            'JPY 日圓': 0.21,
-            'USD 美金': 31.5,
-            'EUR 歐元': 34.2,
-            'VND 越南盾': 0.00127
-        };
+// 從瀏覽器記憶讀取歷史自訂匯率，若無則建立空物件
+        let savedRates = JSON.parse(localStorage.getItem('user_exchange_rates')) || {};
 
         currencySelect.addEventListener('change', (e) => {
             const cur = e.target.value;
-            rateInput.value = mockRates[cur] || 1;
+            
             if(cur.startsWith('TWD')) {
+                rateInput.value = 1;
                 rateInput.readOnly = true;
                 rateInput.classList.add('bg-slate-100');
             } else {
+                // 若有儲存過該外幣的匯率就自動帶入，否則保持空白讓您手動輸入
+                rateInput.value = savedRates[cur] || ''; 
                 rateInput.readOnly = false;
                 rateInput.classList.remove('bg-slate-100');
             }
@@ -255,6 +253,13 @@
                     statusEl.className = 'text-sm font-bold text-emerald-600';
                     addRecentEntry(formData);
                     
+                    // === 新增這兩行：記憶本次送出的外幣匯率 ===
+                    if (!formData.currency.startsWith('TWD')) {
+                        savedRates[formData.currency] = formData.exchangeRate;
+                        localStorage.setItem('user_exchange_rates', JSON.stringify(savedRates));
+                    }
+                    // ==========================================
+
                     document.getElementById('title').value = '';
                     amountInput.value = '';
                     document.getElementById('note').value = '';
