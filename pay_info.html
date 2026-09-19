@@ -108,7 +108,8 @@
                                     <th class="py-2 px-3">類別</th>
                                     <th class="py-2 px-3">項目</th>
                                     <th class="py-2 px-3">付款方式</th>
-                                    <th class="py-2 px-3 text-right">台幣總額</th>
+                                    <th class="py-2 px-3 text-right">金額 (折合台幣)</th>
+                                    // <th class="py-2 px-3 text-right">台幣總額</th>
                                 </tr>
                             </thead>
                             <tbody id="recentList" class="divide-y divide-slate-100">
@@ -239,23 +240,39 @@
             }
         });
 
-        function addRecentEntry(data) {
-            recentEntries.unshift(data);
-            if(recentEntries.length > 5) recentEntries.pop(); // 畫面上只保留最新 5 筆
-            
-            if(recentEntries.length === 1) recentList.innerHTML = ''; // 清除「尚無紀錄」文字
-            
-            const tr = document.createElement('tr');
-            tr.className = 'hover:bg-slate-50 transition';
-            tr.innerHTML = `
-                <td class="py-2 px-3 text-slate-600 text-xs">${data.date}</td>
-                <td class="py-2 px-3"><span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-xs">${data.category}</span></td>
-                <td class="py-2 px-3 font-medium text-slate-800">${data.title}</td>
-                <td class="py-2 px-3 text-slate-600 text-xs">${data.payment}</td>
-                <td class="py-2 px-3 text-right font-bold text-slate-900">NT$ ${data.twdAmount.toLocaleString()}</td>
-            `;
-            recentList.prepend(tr);
-        }
+function addRecentEntry(data) {
+    recentEntries.unshift(data);
+    if(recentEntries.length > 5) recentEntries.pop(); // 畫面上只保留最新 5 筆
+    
+    if(recentEntries.length === 1) recentList.innerHTML = ''; // 清除「尚無紀錄」文字
+    
+    // 判斷是否為外幣，動態決定顯示格式
+    let amountDisplay = '';
+    // 假設您的台幣 value 是 'TWD' 開頭
+    if (data.currency.startsWith('TWD')) {
+        amountDisplay = `NT$ ${data.twdAmount.toLocaleString()}`;
+    } else {
+        // 擷取外幣代號 (例如從 "VND 越" 取出 "VND")
+        const currencyCode = data.currency.split(' ')[0]; 
+        const originalAmt = parseFloat(data.originalAmount).toLocaleString();
+        
+        amountDisplay = `
+            <div class="text-sm">${currencyCode} ${originalAmt}</div>
+            <div class="text-[10px] text-slate-500 font-normal mt-0.5">(NT$ ${data.twdAmount.toLocaleString()})</div>
+        `;
+    }
+
+    const tr = document.createElement('tr');
+    tr.className = 'hover:bg-slate-50 transition';
+    tr.innerHTML = `
+        <td class="py-2 px-3 text-slate-600 text-xs">${data.date}</td>
+        <td class="py-2 px-3"><span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-xs">${data.category}</span></td>
+        <td class="py-2 px-3 font-medium text-slate-800">${data.title}</td>
+        <td class="py-2 px-3 text-slate-600 text-xs">${data.payment}</td>
+        <td class="py-2 px-3 text-right font-bold text-slate-900">${amountDisplay}</td>
+    `;
+    recentList.prepend(tr);
+}
     </script>
 </body>
 </html>
