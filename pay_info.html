@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-50 min-h-screen p-4 md:p-8 font-sans text-slate-800">
-    <div class="max-w-4xl mx-auto space-y-6">
+    <div class="max-w-5xl mx-auto space-y-6">
         
         <!-- 頁首 -->
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-6 rounded-xl shadow-sm border border-slate-100">
@@ -64,16 +64,16 @@
                         <div>
                             <label class="block text-xs font-semibold text-slate-600 mb-1">幣別</label>
                             <select id="currency" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
-                                <option value="TWD">TWD 台幣</option>
-                                <option value="JPY">JPY 日圓</option>
-                                <option value="USD">USD 美金</option>
-                                <option value="VND">VND 越南盾</option>
-                                <option value="EUR">EUR 歐元</option>
+                                <option value="TWD 台幣">TWD 台幣</option>
+                                <option value="JPY 日圓">JPY 日圓</option>
+                                <option value="USD 美金">USD 美金</option>
+                                <option value="EUR 歐元">EUR 歐元</option>
+                                <option value="VND 越南盾">VND 越南盾</option>
                             </select>
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-600 mb-1">匯率</label>
-                            <input type="number" id="exchangeRate" value="1" step="0.0001" min="0.0001" required class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                            <input type="number" id="exchangeRate" value="1" step="0.0001" min="0.000001" required class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
                         </div>
                         <div class="col-span-2">
                             <label class="block text-xs font-semibold text-slate-600 mb-1">外幣/原始金額</label>
@@ -96,8 +96,44 @@
                 </form>
             </div>
 
-            <!-- 本機暫存明細 (供確認用) -->
             <div class="lg:col-span-2 space-y-6">
+                <!-- 歷史區間查詢 -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
+                        <h2 class="text-lg font-bold text-slate-800">查詢歷史紀錄</h2>
+                        <div class="flex items-center gap-2 w-full sm:w-auto">
+                            <input type="date" id="searchStart" class="px-2 py-1.5 border rounded-md text-xs focus:ring-2 focus:ring-blue-500 outline-none w-full sm:w-auto">
+                            <span class="text-slate-400 text-xs">至</span>
+                            <input type="date" id="searchEnd" class="px-2 py-1.5 border rounded-md text-xs focus:ring-2 focus:ring-blue-500 outline-none w-full sm:w-auto">
+                            <button id="searchBtn" class="bg-slate-800 hover:bg-slate-700 text-white px-3 py-1.5 rounded-md text-xs transition whitespace-nowrap">查詢</button>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between items-center bg-slate-50 p-3 rounded-lg border border-slate-100 mb-4">
+                        <span class="text-sm font-medium text-slate-600">此區間台幣總花費：</span>
+                        <span id="historyTotal" class="text-xl font-bold text-rose-600">NT$ 0</span>
+                    </div>
+
+                    <div class="overflow-x-auto max-h-80 overflow-y-auto">
+                        <table class="w-full text-left text-sm whitespace-nowrap relative">
+                            <thead class="bg-slate-50 text-slate-500 text-xs uppercase border-b sticky top-0">
+                                <tr>
+                                    <th class="py-2 px-3">日期</th>
+                                    <th class="py-2 px-3">類別</th>
+                                    <th class="py-2 px-3">項目</th>
+                                    <th class="py-2 px-3">付款方式</th>
+                                    <th class="py-2 px-3 text-right">外幣金額</th>
+                                    <th class="py-2 px-3 text-right">台幣總額</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historyList" class="divide-y divide-slate-100">
+                                <tr><td colspan="6" class="text-center py-6 text-slate-400 text-xs">請點擊查詢載入歷史資料</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 本機暫存明細 (供確認用) -->
                 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
                     <h2 class="text-lg font-bold text-slate-800 mb-4">最近輸入紀錄 (僅顯示本次作業)</h2>
                     <div class="overflow-x-auto">
@@ -108,12 +144,12 @@
                                     <th class="py-2 px-3">類別</th>
                                     <th class="py-2 px-3">項目</th>
                                     <th class="py-2 px-3">付款方式</th>
-                                    <th class="py-2 px-3 text-right">金額 (折合台幣)</th>
-                                    // <th class="py-2 px-3 text-right">台幣總額</th>
+                                    <th class="py-2 px-3 text-right">外幣金額</th>
+                                    <th class="py-2 px-3 text-right">台幣總額</th>
                                 </tr>
                             </thead>
                             <tbody id="recentList" class="divide-y divide-slate-100">
-                                <tr><td colspan="5" class="text-center py-6 text-slate-400 text-xs">尚無新增紀錄</td></tr>
+                                <tr><td colspan="6" class="text-center py-6 text-slate-400 text-xs">尚無新增紀錄</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -124,12 +160,19 @@
 
     <script>
         // ==========================================
-        // 請將下方的 URL 替換為您的 Google Apps Script Web App 網址
+        // 1. 替換為您的 Apps Script 網址
         // ==========================================
-        // const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz4zXZmr7w2U1bpcsHG1osGrllm_vYvsaWd1ogP3W07VCRDQZ7pBs2PLJsV9WY4-OL6/exec'; 
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbywxzHuGomu3OSLTNaIGWiSSZNC6xKBkpMMi0plgZKGurwiah4CHPd0Mep8HmOQR8g/exec'; 
-        // 初始化日期與 DOM 元素
-        document.getElementById('date').valueAsDate = new Date();
+
+        // 初始化日期與 DOM
+        const todayStr = new Date().toISOString().split('T')[0];
+        document.getElementById('date').value = todayStr;
+        
+        // 預設查詢區間為當月1號到今天
+        const firstDayStr = todayStr.substring(0, 8) + '01';
+        document.getElementById('searchStart').value = firstDayStr;
+        document.getElementById('searchEnd').value = todayStr;
+
         const form = document.getElementById('expenseForm');
         const currencySelect = document.getElementById('currency');
         const rateInput = document.getElementById('exchangeRate');
@@ -141,20 +184,18 @@
         
         let recentEntries = [];
 
-        // 簡易匯率預設值 (建議之後可串接真實匯率 API)
         const mockRates = {
-            'TWD': 1,
-            'JPY': 0.21,
-            'USD': 31.5,
-            'VND': 0.0012,
-            'EUR': 34.2
+            'TWD 台幣': 1,
+            'JPY 日圓': 0.21,
+            'USD 美金': 31.5,
+            'EUR 歐元': 34.2,
+            'VND 越南盾': 0.00127
         };
 
-        // 監聽幣別切換，自動帶入預設匯率
         currencySelect.addEventListener('change', (e) => {
             const cur = e.target.value;
             rateInput.value = mockRates[cur] || 1;
-            if(cur === 'TWD') {
+            if(cur.startsWith('TWD')) {
                 rateInput.readOnly = true;
                 rateInput.classList.add('bg-slate-100');
             } else {
@@ -164,7 +205,6 @@
             calculateTWD();
         });
 
-        // 監聽金額與匯率變動，即時計算台幣
         amountInput.addEventListener('input', calculateTWD);
         rateInput.addEventListener('input', calculateTWD);
 
@@ -176,16 +216,14 @@
             return twd;
         }
 
-        // 表單送出事件
+        // 送出表單 (POST)
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
-            
             if(SCRIPT_URL === 'YOUR_GOOGLE_SCRIPT_WEB_APP_URL') {
                 alert('請先在原始碼中填入您的 Google Apps Script 網址！');
                 return;
             }
 
-            // 鎖定按鈕狀態
             submitBtn.disabled = true;
             submitBtn.innerHTML = '連線同步中...';
             statusEl.textContent = '資料傳送中...';
@@ -205,14 +243,11 @@
             };
 
             try {
-                // 將資料以 POST 方式送往 Google Apps Script
-                // 使用 text/plain 避免複雜的 CORS Preflight 問題
                 const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
                     body: JSON.stringify(formData),
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' }
                 });
-
                 const result = await response.json();
 
                 if(result.status === 'success') {
@@ -220,59 +255,125 @@
                     statusEl.className = 'text-sm font-bold text-emerald-600';
                     addRecentEntry(formData);
                     
-                    // 重置表單部分欄位
                     document.getElementById('title').value = '';
                     amountInput.value = '';
                     document.getElementById('note').value = '';
                     calculateTWD();
                 } else {
-                    throw new Error('回傳失敗狀態');
+                    throw new Error(result.message);
                 }
             } catch (error) {
                 console.error('Error:', error);
-                statusEl.textContent = '同步失敗，請重試';
+                statusEl.textContent = '同步失敗';
                 statusEl.className = 'text-sm font-bold text-rose-600';
-                alert('發生錯誤，請確認網路連線或 Apps Script 網址是否正確。');
+                alert('寫入失敗，請確認網址或權限設定。');
             } finally {
-                // 恢復按鈕狀態
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = '<span>送出並同步至雲端</span>';
             }
         });
 
-function addRecentEntry(data) {
-    recentEntries.unshift(data);
-    if(recentEntries.length > 10) recentEntries.pop(); // 畫面上只保留最新 10 筆
-    
-    if(recentEntries.length === 1) recentList.innerHTML = ''; // 清除「尚無紀錄」文字
-    
-    // 判斷是否為外幣，動態決定顯示格式
-    let amountDisplay = '';
-    // 假設您的台幣 value 是 'TWD' 開頭
-    if (data.currency.startsWith('TWD')) {
-        amountDisplay = `NT$ ${data.twdAmount.toLocaleString()}`;
-    } else {
-        // 擷取外幣代號 (例如從 "VND 越" 取出 "VND")
-        const currencyCode = data.currency.split(' ')[0]; 
-        const originalAmt = parseFloat(data.originalAmount).toLocaleString();
-        
-        amountDisplay = `
-            <div class="text-sm">${currencyCode} ${originalAmt}</div>
-            <div class="text-[10px] text-slate-500 font-normal mt-0.5">(NT$ ${data.twdAmount.toLocaleString()})</div>
-        `;
-    }
+        // 渲染最新寫入紀錄 (雙金額欄位)
+        function addRecentEntry(data) {
+            recentEntries.unshift(data);
+            if(recentEntries.length > 5) recentEntries.pop(); 
+            if(recentEntries.length === 1) recentList.innerHTML = '';
+            
+            const currencyCode = data.currency.split(' ')[0];
+            const origAmt = parseFloat(data.originalAmount).toLocaleString();
+            const twdAmt = data.twdAmount.toLocaleString();
+            
+            // 決定外幣欄位顯示內容
+            const displayOrig = currencyCode === 'TWD' ? '-' : `${currencyCode} ${origAmt}`;
 
-    const tr = document.createElement('tr');
-    tr.className = 'hover:bg-slate-50 transition';
-    tr.innerHTML = `
-        <td class="py-2 px-3 text-slate-600 text-xs">${data.date}</td>
-        <td class="py-2 px-3"><span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-xs">${data.category}</span></td>
-        <td class="py-2 px-3 font-medium text-slate-800">${data.title}</td>
-        <td class="py-2 px-3 text-slate-600 text-xs">${data.payment}</td>
-        <td class="py-2 px-3 text-right font-bold text-slate-900">${amountDisplay}</td>
-    `;
-    recentList.prepend(tr);
-}
+            const tr = document.createElement('tr');
+            tr.className = 'hover:bg-slate-50 transition';
+            tr.innerHTML = `
+                <td class="py-2 px-3 text-slate-600 text-xs">${data.date}</td>
+                <td class="py-2 px-3"><span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-xs">${data.category}</span></td>
+                <td class="py-2 px-3 font-medium text-slate-800">${data.title}</td>
+                <td class="py-2 px-3 text-slate-600 text-xs">${data.payment}</td>
+                <td class="py-2 px-3 text-right text-slate-600 text-xs">${displayOrig}</td>
+                <td class="py-2 px-3 text-right font-bold text-slate-900">NT$ ${twdAmt}</td>
+            `;
+            recentList.prepend(tr);
+        }
+
+        // ==========================================
+        // 讀取歷史資料功能 (GET)
+        // ==========================================
+        const searchBtn = document.getElementById('searchBtn');
+        const historyList = document.getElementById('historyList');
+        const historyTotalEl = document.getElementById('historyTotal');
+
+        searchBtn.addEventListener('click', async () => {
+            if(SCRIPT_URL === 'YOUR_GOOGLE_SCRIPT_WEB_APP_URL') {
+                alert('請先設定 SCRIPT_URL'); return;
+            }
+
+            const startDate = document.getElementById('searchStart').value;
+            const endDate = document.getElementById('searchEnd').value;
+            
+            searchBtn.disabled = true;
+            searchBtn.textContent = '載入中...';
+            historyList.innerHTML = '<tr><td colspan="6" class="text-center py-6 text-slate-400 text-xs">正在從雲端讀取資料...</td></tr>';
+            historyTotalEl.textContent = '計算中...';
+
+            try {
+                const response = await fetch(SCRIPT_URL); // GET request
+                const result = await response.json();
+                
+                if(result.status !== 'success') throw new Error(result.message);
+
+                let totalTwd = 0;
+                let htmlStr = '';
+
+                // 反轉陣列讓新日期在上面
+                const records = result.data.reverse();
+
+                records.forEach(row => {
+                    // Google Sheets 回傳的日期可能是 YYYY/MM/DD 或 YYYY-MM-DD
+                    const rowDate = (row['日期'] || '').replace(/\//g, '-');
+                    
+                    // 區間篩選
+                    if(rowDate >= startDate && rowDate <= endDate) {
+                        const twdAmtVal = parseFloat((row['折合台幣']||'').replace(/,/g, '')) || 0;
+                        totalTwd += twdAmtVal;
+
+                        const curCode = (row['幣別'] || '').split(' ')[0];
+                        const origAmtVal = parseFloat((row['外幣金額']||'').replace(/,/g, '')) || 0;
+                        const displayOrig = curCode === 'TWD' ? '-' : `${curCode} ${origAmtVal.toLocaleString()}`;
+
+                        htmlStr += `
+                            <tr class="hover:bg-slate-50 transition border-b border-slate-50 last:border-0">
+                                <td class="py-2 px-3 text-slate-600 text-xs">${rowDate}</td>
+                                <td class="py-2 px-3"><span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-xs">${row['類別'] || '-'}</span></td>
+                                <td class="py-2 px-3 font-medium text-slate-800">${row['項目明細'] || '-'}</td>
+                                <td class="py-2 px-3 text-slate-600 text-xs">${row['付款方式'] || '-'}</td>
+                                <td class="py-2 px-3 text-right text-slate-600 text-xs">${displayOrig}</td>
+                                <td class="py-2 px-3 text-right font-bold text-slate-900">NT$ ${twdAmtVal.toLocaleString()}</td>
+                            </tr>
+                        `;
+                    }
+                });
+
+                if(htmlStr === '') {
+                    historyList.innerHTML = '<tr><td colspan="6" class="text-center py-6 text-slate-400 text-xs">此區間無資料</td></tr>';
+                } else {
+                    historyList.innerHTML = htmlStr;
+                }
+                
+                historyTotalEl.textContent = `NT$ ${totalTwd.toLocaleString()}`;
+
+            } catch (error) {
+                console.error(error);
+                historyList.innerHTML = '<tr><td colspan="6" class="text-center py-6 text-rose-500 text-xs">讀取失敗，請確認程式碼是否已重新部署。</td></tr>';
+                historyTotalEl.textContent = '錯誤';
+            } finally {
+                searchBtn.disabled = false;
+                searchBtn.textContent = '查詢';
+            }
+        });
     </script>
 </body>
 </html>
