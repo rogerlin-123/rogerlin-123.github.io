@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>跨裝置網頁記帳本 (Google Sheets 版)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 min-h-screen p-4 md:p-8 font-sans text-slate-800">
+    <div class="max-w-4xl mx-auto space-y-6">
+        
+        <!-- 頁首 -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+            <div>
+                <h1 class="text-2xl font-bold text-slate-900">雲端支出記帳本</h1>
+                <p class="text-sm text-slate-500 mt-1">資料將自動同步至 Google 試算表</p>
+            </div>
+            <div class="text-right bg-blue-50 px-5 py-3 rounded-lg border border-blue-100 w-full md:w-auto">
+                <div class="text-xs text-blue-600 font-medium">連線狀態</div>
+                <div id="status" class="text-sm font-bold text-blue-700">準備就緒</div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- 記帳輸入表單 -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 h-fit lg:col-span-1">
+                <h2 class="text-lg font-bold mb-4 text-slate-800">新增支出</h2>
+                <form id="expenseForm" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">日期</label>
+                        <input type="date" id="date" required class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">類別</label>
+                            <select id="category" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                                <option value="餐飲食品">餐飲食品</option>
+                                <option value="交通運輸">交通運輸</option>
+                                <option value="服飾美容">服飾美容</option>
+                                <option value="居住住房">居住住房</option>
+                                <option value="娛樂休閒">娛樂休閒</option>
+                                <option value="其他雜項">其他雜項</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">付款方式</label>
+                            <select id="payment" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                                <option value="現金">現金</option>
+                                <option value="悠遊卡">悠遊卡</option>
+                                <option value="信用卡">信用卡</option>
+                                <option value="LINE Pay">LINE Pay</option>
+                                <option value="銀行轉帳">銀行轉帳</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">項目/明細</label>
+                        <input type="text" id="title" placeholder="例：澎湃早餐店" required class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3 bg-slate-50 p-3 rounded-lg border border-slate-100">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">幣別</label>
+                            <select id="currency" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                                <option value="TWD">TWD 台幣</option>
+                                <option value="JPY">JPY 日圓</option>
+                                <option value="USD">USD 美金</option>
+                                <option value="VND">VND 越南盾</option>
+                                <option value="EUR">EUR 歐元</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">匯率</label>
+                            <input type="number" id="exchangeRate" value="1" step="0.0001" min="0.0001" required class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                        </div>
+                        <div class="col-span-2">
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">外幣/原始金額</label>
+                            <input type="number" id="amount" min="0.01" step="0.01" placeholder="輸入金額" required class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                        </div>
+                        <div class="col-span-2 text-right">
+                            <span class="text-xs text-slate-500">折合台幣：</span>
+                            <span id="twdAmountDisplay" class="font-bold text-slate-800">NT$ 0</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">備註 (選填)</label>
+                        <input type="text" id="note" placeholder="例：培根蛋餅+大冰奶" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
+
+                    <button type="submit" id="submitBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-lg text-sm transition flex justify-center items-center gap-2">
+                        <span>送出並同步至雲端</span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- 本機暫存明細 (供確認用) -->
+            <div class="lg:col-span-2 space-y-6">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                    <h2 class="text-lg font-bold text-slate-800 mb-4">最近輸入紀錄 (僅顯示本次作業)</h2>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm whitespace-nowrap">
+                            <thead class="bg-slate-50 text-slate-500 text-xs uppercase border-b">
+                                <tr>
+                                    <th class="py-2 px-3">日期</th>
+                                    <th class="py-2 px-3">類別</th>
+                                    <th class="py-2 px-3">項目</th>
+                                    <th class="py-2 px-3">付款方式</th>
+                                    <th class="py-2 px-3 text-right">台幣總額</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recentList" class="divide-y divide-slate-100">
+                                <tr><td colspan="5" class="text-center py-6 text-slate-400 text-xs">尚無新增紀錄</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // 請將下方的 URL 替換為您的 Google Apps Script Web App 網址
+        // ==========================================
+        // const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz4zXZmr7w2U1bpcsHG1osGrllm_vYvsaWd1ogP3W07VCRDQZ7pBs2PLJsV9WY4-OL6/exec'; 
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbywxzHuGomu3OSLTNaIGWiSSZNC6xKBkpMMi0plgZKGurwiah4CHPd0Mep8HmOQR8g/exec'; 
+        // 初始化日期與 DOM 元素
+        document.getElementById('date').valueAsDate = new Date();
+        const form = document.getElementById('expenseForm');
+        const currencySelect = document.getElementById('currency');
+        const rateInput = document.getElementById('exchangeRate');
+        const amountInput = document.getElementById('amount');
+        const twdDisplay = document.getElementById('twdAmountDisplay');
+        const statusEl = document.getElementById('status');
+        const submitBtn = document.getElementById('submitBtn');
+        const recentList = document.getElementById('recentList');
+        
+        let recentEntries = [];
+
+        // 簡易匯率預設值 (建議之後可串接真實匯率 API)
+        const mockRates = {
+            'TWD': 1,
+            'JPY': 0.21,
+            'USD': 31.5,
+            'VND': 0.0012,
+            'EUR': 34.2
+        };
+
+        // 監聽幣別切換，自動帶入預設匯率
+        currencySelect.addEventListener('change', (e) => {
+            const cur = e.target.value;
+            rateInput.value = mockRates[cur] || 1;
+            if(cur === 'TWD') {
+                rateInput.readOnly = true;
+                rateInput.classList.add('bg-slate-100');
+            } else {
+                rateInput.readOnly = false;
+                rateInput.classList.remove('bg-slate-100');
+            }
+            calculateTWD();
+        });
+
+        // 監聽金額與匯率變動，即時計算台幣
+        amountInput.addEventListener('input', calculateTWD);
+        rateInput.addEventListener('input', calculateTWD);
+
+        function calculateTWD() {
+            const amount = parseFloat(amountInput.value) || 0;
+            const rate = parseFloat(rateInput.value) || 0;
+            const twd = Math.round(amount * rate);
+            twdDisplay.textContent = `NT$ ${twd.toLocaleString()}`;
+            return twd;
+        }
+
+        // 表單送出事件
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if(SCRIPT_URL === 'YOUR_GOOGLE_SCRIPT_WEB_APP_URL') {
+                alert('請先在原始碼中填入您的 Google Apps Script 網址！');
+                return;
+            }
+
+            // 鎖定按鈕狀態
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '連線同步中...';
+            statusEl.textContent = '資料傳送中...';
+            statusEl.className = 'text-sm font-bold text-amber-600';
+
+            const twdAmount = calculateTWD();
+            const formData = {
+                date: document.getElementById('date').value,
+                category: document.getElementById('category').value,
+                payment: document.getElementById('payment').value,
+                title: document.getElementById('title').value,
+                currency: currencySelect.value,
+                originalAmount: amountInput.value,
+                exchangeRate: rateInput.value,
+                twdAmount: twdAmount,
+                note: document.getElementById('note').value
+            };
+
+            try {
+                // 將資料以 POST 方式送往 Google Apps Script
+                // 使用 text/plain 避免複雜的 CORS Preflight 問題
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(formData),
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+                });
+
+                const result = await response.json();
+
+                if(result.status === 'success') {
+                    statusEl.textContent = '同步成功';
+                    statusEl.className = 'text-sm font-bold text-emerald-600';
+                    addRecentEntry(formData);
+                    
+                    // 重置表單部分欄位
+                    document.getElementById('title').value = '';
+                    amountInput.value = '';
+                    document.getElementById('note').value = '';
+                    calculateTWD();
+                } else {
+                    throw new Error('回傳失敗狀態');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                statusEl.textContent = '同步失敗，請重試';
+                statusEl.className = 'text-sm font-bold text-rose-600';
+                alert('發生錯誤，請確認網路連線或 Apps Script 網址是否正確。');
+            } finally {
+                // 恢復按鈕狀態
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<span>送出並同步至雲端</span>';
+            }
+        });
+
+        function addRecentEntry(data) {
+            recentEntries.unshift(data);
+            if(recentEntries.length > 5) recentEntries.pop(); // 畫面上只保留最新 5 筆
+            
+            if(recentEntries.length === 1) recentList.innerHTML = ''; // 清除「尚無紀錄」文字
+            
+            const tr = document.createElement('tr');
+            tr.className = 'hover:bg-slate-50 transition';
+            tr.innerHTML = `
+                <td class="py-2 px-3 text-slate-600 text-xs">${data.date}</td>
+                <td class="py-2 px-3"><span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-xs">${data.category}</span></td>
+                <td class="py-2 px-3 font-medium text-slate-800">${data.title}</td>
+                <td class="py-2 px-3 text-slate-600 text-xs">${data.payment}</td>
+                <td class="py-2 px-3 text-right font-bold text-slate-900">NT$ ${data.twdAmount.toLocaleString()}</td>
+            `;
+            recentList.prepend(tr);
+        }
+    </script>
+</body>
+</html>
