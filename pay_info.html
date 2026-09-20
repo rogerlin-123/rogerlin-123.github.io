@@ -143,7 +143,7 @@
 
     <script>
         // ==========================================
-        // 1. 替換為您的 Apps Script 網址
+        // 1. 您的 Apps Script 網址
         // ==========================================
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbywxzHuGomu3OSLTNaIGWiSSZNC6xKBkpMMi0plgZKGurwiah4CHPd0Mep8HmOQR8g/exec'; 
 
@@ -215,7 +215,7 @@
         // 核心：送出表單 (建立或修改)
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
-            if(SCRIPT_URL === 'YOUR_GOOGLE_SCRIPT_WEB_APP_URL') { alert('請填寫 SCRIPT_URL'); return; }
+            if(!SCRIPT_URL) { alert('請填寫 SCRIPT_URL'); return; }
 
             const actionType = currentEditId ? 'update' : 'create';
             submitBtn.disabled = true;
@@ -271,19 +271,14 @@
 
         // 讀取歷史資料
         searchBtn.addEventListener('click', async () => {
-            if(SCRIPT_URL === 'YOUR_GOOGLE_SCRIPT_WEB_APP_URL') return;
+            if(!SCRIPT_URL) return;
 
             const startDate = document.getElementById('searchStart').value;
             const endDate = document.getElementById('searchEnd').value;
             searchBtn.disabled = true;
             historyList.innerHTML = '<tr><td colspan="6" class="text-center py-6 text-slate-400 text-xs">讀取中...</td></tr>';
 
-        
-        });
-
-        // 進入編輯模式
-        window.startEdit = function(id) {
-            const record = window.historyRecords.find(r => r['ID'] === id);try {
+            try {
                 const response = await fetch(SCRIPT_URL);
                 const result = await response.json();
                 if(result.status !== 'success') throw new Error(result.message);
@@ -358,6 +353,11 @@
             } finally {
                 searchBtn.disabled = false;
             }
+        });
+
+        // 進入編輯模式
+        window.startEdit = function(id) {
+            const record = window.historyRecords.find(r => r['ID'] === id);
             if(!record) return;
 
             currentEditId = id;
@@ -412,16 +412,11 @@
             }
         };
 
-        window.addEventListener('DOMContentLoaded', () => {
-            if (SCRIPT_URL !== 'YOUR_GOOGLE_SCRIPT_WEB_APP_URL') searchBtn.click();
-        });
-
         // ==========================================
         // 網頁載入完成後，自動觸發一次歷史查詢 (載入當月明細)
         // ==========================================
         window.addEventListener('DOMContentLoaded', () => {
-            // 確認已填入真實的 Apps Script 網址才自動查詢，避免一直跳警告
-            if (SCRIPT_URL !== 'YOUR_GOOGLE_SCRIPT_WEB_APP_URL') {
+            if (SCRIPT_URL) {
                 searchBtn.click();
             }
         });        
