@@ -111,11 +111,14 @@
                         </div>
                     </div>
                     
-                    <div class="flex justify-between items-center bg-slate-50 p-3 rounded-lg border border-slate-100 mb-4">
-                        <span class="text-sm font-medium text-slate-600">此區間台幣總花費：</span>
-                        <span id="historyTotal" class="text-xl font-bold text-rose-600">NT$ 0</span>
+                    <div id="summaryBox" class="bg-slate-50 p-3 rounded-lg border border-slate-100 mb-4 flex flex-col gap-2">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm font-medium text-slate-600">此區間台幣總花費：</span>
+                            <span id="historyTotal" class="text-xl font-bold text-rose-600">NT$ 0</span>
+                        </div>
+                        <!-- 外幣總計會透過 JS 動態產生並插入在這裡 -->
                     </div>
-
+                    
                     <div class="overflow-x-auto max-h-96 overflow-y-auto">
                         <table class="w-full text-left text-sm whitespace-nowrap relative">
                             <thead class="bg-slate-50 text-slate-500 text-xs uppercase border-b sticky top-0 z-10">
