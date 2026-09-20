@@ -278,13 +278,19 @@
             searchBtn.disabled = true;
             historyList.innerHTML = '<tr><td colspan="6" class="text-center py-6 text-slate-400 text-xs">讀取中...</td></tr>';
 
-            try {
+        
+        });
+
+        // 進入編輯模式
+        window.startEdit = function(id) {
+            const record = window.historyRecords.find(r => r['ID'] === id);try {
                 const response = await fetch(SCRIPT_URL);
                 const result = await response.json();
                 if(result.status !== 'success') throw new Error(result.message);
 
                 window.historyRecords = result.data.reverse(); 
                 let totalTwd = 0;
+                let foreignTotals = {}; // 新增：用來存放各種外幣的加總
                 let htmlStr = '';
 
                 window.historyRecords.forEach(row => {
@@ -296,9 +302,14 @@
 
                         const curCode = (row['幣別'] || '').split(' ')[0];
                         const origAmtVal = parseFloat((row['外幣金額']||'').replace(/,/g, '')) || 0;
+                        
+                        // 累加外幣總額 (排除台幣)
+                        if (curCode !== 'TWD' && origAmtVal > 0) {
+                            foreignTotals[curCode] = (foreignTotals[curCode] || 0) + origAmtVal;
+                        }
+
                         const displayOrig = curCode === 'TWD' ? '-' : `${curCode} ${origAmtVal.toLocaleString()}`;
                         
-                        // 判斷該列是否有 ID，若無則不顯示按鈕
                         const recordId = row['ID'];
                         let actionHtml = '-';
                         if(recordId) {
@@ -322,17 +333,31 @@
                 });
 
                 historyList.innerHTML = htmlStr || '<tr><td colspan="6" class="text-center py-6 text-slate-400 text-xs">此區間無資料</td></tr>';
-                historyTotalEl.textContent = `NT$ ${totalTwd.toLocaleString()}`;
+                
+                // 動態組裝總計區塊的 HTML
+                let summaryHtml = `
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm font-medium text-slate-600">此區間台幣總花費：</span>
+                        <span class="text-xl font-bold text-rose-600">NT$ ${totalTwd.toLocaleString()}</span>
+                    </div>
+                `;
+                
+                // 如果有外幣，逐一加入分隔線與外幣總計
+                for (const cur in foreignTotals) {
+                    summaryHtml += `
+                        <div class="flex justify-between items-center pt-2 mt-2 border-t border-slate-200">
+                            <span class="text-xs font-medium text-slate-500">外幣花費 (${cur})：</span>
+                            <span class="text-sm font-bold text-slate-700">${cur} ${foreignTotals[cur].toLocaleString()}</span>
+                        </div>
+                    `;
+                }
+                document.getElementById('summaryBox').innerHTML = summaryHtml;
+
             } catch (error) {
                 historyList.innerHTML = '<tr><td colspan="6" class="text-center py-6 text-rose-500 text-xs">讀取失敗</td></tr>';
             } finally {
                 searchBtn.disabled = false;
             }
-        });
-
-        // 進入編輯模式
-        window.startEdit = function(id) {
-            const record = window.historyRecords.find(r => r['ID'] === id);
             if(!record) return;
 
             currentEditId = id;
