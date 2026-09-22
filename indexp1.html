@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>Welcome to Roger's nginx!</title>
+<style>
+html { color-scheme: light dark; }
+body { width: 35em; margin: 0 auto; font-family: Tahoma, Verdana, Arial, sans-serif; line-height: 1.5; }
+.tools-section {
+    margin-top: 30px;
+    margin-bottom: 30px;
+    padding: 20px;
+    background-color: rgba(128, 128, 128, 0.1);
+    border-radius: 8px;
+    border-left: 5px solid #3498db;
+}
+.tools-section h2 { margin-top: 0; color: #2c3e50; }
+@media (prefers-color-scheme: dark) { .tools-section h2 { color: #ebf5fb; } }
+.tools-section a { color: #3498db; text-decoration: none; font-weight: bold; }
+.tools-section a:hover { text-decoration: underline; }
+
+/* 新增分類目錄樣式 */
+.category-box {
+    margin: 15px 0;
+    padding: 12px 15px;
+    background-color: rgba(52, 152, 219, 0.1);
+    border-radius: 6px;
+    border: 1px solid rgba(52, 152, 219, 0.3);
+}
+.category-box summary {
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #2980b9;
+    cursor: pointer;
+    outline: none;
+}
+.category-content {
+    margin-top: 10px;
+    padding-left: 10px;
+}
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+
+<!-- 修改後的題庫解析器連結區塊 -->
+<div class="tools-section">
+    <h2>📚 Roger Lin 系統入口</h2>
+
+    <!-- Juniper 折疊目錄 -->
+    <details class="category-box" open>
+        <summary>📁 Juniper 認證模擬系統</summary>
+        <div class="category-content">
+            <p><a href="Juniper-JN0-481/JN0-481-quiz.html">Juniper JNCIS-DC JN0-481 認證模擬系統-65題</a></p>
+            <p><a href="Juniper-JN0-481/JNCIS-DC-official-practice.html">Juniper JNCIS-DC JN0-481 "官方"認證模擬系統-40題</a></p>
+            <p><a href="Juniper-JN0-281/JN0-281-corrected.html">Juniper JNCIA-DC JN0-281 認證模擬系統</a></p>
+            <p><a href="Juniper-JN0-281/JNCIA-DC-official-practice.html">Juniper JNCIA-DC JN0-281 "官方"認證模擬系統-40題</a></p>
+            <p><a href="Juniper_JN0-364/JN0-364.html">Juniper JNCIS-SP JN0-364 認證模擬系統</a></p>
+        </div>
+    </details>
+
+    <!-- 其餘連結項目 -->
+    <p><a href="NSE4/NSE4.html"><strong>Fortinet NSE4 認證模擬系統</strong></a></p>
+    <p><a href="NSE4/NSE4-random.html"><strong>Fortinet NSE4 認證模擬系統(隨機答案)</strong></a></p>
+    <p><a href="NSE6/NSE6.html"><strong>Fortinet NSE6 認證模擬系統</strong></a></p>
+    <p><a href="NSE7/NSE7.html"><strong>Fortinet NSE7 認證模擬系統</strong></a></p>
+    <p><a href="NGFW.html"><strong>Paloalto NGFW-Engineer 認證模擬系統</strong></a></p>
+    <p><a href="ECIHv3/ECIHv3-20260517.html"><strong>EC-Council ECIH v3 智慧題庫解析器 (雲端同步版)</strong></a></p>
+    <p><a href="ECIHv3/ECIHv3_copy_paste.html"><strong>EC-Council ECIH v3 智慧題庫解析器 (.docx --&gt; copy+paste 版)</strong></a></p>
+    <p><a href="Quiz_Subnet.html"><strong>3. 測驗 : IP 子網路計算</strong></a></p>
+    <p><a href="Quiz_IP_CIDR_2.html"><strong>4. 測驗 : IP/CIDR</strong></a></p>
+    <p><a href="Quiz_Layer3_Routing.html"><strong>5. 測驗 : Layer 3 路由專業</strong></a></p>
+    <p><a href="Tools_IP_Subnet.html"><strong>6. 工具 : IP_Subnet 計算機</strong></a></p>
+    <p><a href="Perpetual_Calendar.html"><strong>7. 萬年曆</strong></a></p>
+    <p><a href="Prompt.html"><strong>8. AI 提示詞 7 段式寫法</strong></a></p>
+    <p><a href="foods.html"><strong>9. 美食珍藏口袋名單</strong></a></p>
+</div>
+</body>
+</html>
