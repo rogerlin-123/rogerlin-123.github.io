@@ -330,8 +330,7 @@
 
     <script>
         // ==========================================
-        // 【請在此處貼上您原本完整的 128 題 questionsData 陣列】
-        // 為了避免 Token 限制，此處僅放第一題作為格式示意，請將其完整覆蓋。
+        // 題目資料區 (包含官方 40 題，使用者可依需自行替換為更完整的題庫)
         // ==========================================
 const questionsData = [
   {
@@ -874,7 +873,8 @@ const questionsData = [
     "explanation": "<div class=\"errata errata-ok\" style=\"margin-bottom:.9rem\"><div class=\"errata-head\"><span class=\"errata-tag\">官方答案<\/span><span class=\"errata-src\">Juniper 官方練習題 · 含官方解說<\/span><\/div><\/div><div class=\"en-head\"><span class=\"en-badge\">OFFICIAL EXPLANATION<\/span><\/div><div class=\"explanation-body\"><p>Intent based analytics takes telemetry information from the devices and processes it to glean real-time information about the network - there are predefined probes, and operators can create their own probes. These probes can alert the operator about various performance impacting issues in the network compared to a baseline.<\/p><\/div><div class=\"zh-wrap\"><div class=\"zh-head\"><span class=\"zh-badge\">中文翻譯<\/span><\/div><div class=\"zh-body\"><p>Intent-based analytics 會取得裝置的<b>遙測（telemetry）<\/b>資訊並加以處理，藉此即時掌握網路狀態。系統內建有預設的 probe，維運人員也可以自行建立 probe。這些 probe 能在網路出現各種影響效能的問題時，<b>對照基準線（baseline）<\/b>向維運人員發出告警。<\/p><\/div><\/div>",
     "images": []
   }
-];        // ==========================================
+];
+        // ==========================================
 
         // Core Logic
         let currentIndex = 0;
@@ -1054,6 +1054,7 @@ const questionsData = [
             }
             saveProgress();
             renderQuestion(currentIndex);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         // 跳轉題號
@@ -1074,6 +1075,7 @@ const questionsData = [
             currentIndex = displayOrder.indexOf(dataIdx);
             saveProgress();
             renderQuestion(currentIndex);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         // 標記本題 (Flag)
@@ -1106,6 +1108,7 @@ const questionsData = [
                     currentIndex = pos;
                     saveProgress();
                     renderQuestion(currentIndex);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
                     return;
                 }
             }
@@ -1115,6 +1118,7 @@ const questionsData = [
                     currentIndex = pos;
                     saveProgress();
                     renderQuestion(currentIndex);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
                     return;
                 }
             }
@@ -1129,6 +1133,7 @@ const questionsData = [
                     currentIndex = pos;
                     saveProgress();
                     renderQuestion(currentIndex);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
                     return;
                 }
             }
@@ -1138,6 +1143,7 @@ const questionsData = [
                     currentIndex = pos;
                     saveProgress();
                     renderQuestion(currentIndex);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
                     return;
                 }
             }
@@ -1454,6 +1460,8 @@ const questionsData = [
                 currentIndex++;
                 saveProgress();
                 renderQuestion(currentIndex);
+                // 【新增此行】切換題目後，自動捲動回頁面最上方
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             } else {
                 showResults();
             }
@@ -1465,6 +1473,8 @@ const questionsData = [
                 currentIndex--;
                 saveProgress();
                 renderQuestion(currentIndex);
+                // 【新增此行】切換題目後，自動捲動回頁面最上方
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             }
         }
 
@@ -1551,6 +1561,8 @@ const questionsData = [
             
             updateStats();
             renderQuestion(currentIndex);
+            // 回到頂部
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function updateProgress() {
@@ -1600,6 +1612,8 @@ const questionsData = [
                     currentIndex = index;
                     saveProgress();
                     renderQuestion(index);
+                    // 【新增此行】從 Palette 點選後，自動捲動回頁面最上方
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
                     togglePalette();
                 };
                 
